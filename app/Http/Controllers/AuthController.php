@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class AuthController extends Controller
 {
@@ -66,16 +67,13 @@ class AuthController extends Controller
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect()->route('login')->with('success', 'Anda telah berhasil keluar.');
+        Alert::success('Anda telah berhasil keluar.')
+            ->toToast()
+            ->autoclose(3000)
+            ->timerProgressBar();
+        return redirect()->route('login');
     }
 
-    /**
-     * Tampilkan halaman manajemen pengguna (DataTable)
-     */
-    public function manajemenPengguna(AuthDataTable $dataTable)
-    {
-        return $dataTable->render('pages.users.index');
-    }
 
     /**
      * Proses registrasi / tambah pengguna baru (oleh admin)
@@ -109,46 +107,4 @@ class AuthController extends Controller
         return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
-    /**
-     * Update data pengguna
-     */
-    public function updatePengguna(Request $request, User $user)
-    {
-        $request->validate([
-            'name'      => ['required', 'string', 'max:255'],
-            'email'     => ['required', 'email', 'unique:users,email,' . $user->id],
-            'role'      => ['required', 'in:admin,operator,asesor,prodi'],
-            'is_active' => ['boolean'],
-            'password'  => ['nullable', Password::min(8)->mixedCase()->numbers(), 'confirmed'],
-        ]);
-
-        $data = [
-            'name'      => $request->name,
-            'email'     => $request->email,
-            'role'      => $request->role,
-            'is_active' => $request->boolean('is_active'),
-        ];
-
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
-        }
-
-        $user->update($data);
-
-        return redirect()->route('users.index')->with('success', 'Data pengguna berhasil diperbarui.');
-    }
-
-    /**
-     * Hapus pengguna
-     */
-    public function destroyPengguna(User $user)
-    {
-        if ($user->id === Auth::id()) {
-            return back()->with('error', 'Anda tidak dapat menghapus akun sendiri.');
-        }
-
-        $user->delete();
-
-        return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus.');
-    }
 }

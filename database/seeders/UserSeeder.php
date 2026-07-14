@@ -9,68 +9,76 @@ use Illuminate\Support\Facades\Hash;
 class UserSeeder extends Seeder
 {
     /**
-     * Seed data pengguna default untuk sistem akreditasi FIKES UIS
+     * Seed data pengguna default sesuai struktur role FIKES UIS.
+     *
+     * Role yang tersedia (dari Checkrole::ROLES):
+     * - admin                     → Admin Sistem
+     * - koordinatorakreditasifikes → Koordinator Akreditasi FIKes
+     * - koordinatorprodi           → Koordinator Prodi
+     * - timpenyusun                → Tim Penyusun (Dosen)
+     * - gpmfikes                   → GPM FIKes
+     * - timlpmrektorat             → Tim LPM/Rektorat
+     * - dekan                      → Pimpinan (Dekan)
      */
     public function run(): void
     {
-        // Admin Utama
-        User::updateOrCreate(
-            ['email' => 'admin@fikes.uis.ac.id'],
+        $users = [
             [
-                'name'      => 'Administrator FIKES',
+                'name'      => 'Administrator Sistem',
                 'email'     => 'admin@fikes.uis.ac.id',
                 'password'  => Hash::make('Admin@123'),
                 'role'      => 'admin',
                 'is_active' => true,
-            ]
-        );
-
-        // Operator
-        User::updateOrCreate(
-            ['email' => 'operator@fikes.uis.ac.id'],
+            ],
             [
-                'name'      => 'Operator Akreditasi',
-                'email'     => 'operator@fikes.uis.ac.id',
-                'password'  => Hash::make('Operator@123'),
-                'role'      => 'operator',
+                'name'      => 'Koordinator Akreditasi FIKes',
+                'email'     => 'koordinator.akreditasi@fikes.uis.ac.id',
+                'password'  => Hash::make('Koor@123'),
+                'role'      => 'koordinatorakreditasifikes',
                 'is_active' => true,
-            ]
-        );
-
-        // Asesor
-        User::updateOrCreate(
-            ['email' => 'asesor@fikes.uis.ac.id'],
+            ],
             [
-                'name'      => 'Asesor Internal',
-                'email'     => 'asesor@fikes.uis.ac.id',
-                'password'  => Hash::make('Asesor@123'),
-                'role'      => 'asesor',
+                'name'      => 'Koordinator Program Studi',
+                'email'     => 'koordinator.prodi@fikes.uis.ac.id',
+                'password'  => Hash::make('Koor@123'),
+                'role'      => 'koordinatorprodi',
                 'is_active' => true,
-            ]
-        );
-
-        // Program Studi (Keperawatan)
-        User::updateOrCreate(
-            ['email' => 'keperawatan@fikes.uis.ac.id'],
+            ],
             [
-                'name'      => 'Prodi Keperawatan',
-                'email'     => 'keperawatan@fikes.uis.ac.id',
-                'password'  => Hash::make('Prodi@123'),
-                'role'      => 'prodi',
+                'name'      => 'Tim Penyusun Dosen',
+                'email'     => 'timpenyusun@fikes.uis.ac.id',
+                'password'  => Hash::make('Tim@123'),
+                'role'      => 'timpenyusun',
                 'is_active' => true,
-            ]
-        );
-
-        // Program Studi (Kesehatan Masyarakat)
-        User::updateOrCreate(
-            ['email' => 'kesmas@fikes.uis.ac.id'],
+            ],
             [
-                'name'      => 'Prodi Kesehatan Masyarakat',
-                'email'     => 'kesmas@fikes.uis.ac.id',
-                'password'  => Hash::make('Prodi@123'),
-                'role'      => 'prodi',
+                'name'      => 'GPM FIKes',
+                'email'     => 'gpmfikes@fikes.uis.ac.id',
+                'password'  => Hash::make('Gpm@123'),
+                'role'      => 'gpmfikes',
                 'is_active' => true,
-            ]
-        );
+            ],
+            [
+                'name'      => 'Tim LPM Rektorat',
+                'email'     => 'timlpm@fikes.uis.ac.id',
+                'password'  => Hash::make('Lpm@123'),
+                'role'      => 'timlpmrektorat',
+                'is_active' => true,
+            ],
+            [
+                'name'      => 'Dekan FIKES',
+                'email'     => 'dekan@fikes.uis.ac.id',
+                'password'  => Hash::make('Dekan@123'),
+                'role'      => 'dekan',
+                'is_active' => true,
+            ],
+        ];
+
+        foreach ($users as $userData) {
+            User::updateOrCreate(
+                ['email' => $userData['email']],
+                $userData
+            );
+        }
     }
 }

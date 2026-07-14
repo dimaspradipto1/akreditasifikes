@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Http\Middleware\Checkrole;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -60,7 +61,7 @@ class User extends Authenticatable
     /**
      * Scope: filter by role
      */
-    public function scopeRole($query, string $role)
+    public function scopeByRole($query, string $role)
     {
         return $query->where('role', $role);
     }
@@ -74,16 +75,18 @@ class User extends Authenticatable
     }
 
     /**
-     * Label role dalam Bahasa Indonesia
+     * Label role dalam Bahasa Indonesia (diambil dari Checkrole::ROLES)
      */
     public function getRoleLabelAttribute(): string
     {
-        return match($this->role) {
-            'admin'    => 'Administrator',
-            'operator' => 'Operator',
-            'asesor'   => 'Asesor',
-            'prodi'    => 'Program Studi',
-            default    => ucfirst($this->role),
-        };
+        return Checkrole::ROLES[$this->role] ?? ucfirst($this->role);
+    }
+
+    /**
+     * Daftar semua role yang tersedia (untuk dropdown, select, dll.)
+     */
+    public static function availableRoles(): array
+    {
+        return Checkrole::ROLES;
     }
 }
