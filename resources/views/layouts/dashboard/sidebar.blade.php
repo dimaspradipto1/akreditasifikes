@@ -18,7 +18,7 @@
                 </a>
                 <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                     <li>
-                        <a href="components-alerts.html">
+                        <a href="{{ route('vmts.index') }}">
                             <i class="bi bi-circle"></i><span>1. Visi, Misi, Tujuan & Strategi</span>
                         </a>
                     </li>
@@ -61,7 +61,7 @@
             </li><!-- End Components Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('user.index') }}">
+                <a class="nav-link collapsed" href="{{ route('vmts.index') }}">
                     <i class="bi bi-file-earmark"></i>
                     <span>Matriks 26 Sub-Kriteria</span>
                 </a>

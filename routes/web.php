@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VmtsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,10 +28,17 @@ Route::middleware(['auth', 'checkrole'])->group(function () {
 
     // User CRUD Resource
     Route::resource('user', UserController::class);
+    Route::resource('vmts', VmtsController::class);
 
     // Update Password (extra route di luar resource)
     Route::get('/user/{user}/update-password', [UserController::class, 'updatePasswordForm'])
         ->name('user.updatePasswordForm');
     Route::put('/user/{user}/update-password', [UserController::class, 'updatePassword'])
         ->name('user.updatePassword');
+
+    // VMTS Custom Routes (diperlukan untuk update narasi dan CRUD bukti)
+    Route::put('/vmts/narasi/{narasi}', [VmtsController::class, 'updateNarasi'])->name('vmts.narasi.update');
+    Route::post('/vmts/bukti', [VmtsController::class, 'storeBukti'])->name('vmts.bukti.store');
+    Route::put('/vmts/bukti/{bukti}', [VmtsController::class, 'updateBukti'])->name('vmts.bukti.update');
+    Route::delete('/vmts/bukti/{bukti}', [VmtsController::class, 'destroyBukti'])->name('vmts.bukti.destroy');
 });

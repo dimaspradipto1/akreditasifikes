@@ -11,7 +11,7 @@ class UserSeeder extends Seeder
     /**
      * Seed data pengguna default sesuai struktur role FIKES UIS.
      *
-     * Role yang tersedia (dari Checkrole::ROLES):
+     * Role yang tersedia (dari App\Http\Middleware\Checkrole::ROLES):
      * - admin                     → Admin Sistem
      * - koordinatorakreditasifikes → Koordinator Akreditasi FIKes
      * - koordinatorprodi           → Koordinator Prodi
