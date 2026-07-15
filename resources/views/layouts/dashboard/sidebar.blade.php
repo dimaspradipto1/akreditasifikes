@@ -33,7 +33,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="components-breadcrumbs.html">
+                        <a href="{{ route('mahasiswa.index') }}">
                             <i class="bi bi-circle"></i><span>4. Mahasiswa</span>
                         </a>
                     </li>

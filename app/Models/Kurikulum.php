@@ -62,6 +62,7 @@ class KurikulumBukti extends Model
 
     protected $fillable = [
         'kurikulum_id',
+        'kriteria_kode',
         'nama_bukti',
         'level',
         'status',

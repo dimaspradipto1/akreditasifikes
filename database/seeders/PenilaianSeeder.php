@@ -99,6 +99,7 @@ class PenilaianSeeder extends Seeder
                 [
                     'penilaian_id' => $penilaian->id,
                     'nama_bukti'   => $bukti['nama_bukti'],
+                    'kriteria_kode' => '3.1'
                 ],
                 [
                     'level'  => $bukti['level'],

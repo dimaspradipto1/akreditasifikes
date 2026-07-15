@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('penilaians', function (Blueprint $table) {
+        Schema::create('mahasiswas', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->year('tahun_akreditasi');
             $table->timestamps();
         });
 
-        Schema::create('penilaian_narasis', function (Blueprint $table) {
+        Schema::create('mahasiswa_narasis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('penilaian_id')->constrained()->onDelete('cascade');
+            $table->foreignId('mahasiswa_id')->constrained()->onDelete('cascade');
             $table->string('kriteria_kode');
             $table->string('kriteria_nama');
             $table->text('kondisi_saat_ini')->nullable();
@@ -34,9 +34,9 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::create('penilaian_buktis', function (Blueprint $table) {
+        Schema::create('mahasiswa_buktis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('penilaian_id')->constrained()->onDelete('cascade');
+            $table->foreignId('mahasiswa_id')->constrained()->onDelete('cascade');
             $table->string('kriteria_kode');
             $table->string('nama_bukti');
             $table->enum('level', ['PRODI', 'FIKES', 'UNIV']);
@@ -54,8 +54,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('penilaian_buktis');
-        Schema::dropIfExists('penilaian_narasis');
-        Schema::dropIfExists('penilaians');
+        Schema::dropIfExists('mahasiswa_buktis');
+        Schema::dropIfExists('mahasiswa_narasis');
+        Schema::dropIfExists('mahasiswas');
     }
 };

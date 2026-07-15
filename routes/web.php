@@ -56,4 +56,11 @@ Route::middleware(['auth', 'checkrole'])->group(function () {
     Route::post('/penilaian/bukti', [App\Http\Controllers\PenilaianController::class, 'storeBukti'])->name('penilaian.bukti.store');
     Route::put('/penilaian/bukti/{bukti}', [App\Http\Controllers\PenilaianController::class, 'updateBukti'])->name('penilaian.bukti.update');
     Route::delete('/penilaian/bukti/{bukti}', [App\Http\Controllers\PenilaianController::class, 'destroyBukti'])->name('penilaian.bukti.destroy');
+
+    // Mahasiswa Resource and Custom Routes
+    Route::resource('mahasiswa', App\Http\Controllers\MahasiswaController::class);
+    Route::put('/mahasiswa/narasi/{narasi}', [App\Http\Controllers\MahasiswaController::class, 'updateNarasi'])->name('mahasiswa.narasi.update');
+    Route::post('/mahasiswa/bukti', [App\Http\Controllers\MahasiswaController::class, 'storeBukti'])->name('mahasiswa.bukti.store');
+    Route::put('/mahasiswa/bukti/{bukti}', [App\Http\Controllers\MahasiswaController::class, 'updateBukti'])->name('mahasiswa.bukti.update');
+    Route::delete('/mahasiswa/bukti/{bukti}', [App\Http\Controllers\MahasiswaController::class, 'destroyBukti'])->name('mahasiswa.bukti.destroy');
 });

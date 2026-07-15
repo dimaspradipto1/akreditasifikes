@@ -74,6 +74,7 @@ class VmtsSeeder extends Seeder
             VmtsBukti::updateOrCreate([
                 'vmts_id' => $vmts->id,
                 'nama_bukti' => $bukti[0],
+                'elemen_kode' => 'EU-1'
             ], [
                 'level' => $bukti[1],
                 'status' => $bukti[2],

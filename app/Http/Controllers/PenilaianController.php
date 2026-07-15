@@ -80,35 +80,11 @@ class PenilaianController extends Controller
             return !str_contains($item->kriteria_kode, '_EU');
         })->sortBy('kriteria_kode');
 
-        // Setup HTML builder untuk DataTable (Bagian B)
-        $dataTable = $builder
-            ->columns([
-                ['data' => 'nama_bukti', 'name' => 'nama_bukti', 'title' => 'NAMA BUKTI', 'width' => '30%'],
-                ['data' => 'level', 'name' => 'level', 'title' => 'LEVEL'],
-                ['data' => 'status', 'name' => 'status', 'title' => 'STATUS'],
-                ['data' => 'link', 'name' => 'link', 'title' => 'LINK', 'orderable' => false],
-                ['data' => 'pic', 'name' => 'pic', 'title' => 'PIC'],
-                ['data' => 'deadline', 'name' => 'deadline', 'title' => 'DEADLINE'],
-                ['data' => 'catatan', 'name' => 'catatan', 'title' => 'CATATAN'],
-                ['data' => 'action', 'name' => 'action', 'title' => 'AKSI', 'orderable' => false, 'searchable' => false, 'width' => '10%'],
-            ])
-            ->parameters([
-                'responsive' => true,
-                'autoWidth' => false,
-                'language' => [
-                    'url' => 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/id.json'
-                ],
-                'dom' => '<"d-flex justify-content-between align-items-center mb-3"lf>rt<"d-flex justify-content-between align-items-center mt-3"ip>',
-            ]);
-
         // Hitung persentase global
         $totalSub = $subKriterias->count();
-        $memenuhiSub = $subKriterias->where('status', 'Memenuhi')->count();
-        $pctNarasi = $totalSub > 0 ? round(($memenuhiSub / $totalSub) * 100) : 0;
+        $pctNarasi = $totalSub > 0 ? (int) round($subKriterias->avg('narasi_persen')) : 0;
 
-        $totalBukti = $penilaian->buktis()->count();
-        $tersediaBukti = $penilaian->buktis()->where('status', 'Tersedia')->count();
-        $pctBukti = $totalBukti > 0 ? round(($tersediaBukti / $totalBukti) * 100) : 0;
+        $pctBukti = $totalSub > 0 ? (int) round($narasis->avg('bukti_persen')) : 0;
 
         return view('pages.penilaian.index', compact(
             'penilaian',
@@ -116,9 +92,7 @@ class PenilaianController extends Controller
             'narasis',
             'pctNarasi',
             'pctBukti',
-            'dataTable',
-            'totalSub',
-            'memenuhiSub'
+            'totalSub'
         ));
     }
 
@@ -169,7 +143,13 @@ class PenilaianController extends Controller
     public function storeBukti(PenilaianRequest $request)
     {
         class_exists(\App\Models\Penilaian::class);
-        \App\Models\PenilaianBukti::create($request->validated());
+        $data = $request->validated();
+        if(isset($data['status_bukti'])) {
+            $data['status'] = $data['status_bukti'];
+            unset($data['status_bukti']);
+        }
+        $bukti = \App\Models\PenilaianBukti::create($data);
+        $this->updateBuktiPersen($bukti->penilaian_id, $bukti->kriteria_kode);
 
         Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
             ->toToast()->autoclose(3000)->timerProgressBar();
@@ -184,7 +164,17 @@ class PenilaianController extends Controller
     {
         class_exists(\App\Models\Penilaian::class);
         $bukti = \App\Models\PenilaianBukti::findOrFail($id);
-        $bukti->update($request->validated());
+        $updateData = $request->validated();
+        if(isset($updateData['status_bukti'])) {
+            $updateData['status'] = $updateData['status_bukti'];
+            unset($updateData['status_bukti']);
+        }
+        $bukti->update($updateData);
+        $newPctBukti = $this->updateBuktiPersen($bukti->penilaian_id, $bukti->kriteria_kode);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.', 'pctBukti' => $newPctBukti, 'kriteria_kode' => $bukti->kriteria_kode]);
+        }
 
         Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
             ->toToast()->autoclose(3000)->timerProgressBar();
@@ -199,11 +189,40 @@ class PenilaianController extends Controller
     {
         class_exists(\App\Models\Penilaian::class);
         $bukti = \App\Models\PenilaianBukti::findOrFail($id);
+        $penilaian_id = $bukti->penilaian_id;
+        $kriteria_kode = $bukti->kriteria_kode;
         $bukti->delete();
+        $this->updateBuktiPersen($penilaian_id, $kriteria_kode);
 
         Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
             ->toToast()->autoclose(3000)->timerProgressBar();
 
         return redirect()->back();
+    }
+
+    /**
+     * Update bukti persen per kriteria_kode
+     */
+    private function updateBuktiPersen($penilaian_id, $kriteria_kode)
+    {
+        $narasi = \App\Models\PenilaianNarasi::where('penilaian_id', $penilaian_id)
+            ->where('kriteria_kode', $kriteria_kode)
+            ->first();
+
+        if ($narasi) {
+            $totalBukti = \App\Models\PenilaianBukti::where('penilaian_id', $penilaian_id)
+                ->where('kriteria_kode', $kriteria_kode)
+                ->count();
+                
+            $tersediaBukti = \App\Models\PenilaianBukti::where('penilaian_id', $penilaian_id)
+                ->where('kriteria_kode', $kriteria_kode)
+                ->where('status', 'Tersedia')
+                ->count();
+                
+            $pct = $totalBukti > 0 ? round(($tersediaBukti / $totalBukti) * 100) : 0;
+            $narasi->update(['bukti_persen' => $pct]);
+            return $pct;
+        }
+        return 0;
     }
 }

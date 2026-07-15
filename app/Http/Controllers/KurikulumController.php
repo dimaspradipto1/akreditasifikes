@@ -65,16 +65,12 @@ class KurikulumController extends Controller
 
         // Kalkulasi persentase kelengkapan
         $totalNarasi = $narasis->count();
-        $lengkapNarasi = $narasis->where('status', 'Memenuhi')->count();
-        $pctNarasi = $totalNarasi > 0 ? round(($lengkapNarasi / $totalNarasi) * 100) : 0;
+        $pctNarasi = $totalNarasi > 0 ? (int) round($narasis->avg('narasi_persen')) : 0;
 
-        $totalBukti = $kurikulum->buktis()->count();
-        $tersediaBukti = $kurikulum->buktis()->where('status', 'Tersedia')->count();
-        $pctBukti = $totalBukti > 0 ? round(($tersediaBukti / $totalBukti) * 100) : 0;
+        $pctBukti = $totalNarasi > 0 ? (int) round($narasis->avg('bukti_persen')) : 0;
 
-        // Render index page with DataTable for Bagian B
-        return $dataTable->with('kurikulum_id', $kurikulum->id)
-                         ->render('pages.kurikulum.index', compact('kurikulum', 'narasis', 'pctNarasi', 'pctBukti'));
+        // Render index page without DataTable
+        return view('pages.kurikulum.index', compact('kurikulum', 'narasis', 'pctNarasi', 'pctBukti'));
     }
 
     /**
@@ -121,7 +117,13 @@ class KurikulumController extends Controller
      */
     public function storeBukti(KurikulumRequest $request)
     {
-        KurikulumBukti::create($request->validated());
+        $data = $request->validated();
+        if(isset($data['status_bukti'])) {
+            $data['status'] = $data['status_bukti'];
+            unset($data['status_bukti']);
+        }
+        $bukti = KurikulumBukti::create($data);
+        $this->updateBuktiPersen($bukti->kurikulum_id, $bukti->kriteria_kode);
 
         Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
             ->toToast()->autoclose(3000)->timerProgressBar();
@@ -134,7 +136,17 @@ class KurikulumController extends Controller
      */
     public function updateBukti(KurikulumRequest $request, KurikulumBukti $bukti)
     {
-        $bukti->update($request->validated());
+        $updateData = $request->validated();
+        if(isset($updateData['status_bukti'])) {
+            $updateData['status'] = $updateData['status_bukti'];
+            unset($updateData['status_bukti']);
+        }
+        $bukti->update($updateData);
+        $newPctBukti = $this->updateBuktiPersen($bukti->kurikulum_id, $bukti->kriteria_kode);
+
+        if ($request->ajax()) {
+            return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.', 'pctBukti' => $newPctBukti, 'kriteria_kode' => $bukti->kriteria_kode]);
+        }
 
         Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
             ->toToast()->autoclose(3000)->timerProgressBar();
@@ -147,11 +159,40 @@ class KurikulumController extends Controller
      */
     public function destroyBukti(KurikulumBukti $bukti)
     {
+        $kurikulum_id = $bukti->kurikulum_id;
+        $kriteria_kode = $bukti->kriteria_kode;
         $bukti->delete();
+        $this->updateBuktiPersen($kurikulum_id, $kriteria_kode);
 
         Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
             ->toToast()->autoclose(3000)->timerProgressBar();
 
         return redirect()->back();
+    }
+
+    /**
+     * Update bukti persen per kriteria_kode
+     */
+    private function updateBuktiPersen($kurikulum_id, $kriteria_kode)
+    {
+        $narasi = KurikulumNarasi::where('kurikulum_id', $kurikulum_id)
+            ->where('kriteria_kode', $kriteria_kode)
+            ->first();
+
+        if ($narasi) {
+            $totalBukti = KurikulumBukti::where('kurikulum_id', $kurikulum_id)
+                ->where('kriteria_kode', $kriteria_kode)
+                ->count();
+                
+            $tersediaBukti = KurikulumBukti::where('kurikulum_id', $kurikulum_id)
+                ->where('kriteria_kode', $kriteria_kode)
+                ->where('status', 'Tersedia')
+                ->count();
+                
+            $pct = $totalBukti > 0 ? round(($tersediaBukti / $totalBukti) * 100) : 0;
+            $narasi->update(['bukti_persen' => $pct]);
+            return $pct;
+        }
+        return 0;
     }
 }

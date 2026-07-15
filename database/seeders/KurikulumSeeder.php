@@ -98,6 +98,7 @@ class KurikulumSeeder extends Seeder
             KurikulumBukti::updateOrCreate([
                 'kurikulum_id' => $kurikulum->id,
                 'nama_bukti' => $bukti[0],
+                'kriteria_kode' => '2.1'
             ], [
                 'level' => $bukti[1],
                 'status' => $bukti[2],

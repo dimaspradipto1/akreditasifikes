@@ -77,33 +77,6 @@
 </div>
 
 <section class="section">
-    <!-- Top KPI Cards -->
-    <div class="row mb-4 g-3">
-        <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">% Narasi Lengkap (Kriteria)</small>
-                <h3 class="fw-bold m-0">{{ $pctNarasi }}%</h3>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">% Bukti Tersedia (Kriteria)</small>
-                <h3 class="fw-bold m-0">{{ $pctBukti }}%</h3>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">Sub-Kriteria Memenuhi</small>
-                <h3 class="fw-bold m-0 text-success">4 dari 4</h3>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">Sub-Kriteria WAJIB Belum Memenuhi</small>
-                <h3 class="fw-bold m-0 text-success">0</h3>
-            </div>
-        </div>
-    </div>
 
     <!-- Horizontal Navigation -->
     <ul class="nav nav-pills nav-pills-kriteria mb-4 border-bottom pb-1">
@@ -114,10 +87,10 @@
             <a class="nav-link" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a>
+            <a class="nav-link" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mhs</a>
+            <a class="nav-link active" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mhs</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#"><i class="bi bi-circle-fill text-warning"></i> K5 — Dosen&PkM</a>
@@ -139,11 +112,11 @@
                 <ol class="breadcrumb mb-1" style="font-size: 0.85rem;">
                     <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Dashboard</a></li>
                     <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Akreditasi S1</a></li>
-                    <li class="breadcrumb-item active fw-medium text-dark" aria-current="page">K3 — Penilaian</li>
+                    <li class="breadcrumb-item active fw-medium text-dark" aria-current="page">K4 — Mahasiswa</li>
                 </ol>
             </nav>
-            <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">Kriteria 3 — Penilaian</h1>
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">Kelola dokumen narasi dan bukti pendukung untuk standar Penilaian LAM-PTKes.</p>
+            <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">Kriteria 4 — Mahasiswa</h1>
+            <p class="text-muted mb-0" style="font-size: 0.9rem;">Kelola dokumen narasi dan bukti pendukung untuk standar Mahasiswa LAM-PTKes.</p>
         </div>
         <div class="d-flex gap-2">
             <button class="btn btn-light border shadow-sm btn-sm px-3 fw-medium">
@@ -198,12 +171,8 @@
         </div>
     </div>
 
-    @php
-        $subKriterias = $narasis->filter(fn($n, $kode) => preg_match('/^3\.\d+$/', $kode));
-    @endphp
-
-    <!-- OUTER ACCORDION FOR 3.1 to 3.4 -->
-    <div class="accordion mb-5" id="accordionPenilaian">
+    <!-- OUTER ACCORDION FOR 4.1 to 4.4 -->
+    <div class="accordion mb-5" id="accordionMahasiswa">
         @foreach($subKriterias as $kode => $sub)
         @php
             $euKriterias = $narasis->filter(fn($n, $k) => str_starts_with($k, $sub->kriteria_kode . '_EU'));
@@ -217,26 +186,24 @@
                     <span class="text-dark fw-bold flex-grow-1" style="font-size: 1.1rem;">{{ $sub->kriteria_nama }}</span>
                 </button>
                 <div class="me-4 d-flex align-items-center gap-3" style="z-index: 2;">
-                    @if($sub->kriteria_kode == '3.2')
+                    @if(in_array($sub->kriteria_kode, ['4.2', '4.3']))
                         <span class="badge bg-warning bg-opacity-10 text-warning border border-warning" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;">BOLEH SEBAGIAN</span>
                     @else
                         <span class="badge bg-danger bg-opacity-10 text-danger border border-danger" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;">WAJIB</span>
                     @endif
                     <span class="badge {{ $sub->status == 'Memenuhi' ? 'bg-success bg-opacity-10 text-success border border-success' : ($sub->status == 'Memenuhi Sebagian' ? 'bg-warning bg-opacity-10 text-warning border border-warning' : 'bg-danger bg-opacity-10 text-danger border border-danger') }}" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;"><i class="bi {{ $sub->status == 'Memenuhi' ? 'bi-check-circle-fill' : ($sub->status == 'Memenuhi Sebagian' ? 'bi-circle-fill' : 'bi-x') }} me-1"></i> {{ $sub->status == 'Belum Memenuhi' ? 'Tidak Memenuhi' : $sub->status }}</span>
-                    
-                    <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
-                        <span class="me-2">Narasi {{ $sub->narasi_persen ?? 0 }}%</span>
-                        <span class="bukti-pct-display">Bukti {{ $pctBukti ?? 0 }}%</span>
-                    </div>
+                                        <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
+                            <span class="me-2">Narasi {{ $sub->narasi_persen ?? 0 }}%</span>
+                            <span class="bukti-pct-display" data-kriteria="{{ $sub->kriteria_kode }}">Bukti {{ $sub->bukti_persen ?? 0 }}%</span>
+                        </div>
                     
                     <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
-                        <div class="progress-bar bg-success progress-bar-combined" data-narasi-pct="{{ $sub->narasi_persen ?? 0 }}" role="progressbar" style="width: {{ (($sub->narasi_persen ?? 0) + ($pctBukti ?? 0)) / 2 }}%"></div>
+                            <div class="progress-bar-combined" data-narasi-pct="{{ $sub->narasi_persen ?? 0 }}" data-kriteria="{{ $sub->kriteria_kode }}" style="width: {{ (($sub->narasi_persen ?? 0) + ($sub->bukti_persen ?? 0)) / 2 }}%; background: #2f7a42; height: 100%; transition: width 0.3s ease;"></div>
                     </div>
-                </div>
             </h2>
 
-            <div id="collapseSub{{ $sub->id }}" class="accordion-collapse collapse" aria-labelledby="headingSub{{ $sub->id }}" data-bs-parent="#accordionPenilaian">
-                <div class="accordion-body p-4" style="background-color: #f8fafc;">
+                <div id="collapseSub{{ $sub->id }}" class="accordion-collapse collapse" aria-labelledby="headingSub{{ $sub->id }}" data-bs-parent="#accordionMahasiswa">
+                    <div class="accordion-body p-4" style="background-color: #fff; border-left: 3px solid #185fa5;">
                     
                     @if($hasEU)
                         <!-- Bagian A untuk Elemen Utama -->
@@ -244,7 +211,13 @@
                         <p class="text-muted mb-4" style="font-size: 0.85rem;">{{ $euKriterias->count() }} Elemen Utama pada sub-kriteria ini. Setiap EU memuat form narasi 5 blok (A-E) beserta status & simulasi pemenuhan otomatis.</p>
 
                         <div class="accordion mb-5" id="accordionEU{{ $sub->id }}">
-                            @foreach($euKriterias as $euKode => $euNarasi)
+                            @php
+                                $euCount = $euKriterias->count();
+                                $visibleLimit = (in_array($sub->kriteria_kode, ['4.3', '4.4'])) ? 3 : 4;
+                                $visibleEus = $euKriterias->take($visibleLimit);
+                                $hiddenEuCount = $euCount > $visibleLimit ? $euCount - $visibleLimit : 0;
+                            @endphp
+                            @foreach($visibleEus as $euKode => $euNarasi)
                             @php
                                 $displayEuKode = explode('_', $euNarasi->kriteria_kode)[1] ?? $euNarasi->kriteria_kode;
                             @endphp
@@ -264,7 +237,7 @@
                                 </h2>
                                 <div id="collapseEU{{ $euNarasi->id }}" class="accordion-collapse collapse" aria-labelledby="headingEU{{ $euNarasi->id }}" data-bs-parent="#accordionEU{{ $sub->id }}">
                                     <div class="accordion-body bg-white p-4">
-                                        <form id="form-narasi-{{ $euNarasi->id }}" action="{{ route('penilaian.narasi.update', $euNarasi->id) }}" method="POST">
+                                        <form id="form-narasi-{{ $euNarasi->id }}" action="{{ route('mahasiswa.narasi.update', $euNarasi->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             
@@ -290,9 +263,13 @@
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center pt-3 mt-4 border-top">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="simulasi{{ $euNarasi->id }}" checked disabled>
-                                                    <label class="form-check-label fw-bold {{ $euNarasi->status == 'Lengkap' ? 'text-success' : 'text-warning' }}" for="simulasi{{ $euNarasi->id }}" style="font-size: 0.85rem;">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    @if($euNarasi->status == 'Lengkap')
+                                                        <i class="bi bi-check-square-fill text-success" style="font-size: 1.1rem;"></i>
+                                                    @else
+                                                        <i class="bi bi-circle-fill text-warning" style="font-size: 0.9rem;"></i>
+                                                    @endif
+                                                    <label class="fw-bold {{ $euNarasi->status == 'Lengkap' ? 'text-success' : 'text-warning' }}" style="font-size: 0.85rem;">
                                                         Simulasi Pemenuhan EU: {{ $euNarasi->status == 'Lengkap' ? 'Memenuhi' : 'Belum Lengkap' }}
                                                     </label>
                                                 </div>
@@ -306,11 +283,17 @@
                             </div>
                             @endforeach
                         </div>
+                        @if($hiddenEuCount > 0)
+                        <div class="mb-5 text-muted" style="font-size: 0.8rem; font-style: italic; margin-top: -2rem;">
+                            + {{ $hiddenEuCount }} Elemen Utama lain pada sub-kriteria ini — lihat Tracker Terpusat untuk rincian lengkap.
+                        </div>
+                        @endif
+
+
                     @else
                         <!-- Form Standar A-E untuk sub-kriteria tanpa EU -->
                         <div class="bg-white p-4 rounded shadow-sm mb-5" style="border: 1px solid #e2e8f0;">
-                        <div class="bg-white p-4 rounded shadow-sm" style="border: 1px solid #e2e8f0;">
-                            <form id="form-narasi-{{ $sub->id }}" action="{{ route('penilaian.narasi.update', $sub->id) }}" method="POST">
+                            <form id="form-eu-{{ $sub->id }}" action="{{ route('mahasiswa.narasi.update', $sub->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 
@@ -365,8 +348,15 @@
                     <!-- Bagian B untuk Daftar Bukti Pendukung (Ditampilkan untuk semua sub-kriteria) -->
                     <h5 class="fw-bold mb-1 mt-4" style="font-size: 1rem; color: #1e3a8a;">Bagian B — Daftar Bukti Pendukung</h5>
                     @php
-                        $docCount = 8;
-                        $plusCount = 4;
+                        $docCount = 12;
+                        $plusCount = 8;
+                        if ($sub->kriteria_kode == '4.3') {
+                            $docCount = 11;
+                            $plusCount = 8;
+                        } elseif ($sub->kriteria_kode == '4.4') {
+                            $docCount = 7;
+                            $plusCount = 4;
+                        }
                     @endphp
                     <p class="text-muted mb-4" style="font-size: 0.85rem;">{{ $docCount }} dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</p>
                     
@@ -377,88 +367,59 @@
                             </button>
                         </div>
                         <div class="table-responsive">
-                            @if($penilaian->buktis->where('kriteria_kode', $sub->kriteria_kode)->isEmpty())
-                                <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
-                                    <thead>
-                                        <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
-                                            <th class="py-3">Nama Bukti</th>
-                                            <th class="py-3">Level</th>
-                                            <th class="py-3">Status</th>
-                                            <th class="py-3">Link</th>
-                                            <th class="py-3">PIC</th>
-                                            <th class="py-3">Deadline</th>
-                                            <th class="py-3 text-center">Catatan</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td colspan="7" class="text-center text-muted py-4">Belum ada dokumen bukti.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            @else
-                                <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
-                                    <thead>
-                                        <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
-                                            <th class="py-3" style="width: 5%;">No</th>
-                                            <th class="py-3" style="width: 25%;">Nama Bukti</th>
-                                            <th class="py-3">Level</th>
-                                            <th class="py-3">Status</th>
-                                            <th class="py-3">Link</th>
-                                            <th class="py-3">PIC</th>
-                                            <th class="py-3">Deadline</th>
-                                            <th class="py-3 text-center">Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @forelse($penilaian->buktis->where('kriteria_kode', $sub->kriteria_kode) as $index => $bukti)
-                                        <tr style="border-bottom: 1px solid #f1f5f9;" class="bukti-row" data-id="{{ $bukti->id }}">
-                                            <td class="text-muted">{{ $loop->iteration }}</td>
-                                            <td class="fw-medium text-dark">{{ $bukti->nama_bukti }}</td>
-                                            <td>
-                                                @if($bukti->level == 'PRODI')
-                                                    <span class="badge rounded-pill" style="background-color: #fef08a; color: #854d0e; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
-                                                @elseif($bukti->level == 'FIKES')
-                                                    <span class="badge rounded-pill" style="background-color: #d1fae5; color: #065f46; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
-                                                @else
-                                                    <span class="badge rounded-pill" style="background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <select name="status_bukti" class="form-select form-select-sm shadow-none bukti-input" style="width: 120px; font-size: 0.8rem; border-color: #cbd5e1; color: #334155; border-radius: 6px; cursor: pointer;">
-                                                    <option value="Tersedia" {{ $bukti->status == 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
-                                                    <option value="Tidak Ada" {{ $bukti->status == 'Tidak Ada' ? 'selected' : '' }}>Tidak Ada</option>
-                                                    <option value="Belum Memenuhi" {{ $bukti->status == 'Belum Memenuhi' ? 'selected' : '' }}>Belum Memenuhi</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <input type="text" name="link" class="form-control form-control-sm shadow-none bukti-input" placeholder="tautan / lokasi file" value="{{ $bukti->link }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 160px;">
-                                            </td>
-                                            <td>
-                                                <input type="text" name="pic" class="form-control form-control-sm shadow-none bukti-input" placeholder="nama PIC" value="{{ $bukti->pic }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 120px;">
-                                            </td>
-                                            <td>
-                                                <input type="date" name="deadline" class="form-control form-control-sm shadow-none text-muted bukti-input" value="{{ $bukti->deadline }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; width: 130px;">
-                                            </td>
-                                            <td class="text-center">
-                                                <div class="d-flex justify-content-center gap-1">
-                                                    <button type="button" class="btn btn-sm text-secondary p-1 border-0 shadow-none" title="Catatan" style="background:transparent;"><i class="bi bi-chat-left-text" style="font-size:14px;"></i></button>
-                                                    <form action="{{ route('penilaian.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="8" class="text-center text-muted py-4">Belum ada dokumen bukti.</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            @endif
+                            <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
+                                <thead>
+                                    <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
+                                        <th class="py-3">Nama Bukti</th>
+                                        <th class="py-3">Level</th>
+                                        <th class="py-3">Status</th>
+                                        <th class="py-3">Link</th>
+                                        <th class="py-3">PIC</th>
+                                        <th class="py-3">Deadline</th>
+                                        <th class="py-3 text-center">Catatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($mahasiswa->buktis->where('kriteria_kode', $sub->kriteria_kode) as $index => $bukti)
+                                    <tr style="border-bottom: 1px solid #f1f5f9;" class="bukti-row" data-id="{{ $bukti->id }}">
+                                        <td class="fw-medium text-dark" style="max-width: 250px;">{{ $bukti->nama_bukti }}</td>
+                                        <td>
+                                            @if($bukti->level == 'PRODI')
+                                                <span class="badge rounded-pill" style="background-color: #fef08a; color: #854d0e; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
+                                            @elseif($bukti->level == 'FIKES')
+                                                <span class="badge rounded-pill" style="background-color: #d1fae5; color: #065f46; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
+                                            @else
+                                                <span class="badge rounded-pill" style="background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <select name="status_bukti" class="form-select form-select-sm shadow-none bukti-input" style="width: 120px; font-size: 0.8rem; border-color: #cbd5e1; color: #334155; border-radius: 6px; cursor: pointer;">
+                                                <option value="Tersedia" {{ $bukti->status == 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
+                                                <option value="Tidak Ada" {{ $bukti->status == 'Tidak Ada' ? 'selected' : '' }}>Tidak Ada</option>
+                                                <option value="Belum Memenuhi" {{ $bukti->status == 'Belum Memenuhi' ? 'selected' : '' }}>Belum Memenuhi</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="link" class="form-control form-control-sm shadow-none bukti-input" placeholder="tautan / lokasi file" value="{{ $bukti->link }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 160px;">
+                                        </td>
+                                        <td>
+                                            <input type="text" name="pic" class="form-control form-control-sm shadow-none bukti-input" placeholder="nama PIC" value="{{ $bukti->pic }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 120px;">
+                                        </td>
+                                        <td>
+                                            <input type="date" name="deadline" class="form-control form-control-sm shadow-none text-muted bukti-input" value="{{ $bukti->deadline }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; width: 130px;">
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm border-0 shadow-none p-0 d-inline-flex align-items-center justify-content-center" style="background-color: #f1f5f9; width: 28px; height: 28px; border-radius: 50%;" title="Catatan">
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center text-muted py-4">Belum ada dokumen bukti.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
                         </div>
                         @if($plusCount > 0)
                         <div class="mt-3 text-muted" style="font-size: 0.8rem; font-style: italic;">
@@ -475,9 +436,9 @@
         <div class="modal fade" id="modalTambahBukti{{ $sub->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="{{ route('penilaian.bukti.store') }}" method="POST">
+                    <form action="{{ route('mahasiswa.bukti.store') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="penilaian_id" value="{{ $penilaian->id ?? 1 }}">
+                        <input type="hidden" name="mahasiswa_id" value="{{ $mahasiswa->id ?? 1 }}">
                         <input type="hidden" name="kriteria_kode" value="{{ $sub->kriteria_kode }}">
                         <div class="modal-header">
                             <h5 class="modal-title">Tambah Dokumen Bukti ({{ $sub->kriteria_kode }})</h5>
@@ -556,7 +517,9 @@
     </div>
 </div>
 
+</div>
 @push('scripts')
+    {!! $dataTable->scripts() !!}
     <script>
         $(document).ready(function() {
             $('.bukti-input').on('change', function() {
@@ -572,7 +535,7 @@
                 data[fieldName] = fieldValue;
                 
                 $.ajax({
-                    url: '/penilaian/bukti/' + buktiId,
+                    url: '/mahasiswa/bukti/' + buktiId,
                     type: 'POST',
                     data: data,
                     success: function(response) {
@@ -584,13 +547,12 @@
                         
                         // Update percentages dynamically if returned
                         if(response.pctBukti !== undefined && response.kriteria_kode !== undefined) {
-                            var heading = $row.closest('.accordion-item').find('.accordion-header');
-                            heading.find('.bukti-pct-display').text('Bukti ' + response.pctBukti + '%');
-                            
-                            var progressBar = heading.find('.progress-bar-combined');
-                            var narasiPct = parseFloat(progressBar.data('narasi-pct')) || 0;
-                            var combined = (narasiPct + response.pctBukti) / 2;
-                            progressBar.css('width', combined + '%');
+                            $('.bukti-pct-display[data-kriteria="' + response.kriteria_kode + '"]').text('Bukti ' + response.pctBukti + '%');
+                            $('.progress-bar-combined[data-kriteria="' + response.kriteria_kode + '"]').each(function() {
+                                var narasiPct = parseFloat($(this).data('narasi-pct')) || 0;
+                                var combined = (narasiPct + response.pctBukti) / 2;
+                                $(this).css('width', combined + '%');
+                            });
                         }
                     },
                     error: function(xhr) {

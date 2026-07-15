@@ -31,6 +31,8 @@ return new class extends Migration
             $table->text('permasalahan')->nullable();
             $table->text('rencana_perbaikan')->nullable();
             $table->string('status')->default('Draft'); // Draft, Lengkap
+            $table->integer('narasi_persen')->default(0);
+            $table->integer('bukti_persen')->default(0);
             $table->timestamps();
         });
 
@@ -38,6 +40,7 @@ return new class extends Migration
         Schema::create('vmts_buktis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('vmts_id')->constrained('vmts')->cascadeOnDelete();
+            $table->string('elemen_kode');
             $table->string('nama_bukti');
             $table->enum('level', ['PRODI', 'FIKES', 'UNIV']);
             $table->enum('status', ['Tersedia', 'Tidak Ada', 'Belum Memenuhi']);

@@ -28,10 +28,11 @@ class KurikulumRequest extends FormRequest
 
         if ($this->routeIs('kurikulum.bukti.store')) {
             return [
-                'kurikulum_id' => 'required|exists:kurikulums,id',
-                'nama_bukti'   => 'required|string|max:255',
-                'level'        => 'required|in:PRODI,FIKES,UNIV',
-                'status'       => 'required|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                'kurikulum_id'  => 'required|exists:kurikulums,id',
+                'kriteria_kode' => 'required|string',
+                'nama_bukti'    => 'required|string|max:255',
+                'level'         => 'required|in:PRODI,FIKES,UNIV',
+                'status_bukti'  => 'required|in:Tersedia,Tidak Ada,Belum Memenuhi',
                 'link'         => 'nullable|url',
                 'pic'          => 'nullable|string|max:255',
                 'deadline'     => 'nullable|date',
@@ -41,10 +42,10 @@ class KurikulumRequest extends FormRequest
 
         if ($this->routeIs('kurikulum.bukti.update')) {
             return [
-                'nama_bukti' => 'required|string|max:255',
-                'level'      => 'required|in:PRODI,FIKES,UNIV',
-                'status'     => 'required|in:Tersedia,Tidak Ada,Belum Memenuhi',
-                'link'       => 'nullable|url',
+                'nama_bukti'   => 'sometimes|required|string|max:255',
+                'level'        => 'sometimes|required|in:PRODI,FIKES,UNIV',
+                'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                'link'       => 'nullable|string|max:255',
                 'pic'        => 'nullable|string|max:255',
                 'deadline'   => 'nullable|date',
                 'catatan'    => 'nullable|string',

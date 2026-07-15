@@ -44,6 +44,8 @@ class VmtsNarasi extends Model
         'permasalahan',
         'rencana_perbaikan',
         'status',
+        'narasi_persen',
+        'bukti_persen',
     ];
 
     public function vmts()
@@ -58,6 +60,7 @@ class VmtsBukti extends Model
 
     protected $fillable = [
         'vmts_id',
+        'elemen_kode',
         'nama_bukti',
         'level',
         'status',

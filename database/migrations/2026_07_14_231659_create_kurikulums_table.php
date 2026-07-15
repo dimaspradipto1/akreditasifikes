@@ -41,6 +41,7 @@ return new class extends Migration
         Schema::create('kurikulum_buktis', function (Blueprint $table) {
             $table->id();
             $table->foreignId('kurikulum_id')->constrained('kurikulums')->cascadeOnDelete();
+            $table->string('kriteria_kode');
             $table->string('nama_bukti');
             $table->enum('level', ['PRODI', 'FIKES', 'UNIV']);
             $table->enum('status', ['Tersedia', 'Tidak Ada', 'Belum Memenuhi']);

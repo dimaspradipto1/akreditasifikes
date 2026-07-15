@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Penilaian extends Model
+class Mahasiswa extends Model
 {
     use HasFactory;
 
@@ -21,21 +21,21 @@ class Penilaian extends Model
 
     public function narasis()
     {
-        return $this->hasMany(PenilaianNarasi::class);
+        return $this->hasMany(MahasiswaNarasi::class);
     }
 
     public function buktis()
     {
-        return $this->hasMany(PenilaianBukti::class);
+        return $this->hasMany(MahasiswaBukti::class);
     }
 }
 
-class PenilaianNarasi extends Model
+class MahasiswaNarasi extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'penilaian_id',
+        'mahasiswa_id',
         'kriteria_kode',
         'kriteria_nama',
         'kondisi_saat_ini',
@@ -48,18 +48,18 @@ class PenilaianNarasi extends Model
         'bukti_persen',
     ];
 
-    public function penilaian()
+    public function mahasiswa()
     {
-        return $this->belongsTo(Penilaian::class);
+        return $this->belongsTo(Mahasiswa::class);
     }
 }
 
-class PenilaianBukti extends Model
+class MahasiswaBukti extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'penilaian_id',
+        'mahasiswa_id',
         'kriteria_kode',
         'nama_bukti',
         'level',
@@ -70,8 +70,8 @@ class PenilaianBukti extends Model
         'catatan',
     ];
 
-    public function penilaian()
+    public function mahasiswa()
     {
-        return $this->belongsTo(Penilaian::class);
+        return $this->belongsTo(Mahasiswa::class);
     }
 }

@@ -117,7 +117,7 @@
             <a class="nav-link" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-warning"></i> K4 — Mhs</a>
+            <a class="nav-link" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mhs</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#"><i class="bi bi-circle-fill text-warning"></i> K5 — Dosen&PkM</a>
@@ -223,11 +223,11 @@
                     
                     <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
                         <span class="me-2">Narasi {{ $sub->narasi_persen ?? 0 }}%</span>
-                        <span>Bukti {{ $sub->bukti_persen ?? 0 }}%</span>
+                        <span class="bukti-pct-display">Bukti {{ $pctBukti ?? 0 }}%</span>
                     </div>
                     
                     <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
-                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ (($sub->narasi_persen ?? 0) + ($sub->bukti_persen ?? 0)) / 2 }}%"></div>
+                        <div class="progress-bar bg-success progress-bar-combined" data-narasi-pct="{{ $sub->narasi_persen ?? 0 }}" role="progressbar" style="width: {{ (($sub->narasi_persen ?? 0) + ($pctBukti ?? 0)) / 2 }}%"></div>
                     </div>
                 </div>
             </h2>
@@ -303,104 +303,9 @@
                             </div>
                             @endforeach
                         </div>
-
-                        <!-- Bagian B untuk Daftar Bukti Pendukung -->
-                        <h5 class="fw-bold mb-1" style="font-size: 1rem; color: #1e3a8a;">Bagian B — Daftar Bukti Pendukung</h5>
-                        @php
-                            $docCount = 6;
-                            if ($sub->kriteria_kode == '2.1') $docCount = 16;
-                            if ($sub->kriteria_kode == '2.3') $docCount = 9;
-                            if ($sub->kriteria_kode == '2.4') $docCount = 4;
-                            
-                            $plusCount = 1;
-                            if ($sub->kriteria_kode == '2.1') $plusCount = 9;
-                            if ($sub->kriteria_kode == '2.4') $plusCount = 0;
-                        @endphp
-                        <p class="text-muted mb-4" style="font-size: 0.85rem;">{{ $docCount }} dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</p>
-                        
-                        <div class="bg-white p-3 rounded shadow-sm" style="border: 1px solid #e2e8f0;">
-                            <div class="d-flex justify-content-end mb-3">
-                                <button class="btn btn-sm text-white" style="background: #185fa5;" data-bs-toggle="modal" data-bs-target="#modalTambahBukti">
-                                    <i class="bi bi-plus-circle me-1"></i> Tambah Bukti
-                                </button>
-                            </div>
-                            <div class="table-responsive">
-                                @if($sub->kriteria_kode == '2.1')
-                                    {!! $dataTable->table(['class' => 'table table-borderless table-hover align-middle', 'style' => 'font-size: 0.85rem; margin-bottom: 0;']) !!}
-                                @else
-                                    <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
-                                        <thead>
-                                            <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
-                                                <th class="py-3">No</th>
-                                                <th class="py-3">Nama Bukti</th>
-                                                <th class="py-3">Level</th>
-                                                <th class="py-3">Status</th>
-                                                <th class="py-3">Link</th>
-                                                <th class="py-3">PIC</th>
-                                                <th class="py-3">Deadline</th>
-                                                <th class="py-3 text-center">Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @forelse($kurikulum->buktis as $index => $bukti)
-                                            <tr style="border-bottom: 1px solid #f1f5f9;">
-                                                <td class="text-muted">{{ $index + 1 }}</td>
-                                                <td class="fw-medium text-dark">{{ $bukti->nama_bukti }}</td>
-                                                <td>
-                                                    @if($bukti->level == 'PRODI')
-                                                        <span class="badge bg-warning text-dark">{{ $bukti->level }}</span>
-                                                    @elseif($bukti->level == 'FIKES')
-                                                        <span class="badge bg-success">{{ $bukti->level }}</span>
-                                                    @else
-                                                        <span class="badge bg-primary">{{ $bukti->level }}</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if($bukti->status == 'Tersedia')
-                                                        <strong class="text-success">{{ $bukti->status }}</strong>
-                                                    @elseif($bukti->status == 'Tidak Ada')
-                                                        <strong class="text-danger">{{ $bukti->status }}</strong>
-                                                    @else
-                                                        <strong class="text-warning">{{ $bukti->status }}</strong>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    @if($bukti->link)
-                                                        <a href="{{ $bukti->link }}" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2" style="font-size: 0.75rem;"><i class="bi bi-link-45deg"></i> Link</a>
-                                                    @else
-                                                        <span class="text-muted">-</span>
-                                                    @endif
-                                                </td>
-                                                <td class="text-muted">{{ $bukti->pic ?: '-' }}</td>
-                                                <td class="text-muted">{{ $bukti->deadline ? \Carbon\Carbon::parse($bukti->deadline)->format('d M Y') : '-' }}</td>
-                                                <td class="text-center">
-                                                    <div class="d-flex gap-1 justify-content-center">
-                                                        <button type="button" class="btn btn-sm btn-warning text-white py-0 px-1" title="Edit"><i class="bi bi-pencil-fill" style="font-size:11px;"></i></button>
-                                                        <form action="{{ route('kurikulum.bukti.destroy', $bukti->id) }}" method="POST" class="m-0" onsubmit="return confirm('Hapus bukti ini?');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            @empty
-                                            <tr>
-                                                <td colspan="8" class="text-center text-muted py-4">Belum ada dokumen bukti.</td>
-                                            </tr>
-                                            @endforelse
-                                        </tbody>
-                                    </table>
-                                @endif
-                            </div>
-                            @if($plusCount > 0)
-                            <div class="mt-3 text-muted" style="font-size: 0.8rem; font-style: italic;">
-                                + {{ $plusCount }} dokumen bukti lain pada sub-kriteria ini — lihat Tracker Terpusat untuk rincian lengkap.
-                            </div>
-                            @endif
-                        </div>
                     @else
                         <!-- Form Standar A-E untuk sub-kriteria tanpa EU -->
+                        <div class="bg-white p-4 rounded shadow-sm mb-5" style="border: 1px solid #e2e8f0;">
                         <div class="bg-white p-4 rounded shadow-sm" style="border: 1px solid #e2e8f0;">
                             <form id="form-narasi-{{ $sub->id }}" action="{{ route('kurikulum.narasi.update', $sub->id) }}" method="POST">
                                 @csrf
@@ -412,6 +317,7 @@
                                         <option value="Memenuhi" {{ $sub->status == 'Memenuhi' ? 'selected' : '' }}>Memenuhi</option>
                                         <option value="Memenuhi Sebagian" {{ $sub->status == 'Memenuhi Sebagian' ? 'selected' : '' }}>Memenuhi Sebagian</option>
                                         <option value="Belum Memenuhi" {{ $sub->status == 'Belum Memenuhi' ? 'selected' : '' }}>Belum Memenuhi</option>
+                                        <option value="Belum Diisi" {{ $sub->status == 'Belum Diisi' ? 'selected' : '' }}>Belum Diisi</option>
                                     </select>
                                 </div>
                                 <div class="row mb-4">
@@ -453,6 +359,173 @@
                         </div>
                     @endif
                     
+                    <!-- Bagian B untuk Daftar Bukti Pendukung (Ditampilkan untuk semua sub-kriteria) -->
+                    <h5 class="fw-bold mb-1 mt-4" style="font-size: 1rem; color: #1e3a8a;">Bagian B — Daftar Bukti Pendukung</h5>
+                    @php
+                        $docCount = 8;
+                        if ($sub->kriteria_kode == '2.1') $docCount = 8;
+                        
+                        $plusCount = 4;
+                        if ($sub->kriteria_kode == '2.1') $plusCount = 4;
+                    @endphp
+                    <p class="text-muted mb-4" style="font-size: 0.85rem;">{{ $docCount }} dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</p>
+                    
+                    <div class="bg-white p-3 rounded shadow-sm" style="border: 1px solid #e2e8f0;">
+                        <div class="d-flex justify-content-end mb-3">
+                            <button class="btn btn-sm text-white" style="background: #185fa5;" data-bs-toggle="modal" data-bs-target="#modalTambahBukti{{ $sub->id }}">
+                                <i class="bi bi-plus-circle me-1"></i> Tambah Bukti
+                            </button>
+                        </div>
+                        <div class="table-responsive">
+                            @if($kurikulum->buktis->where('kriteria_kode', $sub->kriteria_kode)->isEmpty())
+                                <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
+                                    <thead>
+                                        <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
+                                            <th class="py-3">Nama Bukti</th>
+                                            <th class="py-3">Level</th>
+                                            <th class="py-3">Status</th>
+                                            <th class="py-3">Link</th>
+                                            <th class="py-3">PIC</th>
+                                            <th class="py-3">Deadline</th>
+                                            <th class="py-3 text-center">Catatan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="7" class="text-center text-muted py-4">Belum ada dokumen bukti.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            @else
+                                <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
+                                    <thead>
+                                        <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
+                                            <th class="py-3" style="width: 5%;">No</th>
+                                            <th class="py-3" style="width: 25%;">Nama Bukti</th>
+                                            <th class="py-3">Level</th>
+                                            <th class="py-3">Status</th>
+                                            <th class="py-3">Link</th>
+                                            <th class="py-3">PIC</th>
+                                            <th class="py-3">Deadline</th>
+                                            <th class="py-3 text-center">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse($kurikulum->buktis->where('kriteria_kode', $sub->kriteria_kode) as $index => $bukti)
+                                        <tr style="border-bottom: 1px solid #f1f5f9;" class="bukti-row" data-id="{{ $bukti->id }}">
+                                            <td class="text-muted">{{ $loop->iteration }}</td>
+                                            <td class="fw-medium text-dark">{{ $bukti->nama_bukti }}</td>
+                                            <td>
+                                                @if($bukti->level == 'PRODI')
+                                                    <span class="badge rounded-pill" style="background-color: #fef08a; color: #854d0e; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
+                                                @elseif($bukti->level == 'FIKES')
+                                                    <span class="badge rounded-pill" style="background-color: #d1fae5; color: #065f46; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
+                                                @else
+                                                    <span class="badge rounded-pill" style="background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <select name="status_bukti" class="form-select form-select-sm shadow-none bukti-input" style="width: 120px; font-size: 0.8rem; border-color: #cbd5e1; color: #334155; border-radius: 6px; cursor: pointer;">
+                                                    <option value="Tersedia" {{ $bukti->status == 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
+                                                    <option value="Tidak Ada" {{ $bukti->status == 'Tidak Ada' ? 'selected' : '' }}>Tidak Ada</option>
+                                                    <option value="Belum Memenuhi" {{ $bukti->status == 'Belum Memenuhi' ? 'selected' : '' }}>Belum Memenuhi</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="text" name="link" class="form-control form-control-sm shadow-none bukti-input" placeholder="tautan / lokasi file" value="{{ $bukti->link }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 160px;">
+                                            </td>
+                                            <td>
+                                                <input type="text" name="pic" class="form-control form-control-sm shadow-none bukti-input" placeholder="nama PIC" value="{{ $bukti->pic }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 120px;">
+                                            </td>
+                                            <td>
+                                                <input type="date" name="deadline" class="form-control form-control-sm shadow-none text-muted bukti-input" value="{{ $bukti->deadline }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; width: 130px;">
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-flex justify-content-center gap-1">
+                                                    <button type="button" class="btn btn-sm text-secondary p-1 border-0 shadow-none" title="Catatan" style="background:transparent;"><i class="bi bi-chat-left-text" style="font-size:14px;"></i></button>
+                                                    <form action="{{ route('kurikulum.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="8" class="text-center text-muted py-4">Belum ada dokumen bukti.</td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            @endif
+                        </div>
+                        @if($plusCount > 0)
+                        <div class="mt-3 text-muted" style="font-size: 0.8rem; font-style: italic;">
+                            + {{ $plusCount }} dokumen bukti lain pada sub-kriteria ini — lihat Tracker Terpusat untuk rincian lengkap.
+                        </div>
+                        @endif
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Tambah Bukti per Sub -->
+        <div class="modal fade" id="modalTambahBukti{{ $sub->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <form action="{{ route('kurikulum.bukti.store') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="kurikulum_id" value="{{ $kurikulum->id ?? 1 }}">
+                        <input type="hidden" name="kriteria_kode" value="{{ $sub->kriteria_kode }}">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Tambah Dokumen Bukti ({{ $sub->kriteria_kode }})</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Dokumen Bukti</label>
+                                <input type="text" name="nama_bukti" class="form-control" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Level Tanggung Jawab</label>
+                                <select name="level" class="form-select" required>
+                                    <option value="PRODI">PRODI</option>
+                                    <option value="FIKES">FIKES</option>
+                                    <option value="UNIV">UNIV</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Status</label>
+                                <select name="status_bukti" class="form-select" required>
+                                    <option value="Tersedia">Tersedia</option>
+                                    <option value="Tidak Ada">Tidak Ada</option>
+                                    <option value="Belum Memenuhi">Belum Memenuhi</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Tautan / Link File</label>
+                                <input type="url" name="link" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">PIC (Penanggung Jawab)</label>
+                                <input type="text" name="pic" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Deadline</label>
+                                <input type="date" name="deadline" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Catatan</label>
+                                <textarea name="catatan" class="form-control" rows="2"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                            <button type="submit" class="btn btn-primary">Simpan Bukti</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -479,69 +552,51 @@
         <span class="badge rounded-pill" style="background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 0.35rem 0.6rem;">UNIV</span>
         
         <span class="badge rounded-pill" style="background-color: #fee2e2; color: #991b1b; font-weight: 600; padding: 0.35rem 0.6rem;">WAJIB</span>
-        <span class="badge rounded-pill" style="background-color: #fef3c7; color: #92400e; font-weight: 600; padding: 0.35rem 0.6rem;">BOLEH SEBAGIAN</span>
-    </div>
-</div>
-
-<!-- Modal Tambah Bukti -->
-<div class="modal fade" id="modalTambahBukti" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form action="{{ route('kurikulum.bukti.store') }}" method="POST">
-                @csrf
-                <input type="hidden" name="kurikulum_id" value="{{ $kurikulum->id ?? 1 }}">
-                <div class="modal-header">
-                    <h5 class="modal-title">Tambah Dokumen Bukti</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Nama Dokumen Bukti</label>
-                        <input type="text" name="nama_bukti" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Level Tanggung Jawab</label>
-                        <select name="level" class="form-select" required>
-                            <option value="PRODI">PRODI</option>
-                            <option value="FIKES">FIKES</option>
-                            <option value="UNIV">UNIV</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-select" required>
-                            <option value="Tersedia">Tersedia</option>
-                            <option value="Tidak Ada">Tidak Ada</option>
-                            <option value="Belum Memenuhi">Belum Memenuhi</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Tautan / Link File</label>
-                        <input type="url" name="link" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">PIC (Penanggung Jawab)</label>
-                        <input type="text" name="pic" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Deadline</label>
-                        <input type="date" name="deadline" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Catatan</label>
-                        <textarea name="catatan" class="form-control" rows="2"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">Simpan Bukti</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-@push('scripts')
-    {!! $dataTable->scripts() !!}
+        <span class="badge rounded-pill" style="background-color: #fef3c7; color: #92400e; font-weight: 600; padding: 0.35rem 0.6rem;">BO@push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('.bukti-input').on('change', function() {
+                var $row = $(this).closest('tr.bukti-row');
+                var buktiId = $row.data('id');
+                var fieldName = $(this).attr('name');
+                var fieldValue = $(this).val();
+                
+                var data = {
+                    _token: '{{ csrf_token() }}',
+                    _method: 'PUT'
+                };
+                data[fieldName] = fieldValue;
+                
+                $.ajax({
+                    url: '/kurikulum/bukti/' + buktiId,
+                    type: 'POST',
+                    data: data,
+                    success: function(response) {
+                        // Flash green background temporarily to show save success
+                        $row.css('background-color', '#d1fae5');
+                        setTimeout(function() {
+                            $row.css('background-color', 'transparent');
+                        }, 800);
+                        
+                        // Update percentages dynamically if returned
+                        if(response.pctBukti !== undefined && response.kriteria_kode !== undefined) {
+                            var heading = $row.closest('.accordion-item').find('.accordion-header');
+                            heading.find('.bukti-pct-display').text('Bukti ' + response.pctBukti + '%');
+                            
+                            var progressBar = heading.find('.progress-bar-combined');
+                            var narasiPct = parseFloat(progressBar.data('narasi-pct')) || 0;
+                            var combined = (narasiPct + response.pctBukti) / 2;
+                            progressBar.css('width', combined + '%');
+                        }
+                    },
+                    error: function(xhr) {
+                        alert('Gagal menyimpan perubahan. Silakan coba lagi.');
+                    }
+                });
+            });
+        });
+    </script>  });
+        });
+    </script>
 @endpush
 @endsection
