@@ -14,13 +14,14 @@
         font-weight: 500;
         font-size: 0.9rem;
         padding: 8px 16px;
-        border-radius: 20px;
-        margin-right: 5px;
-        margin-bottom: 5px;
+        border: none;
+        background: transparent;
+        border-radius: 0;
     }
     .nav-pills-kriteria .nav-link.active {
-        background-color: #5520B8;
-        color: white;
+        color: #5520B8;
+        border-bottom: 2px solid #5520B8;
+        background: transparent;
     }
     .nav-pills-kriteria .nav-link i {
         font-size: 0.5rem;
@@ -107,22 +108,22 @@
     <!-- Horizontal Navigation -->
     <ul class="nav nav-pills nav-pills-kriteria mb-4 border-bottom pb-3">
         <li class="nav-item">
-            <a class="nav-link active" href="#"><i class="bi bi-circle-fill text-primary"></i> K1 — VMTS</a>
+            <a class="nav-link active" href="{{ route('vmts.index') }}"><i class="bi bi-circle-fill text-primary"></i> K1 — VMTS</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a>
+            <a class="nav-link" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-secondary"></i> K3 — Penilaian</a>
+            <a class="nav-link" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#"><i class="bi bi-circle-fill text-warning"></i> K4 — Mhs</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-info"></i> K5 — Dosen&PkM</a>
+            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-warning"></i> K5 — Dosen&PkM</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-danger"></i> K6 — Sarpras&Keu</a>
+            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-success"></i> K6 — Sarpras&Keu</a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="#"><i class="bi bi-circle-fill text-success"></i> K7 — Mutu</a>
@@ -132,23 +133,31 @@
         </li>
     </ul>
 
-    <!-- Main Content Card -->
-    <div class="card shadow-sm border-0" style="border-radius: 12px; border-left: 4px solid #5520B8 !important;">
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #e2e8f0;">
-            <h5 class="m-0 fw-bold" style="color: #1e293b; font-size: 1.1rem;">
-                <span class="me-3">1.1</span> Pernyataan Visi, Misi, Tujuan, dan Strategi
-            </h5>
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">WAJIB</span>
-                <span class="badge bg-success bg-opacity-10 text-success border border-success"><i class="bi bi-check-circle-fill me-1"></i> Memenuhi</span>
-                <small class="text-muted ms-2" style="font-size: 0.75rem;">Narasi {{ $pctNarasi }}% &nbsp; Bukti {{ $pctBukti }}%</small>
-                <div class="progress ms-2" style="width: 60px; height: 6px;">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ ($pctNarasi + $pctBukti) / 2 }}%"></div>
+    <!-- Main Content Accordion -->
+    <div class="accordion mb-5" id="accordionVMTS">
+        <div class="accordion-item mb-3 shadow-sm border-0" style="border-radius: 12px; overflow: hidden; background-color: #fff; border: 1px solid #e2e8f0;">
+            <h2 class="accordion-header d-flex align-items-center" id="headingSub1_1" style="border-bottom: 1px solid #e2e8f0;">
+                <button class="accordion-button flex-grow-1 shadow-none bg-white py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSub1_1" aria-expanded="true" aria-controls="collapseSub1_1">
+                    <span class="text-primary fw-bold me-3" style="font-size: 1.1rem;">1.1</span>
+                    <span class="text-dark fw-bold flex-grow-1" style="font-size: 1.1rem;">Pernyataan Visi, Misi, Tujuan, dan Strategi</span>
+                </button>
+                <div class="me-4 d-flex align-items-center gap-3" style="z-index: 2;">
+                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;">WAJIB</span>
+                    <span class="badge rounded-pill {{ $pctNarasi == 100 ? 'bg-success bg-opacity-10 text-success border border-success' : 'bg-warning bg-opacity-10 text-warning border border-warning' }}" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi {{ $pctNarasi == 100 ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill' }} me-1"></i> {{ $pctNarasi == 100 ? 'Memenuhi' : 'Belum Memenuhi' }}</span>
+                    
+                    <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
+                        <span class="me-2">Narasi {{ $pctNarasi }}%</span>
+                        <span>Bukti {{ $pctBukti }}%</span>
+                    </div>
+                    
+                    <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ ($pctNarasi + $pctBukti) / 2 }}%"></div>
+                    </div>
                 </div>
-            </div>
-        </div>
+            </h2>
 
-        <div class="card-body p-4">
+            <div id="collapseSub1_1" class="accordion-collapse collapse show" aria-labelledby="headingSub1_1" data-bs-parent="#accordionVMTS">
+                <div class="accordion-body p-4" style="background-color: #fff; border-left: 3px solid #5520B8;">
             
             <!-- BAGIAN A -->
             <div class="mb-5">
@@ -164,7 +173,7 @@
                                 <span class="text-dark" style="font-weight: 500;">{{ $narasi->elemen_nama }}</span>
                             </button>
                             <div class="me-3" style="min-width: 130px; z-index: 2;">
-                                <select name="status" form="form-narasi-{{ $narasi->id }}" class="form-select form-select-sm" style="font-size: 0.85rem; font-weight: 500; border-radius: 6px; border-color: #cbd5e1; cursor: pointer; color: #334155; {{ $narasi->status == 'Lengkap' ? 'background-color: #f0fdf4; color: #166534; border-color: #bbf7d0;' : '' }}" onchange="document.getElementById('form-narasi-{{ $narasi->id }}').submit();">
+                                <select name="status" form="form-narasi-{{ $narasi->id }}" class="form-select form-select-sm" style="font-size: 0.85rem; font-weight: 500; border-radius: 6px; border-color: #cbd5e1; cursor: pointer; color: #334155; {{ $narasi->status == 'Lengkap' ? 'background-color: #f0fdf4; color: #166534; border-color: #bbf7d0;' : '' }}">
                                     <option value="Lengkap" {{ $narasi->status == 'Lengkap' ? 'selected' : '' }}>Lengkap</option>
                                     <option value="Draft" {{ $narasi->status == 'Draft' ? 'selected' : '' }}>Draft</option>
                                     <option value="Belum Diisi" {{ $narasi->status == 'Belum Diisi' ? 'selected' : '' }}>Belum Diisi</option>
@@ -234,7 +243,32 @@
 
             </div>
 
+                </div>
+            </div>
         </div>
+    </div>
+    
+    <!-- Legend -->
+    <div class="d-flex flex-wrap align-items-center mt-4 gap-3 px-1" style="font-size: 0.85rem;">
+        <div class="d-flex align-items-center gap-2">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#198754;"></span>
+            <span class="text-muted">Memenuhi / Lengkap</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#ffc107;"></span>
+            <span class="text-muted">Memenuhi Sebagian</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background-color:#dc3545;"></span>
+            <span class="text-muted">Tidak Ada / Belum Memenuhi</span>
+        </div>
+        
+        <span class="badge rounded-pill" style="background-color: #fef08a; color: #854d0e; font-weight: 600; padding: 0.35rem 0.6rem;">PRODI</span>
+        <span class="badge rounded-pill" style="background-color: #d1fae5; color: #065f46; font-weight: 600; padding: 0.35rem 0.6rem;">FIKES</span>
+        <span class="badge rounded-pill" style="background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 0.35rem 0.6rem;">UNIV</span>
+        
+        <span class="badge rounded-pill" style="background-color: #fee2e2; color: #991b1b; font-weight: 600; padding: 0.35rem 0.6rem;">WAJIB</span>
+        <span class="badge rounded-pill" style="background-color: #fef3c7; color: #92400e; font-weight: 600; padding: 0.35rem 0.6rem;">BOLEH SEBAGIAN</span>
     </div>
 </section>
 

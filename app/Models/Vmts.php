@@ -29,3 +29,46 @@ class Vmts extends Model
         return $this->hasMany(VmtsBukti::class);
     }
 }
+
+class VmtsNarasi extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'vmts_id',
+        'elemen_kode',
+        'elemen_nama',
+        'kondisi_saat_ini',
+        'data_fakta',
+        'analisis',
+        'permasalahan',
+        'rencana_perbaikan',
+        'status',
+    ];
+
+    public function vmts()
+    {
+        return $this->belongsTo(Vmts::class);
+    }
+}
+
+class VmtsBukti extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'vmts_id',
+        'nama_bukti',
+        'level',
+        'status',
+        'link',
+        'pic',
+        'deadline',
+        'catatan',
+    ];
+
+    public function vmts()
+    {
+        return $this->belongsTo(Vmts::class);
+    }
+}

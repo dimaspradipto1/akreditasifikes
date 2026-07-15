@@ -49,4 +49,11 @@ Route::middleware(['auth', 'checkrole'])->group(function () {
     Route::post('/kurikulum/bukti', [KurikulumController::class, 'storeBukti'])->name('kurikulum.bukti.store');
     Route::put('/kurikulum/bukti/{bukti}', [KurikulumController::class, 'updateBukti'])->name('kurikulum.bukti.update');
     Route::delete('/kurikulum/bukti/{bukti}', [KurikulumController::class, 'destroyBukti'])->name('kurikulum.bukti.destroy');
+
+    // Penilaian Resource and Custom Routes
+    Route::resource('penilaian', App\Http\Controllers\PenilaianController::class);
+    Route::put('/penilaian/narasi/{narasi}', [App\Http\Controllers\PenilaianController::class, 'updateNarasi'])->name('penilaian.narasi.update');
+    Route::post('/penilaian/bukti', [App\Http\Controllers\PenilaianController::class, 'storeBukti'])->name('penilaian.bukti.store');
+    Route::put('/penilaian/bukti/{bukti}', [App\Http\Controllers\PenilaianController::class, 'updateBukti'])->name('penilaian.bukti.update');
+    Route::delete('/penilaian/bukti/{bukti}', [App\Http\Controllers\PenilaianController::class, 'destroyBukti'])->name('penilaian.bukti.destroy');
 });

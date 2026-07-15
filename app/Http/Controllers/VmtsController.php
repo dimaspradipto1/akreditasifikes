@@ -7,6 +7,7 @@ use App\Models\Vmts;
 use App\Models\VmtsNarasi;
 use App\Models\VmtsBukti;
 use Illuminate\Http\Request;
+use App\Http\Requests\VmtsRequest;
 use Illuminate\Support\Facades\Auth;
 use RealRashid\SweetAlert\Facades\Alert;
 
@@ -60,18 +61,9 @@ class VmtsController extends Controller
     /**
      * Update Narasi (Bagian A) via AJAX or standard form submission.
      */
-    public function updateNarasi(Request $request, VmtsNarasi $narasi)
+    public function updateNarasi(VmtsRequest $request, VmtsNarasi $narasi)
     {
-        $request->validate([
-            'kondisi_saat_ini'  => 'nullable|string',
-            'data_fakta'        => 'nullable|string',
-            'analisis'          => 'nullable|string',
-            'permasalahan'      => 'nullable|string',
-            'rencana_perbaikan' => 'nullable|string',
-            'status'            => 'required|in:Draft,Lengkap,Belum Diisi',
-        ]);
-
-        $narasi->update($request->all());
+        $narasi->update($request->validated());
 
         Alert::success('Berhasil!', 'Narasi ' . $narasi->elemen_kode . ' berhasil disimpan.')
             ->toToast()->autoclose(3000)->timerProgressBar();
@@ -82,20 +74,9 @@ class VmtsController extends Controller
     /**
      * Store new Bukti (Bagian B).
      */
-    public function storeBukti(Request $request)
+    public function storeBukti(VmtsRequest $request)
     {
-        $request->validate([
-            'vmts_id'    => 'required|exists:vmts,id',
-            'nama_bukti' => 'required|string|max:255',
-            'level'      => 'required|in:PRODI,FIKES,UNIV',
-            'status'     => 'required|in:Tersedia,Tidak Ada,Belum Memenuhi',
-            'link'       => 'nullable|url',
-            'pic'        => 'nullable|string|max:255',
-            'deadline'   => 'nullable|date',
-            'catatan'    => 'nullable|string',
-        ]);
-
-        VmtsBukti::create($request->all());
+        VmtsBukti::create($request->validated());
 
         Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
             ->toToast()->autoclose(3000)->timerProgressBar();
@@ -106,19 +87,9 @@ class VmtsController extends Controller
     /**
      * Update existing Bukti (Bagian B).
      */
-    public function updateBukti(Request $request, VmtsBukti $bukti)
+    public function updateBukti(VmtsRequest $request, VmtsBukti $bukti)
     {
-        $request->validate([
-            'nama_bukti' => 'required|string|max:255',
-            'level'      => 'required|in:PRODI,FIKES,UNIV',
-            'status'     => 'required|in:Tersedia,Tidak Ada,Belum Memenuhi',
-            'link'       => 'nullable|url',
-            'pic'        => 'nullable|string|max:255',
-            'deadline'   => 'nullable|date',
-            'catatan'    => 'nullable|string',
-        ]);
-
-        $bukti->update($request->all());
+        $bukti->update($request->validated());
 
         Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
             ->toToast()->autoclose(3000)->timerProgressBar();

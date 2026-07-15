@@ -28,7 +28,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="components-badges.html">
+                        <a href="{{ route('penilaian.index') }}">
                             <i class="bi bi-circle"></i><span>3. Penilaian</span>
                         </a>
                     </li>

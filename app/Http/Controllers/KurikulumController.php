@@ -84,6 +84,32 @@ class KurikulumController extends Controller
     {
         $narasi->update($request->validated());
 
+        // Recalculate parent progress if this is an EU
+        if (str_contains($narasi->kriteria_kode, '_EU')) {
+            $parentKode = explode('_', $narasi->kriteria_kode)[0];
+            $parent = KurikulumNarasi::where('kurikulum_id', $narasi->kurikulum_id)
+                ->where('kriteria_kode', $parentKode)
+                ->first();
+
+            if ($parent) {
+                $allEUs = KurikulumNarasi::where('kurikulum_id', $narasi->kurikulum_id)
+                    ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
+                    ->get();
+                
+                $totalEU = $allEUs->count();
+                $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
+                
+                $narasiPersen = $totalEU > 0 ? round(($lengkapEU / $totalEU) * 100) : 0;
+                
+                $status = ($narasiPersen == 100) ? 'Memenuhi' : 'Belum Memenuhi';
+                
+                $parent->update([
+                    'narasi_persen' => $narasiPersen,
+                    'status' => $status
+                ]);
+            }
+        }
+
         Alert::success('Berhasil!', 'Narasi ' . $narasi->kriteria_kode . ' berhasil disimpan.')
             ->toToast()->autoclose(3000)->timerProgressBar();
 
