@@ -23,7 +23,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="components-accordion.html">
+                        <a href="{{ route('kurikulum.index') }}">
                             <i class="bi bi-circle"></i><span>2. Kurikulum</span>
                         </a>
                     </li>
