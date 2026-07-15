@@ -30,20 +30,34 @@ class KurikulumController extends Controller
             '2.2' => 'Struktur Kurikulum',
             '2.3' => 'Isi Kurikulum',
             '2.4' => 'Metode dan Pengalaman Pembelajaran',
-            'EU-1' => 'Penyusunan CPL 4 komponen (sikap, pengetahuan, keterampilan umum & khusus)',
-            'EU-2' => 'Kesesuaian CPL dengan SN-DIKTI & KKNI',
-            'EU-3' => 'Pendekatan Outcome-Based Education (OBE)',
-            'EU-4' => 'Pelibatan stakeholder/industri dalam penyusunan CPL',
-            'EU-5' => 'Pengalaman belajar lapangan (PKL/magang)',
-            'EU-6' => 'Relevansi CPL dengan karir lulusan',
-            'EU-7' => 'Kesesuaian dengan konteks lokal Batam/Kepri',
+            
+            '2.1_EU-1' => 'Penyusunan CPL 4 komponen (sikap, pengetahuan, keterampilan umum & khusus)',
+            '2.1_EU-2' => 'Kesesuaian CPL dengan SN-DIKTI & KKNI',
+            '2.1_EU-3' => 'Pendekatan Outcome-Based Education (OBE)',
+            '2.1_EU-4' => 'Pelibatan stakeholder/industri dalam penyusunan CPL',
+            '2.1_EU-5' => 'Pengalaman belajar lapangan (PKL/magang)',
+            '2.1_EU-6' => 'Relevansi CPL dengan karir lulusan',
+            '2.1_EU-7' => 'Kesesuaian dengan konteks lokal Batam/Kepri',
+
+            '2.2_EU-1' => 'Prinsip desain kurikulum',
+            '2.2_EU-2' => 'Keseimbangan komponen teori, praktik, dan lapangan',
+            '2.2_EU-3' => 'Integrasi penelitian & PkM dosen ke dalam pembelajaran',
+
+            '2.3_EU-1' => 'Cakupan kompetensi inti',
+            '2.3_EU-2' => 'Kemutakhiran isi kurikulum',
+            '2.3_EU-3' => 'Penguasaan regulasi/standar bidang kesehatan',
+            '2.3_EU-4' => 'Integrasi konteks sektor lokal',
+
+            '2.4_EU-1' => 'Variasi metode pembelajaran',
+            '2.4_EU-2' => 'Pengelolaan PKL/magang terstruktur',
+            '2.4_EU-3' => 'Suasana akademik (seminar/kuliah tamu ≥ 2x/semester)',
         ];
 
         foreach ($elements as $kode => $nama) {
-            $status = str_starts_with($kode, 'EU') ? 'Draft' : 'Belum Memenuhi';
+            $status = str_contains($kode, 'EU') ? 'Draft' : 'Belum Memenuhi';
             KurikulumNarasi::firstOrCreate(
                 ['kurikulum_id' => $kurikulum->id, 'kriteria_kode' => $kode],
-                ['kriteria_nama' => $nama, 'syarat' => 'WAJIB', 'status' => $status]
+                ['kriteria_nama' => $nama, 'status' => $status]
             );
         }
 
