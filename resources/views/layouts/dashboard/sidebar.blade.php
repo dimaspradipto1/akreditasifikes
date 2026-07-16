@@ -66,6 +66,13 @@
                     <span>Matriks 26 Sub-Kriteria</span>
                 </a>
             </li>
+            
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('tracker.index') }}">
+                    <i class="bi bi-search"></i>
+                    <span>Tracker Bukti Terpusat</span>
+                </a>
+            </li>
 
               <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('user.index') }}">
@@ -73,13 +80,6 @@
                     <span>Dokumen Bersama</span>
                 </a>
             </li>
-              <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('user.index') }}">
-                    <i class="bi bi-file-earmark"></i>
-                    <span>Tracker Bukti</span>
-                </a>
-            </li>
-
 
             <li class="nav-heading">Pages</li>
 

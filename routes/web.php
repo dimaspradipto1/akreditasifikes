@@ -6,6 +6,7 @@ use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VmtsController;
 use App\Http\Controllers\MatriksController;
+use App\Http\Controllers\TrackerController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -28,6 +29,7 @@ Route::middleware(['auth', 'checkrole'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/matriks', [MatriksController::class, 'index'])->name('matriks.index');
+    Route::get('/tracker-bukti', [TrackerController::class, 'index'])->name('tracker.index');
 
     // User CRUD Resource
     Route::resource('user', UserController::class);
