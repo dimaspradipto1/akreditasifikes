@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KurikulumController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VmtsController;
+use App\Http\Controllers\MatriksController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -26,6 +27,7 @@ Route::controller(AuthController::class)->group(function () {
 Route::middleware(['auth', 'checkrole'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/matriks', [MatriksController::class, 'index'])->name('matriks.index');
 
     // User CRUD Resource
     Route::resource('user', UserController::class);

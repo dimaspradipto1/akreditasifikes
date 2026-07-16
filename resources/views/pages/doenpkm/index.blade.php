@@ -75,13 +75,9 @@
         <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Kriteria 5 — Dosen & PkM</h1>
         <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - {{ count($elements) }} sub-kriteria pada kriteria ini</small>
     </div>
-    <div class="text-end d-flex gap-2 align-items-center justify-content-end">
-        <button class="btn btn-light border shadow-sm btn-sm px-3 fw-medium">
-            <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Export PDF
-        </button>
-        <button class="btn btn-primary shadow-sm btn-sm px-3 fw-medium" style="background-color: #185fa5; border: none;">
-            <i class="bi bi-cloud-arrow-up me-1"></i> Simpan Semua
-        </button>
+    <div class="text-end">
+        <div class="text-muted mb-1" style="font-size: 0.85rem;">Status simulasi kriteria</div>
+        <div class="fs-4 fw-bold text-success" style="line-height: 1;">Baik</div>
     </div>
 </div>
 

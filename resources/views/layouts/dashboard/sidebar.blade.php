@@ -61,7 +61,7 @@
             </li><!-- End Components Nav -->
 
             <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('vmts.index') }}">
+                <a class="nav-link collapsed" href="{{ route('matriks.index') }}">
                     <i class="bi bi-file-earmark"></i>
                     <span>Matriks 26 Sub-Kriteria</span>
                 </a>
