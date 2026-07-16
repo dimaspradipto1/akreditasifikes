@@ -89,8 +89,9 @@ class VmtsController extends Controller
     /**
      * Update existing Bukti (Bagian B).
      */
-    public function updateBukti(VmtsRequest $request, VmtsBukti $bukti)
+    public function updateBukti(VmtsRequest $request, $id)
     {
+        $bukti = \App\Models\VmtsBukti::findOrFail($id);
         $updateData = $request->validated();
         if(isset($updateData['status_bukti'])) {
             $updateData['status'] = $updateData['status_bukti'];
@@ -112,8 +113,9 @@ class VmtsController extends Controller
     /**
      * Remove Bukti (Bagian B).
      */
-    public function destroyBukti(VmtsBukti $bukti)
+    public function destroyBukti($id)
     {
+        $bukti = \App\Models\VmtsBukti::findOrFail($id);
         $vmts_id = $bukti->vmts_id;
         $elemen_kode = $bukti->elemen_kode;
         $bukti->delete();

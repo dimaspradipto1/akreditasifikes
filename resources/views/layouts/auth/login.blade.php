@@ -649,14 +649,6 @@
                 @enderror
             </div>
 
-            {{-- Remember --}}
-            <div class="options-row">
-                <label class="remember-label">
-                    <input type="checkbox" name="remember" id="remember" {{ old('remember') ? 'checked' : '' }}>
-                    <span>Ingat saya</span>
-                </label>
-            </div>
-
             {{-- Submit --}}
             <button type="submit" class="btn-submit" id="btnSubmit">
                 <i class="bi bi-box-arrow-in-right" id="btnIcon"></i>

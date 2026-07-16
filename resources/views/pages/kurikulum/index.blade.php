@@ -68,142 +68,93 @@
             </ol>
         </nav>
         <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Kriteria 2 — Kurikulum</h1>
-        <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - 4 sub-kriteria pada kriteria ini</small>
+        <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - {{ $subKriterias->count() }} sub-kriteria pada kriteria ini</small>
     </div>
-    <div class="text-end">
-        <small class="text-muted d-block mb-1">Status simulasi kriteria</small>
-        <h4 class="text-success fw-bold m-0">Baik</h4>
+    <div class="text-end d-flex gap-2 align-items-center justify-content-end">
+        <button class="btn btn-light border shadow-sm btn-sm px-3 fw-medium">
+            <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Export PDF
+        </button>
+        <button class="btn btn-primary shadow-sm btn-sm px-3 fw-medium" style="background-color: #185fa5; border: none;">
+            <i class="bi bi-cloud-arrow-up me-1"></i> Simpan Semua
+        </button>
     </div>
 </div>
 
 <section class="section">
-    <!-- Top KPI Cards -->
-    <div class="row mb-4 g-3">
-        <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">% Narasi Lengkap (Kriteria)</small>
-                <h3 class="fw-bold m-0">{{ $pctNarasi }}%</h3>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">% Bukti Tersedia (Kriteria)</small>
-                <h3 class="fw-bold m-0">{{ $pctBukti }}%</h3>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">Sub-Kriteria Memenuhi</small>
-                <h3 class="fw-bold m-0 text-success">4 dari 4</h3>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">Sub-Kriteria WAJIB Belum Memenuhi</small>
-                <h3 class="fw-bold m-0 text-success">0</h3>
-            </div>
-        </div>
-    </div>
-
-    <!-- Horizontal Navigation -->
-    <ul class="nav nav-pills nav-pills-kriteria mb-4 border-bottom pb-3">
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('vmts.index') }}"><i class="bi bi-circle-fill text-success"></i> K1 — VMTS</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link active" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mhs</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-warning"></i> K5 — Dosen&PkM</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-success"></i> K6 — Sarpras&Keu</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-success"></i> K7 — Mutu</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-warning"></i> K8 — Tata Kelola</a>
-        </li>
-    </ul>
-
-<div class="container-fluid px-0">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1" style="font-size: 0.85rem;">
-                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Akreditasi S1</a></li>
-                    <li class="breadcrumb-item active fw-medium text-dark" aria-current="page">K2 — Kurikulum</li>
-                </ol>
-            </nav>
-            <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700; color: #1e293b;">Kriteria 2 — Kurikulum</h1>
-            <p class="text-muted mb-0" style="font-size: 0.9rem;">Kelola dokumen narasi dan bukti pendukung untuk standar Kurikulum LAM-PTKes.</p>
-        </div>
-        <div class="d-flex gap-2">
-            <button class="btn btn-light border shadow-sm btn-sm px-3 fw-medium">
-                <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Export PDF
-            </button>
-            <button class="btn btn-primary shadow-sm btn-sm px-3 fw-medium" style="background-color: #185fa5; border: none;">
-                <i class="bi bi-cloud-arrow-up me-1"></i> Simpan Semua
-            </button>
-        </div>
-    </div>
-
     <!-- Ringkasan Metrik -->
     <div class="row g-3 mb-4">
+        <!-- Progress Narasi -->
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: linear-gradient(145deg, #ffffff, #f8fafc);">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
                 <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #e0e7ff; color: #4f46e5;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #eef2ff; color: #4f46e5;">
                         <i class="bi bi-card-text fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-muted" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Progress Narasi</div>
-                        <div class="fs-4 fw-bold text-dark">{{ $pctNarasi }}%</div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Progress Narasi</div>
+                        <div class="fs-4 fw-bold text-dark" style="line-height: 1;">{{ $pctNarasi }}%</div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Bukti Tersedia -->
         <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: linear-gradient(145deg, #ffffff, #f8fafc);">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
                 <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #dcfce7; color: #16a34a;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #eff6ff; color: #2563eb;">
                         <i class="bi bi-folder-check fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-muted" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Ketersediaan Bukti</div>
-                        <div class="fs-4 fw-bold text-dark">{{ $pctBukti }}%</div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Bukti Tersedia</div>
+                        <div class="fs-4 fw-bold text-dark" style="line-height: 1;">{{ $pctBukti }}%</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #fff8f1;">
+        
+        <!-- Sub Memenuhi -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
                 <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #ffedd5; color: #ea580c;">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #ecfdf5; color: #16a34a;">
+                        <i class="bi bi-check-circle fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sub Memenuhi</div>
+                        <div class="fs-4 fw-bold text-success" style="line-height: 1;">{{ $narasis->where('status', 'Memenuhi')->count() }} <span class="text-muted fw-normal fs-6">dari {{ $subKriterias->count() }}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Wajib Belum -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #fef2f2; color: #dc2626;">
                         <i class="bi bi-exclamation-triangle fs-4"></i>
                     </div>
                     <div>
-                        <div class="text-muted" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Status</div>
-                        <div class="fw-bold text-dark" style="font-size: 0.9rem;">Masih ada {{ $narasis->where('status', '!=', 'Memenuhi')->count() }} sub-kriteria belum lengkap</div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Wajib Belum</div>
+                        <div class="fs-4 fw-bold text-danger" style="line-height: 1;">{{ $narasis->where('status', '!=', 'Memenuhi')->count() }}</div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Horizontal Navigation -->
+    <ul class="nav nav-pills nav-pills-kriteria mb-4 border-bottom pb-3">
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('vmts.*') ? 'active' : '' }}" href="{{ route('vmts.index') }}"><i class="bi bi-circle-fill text-success"></i> K1 — VMTS</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('kurikulum.*') ? 'active' : '' }}" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('penilaian.*') ? 'active' : '' }}" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('mahasiswa.*') ? 'active' : '' }}" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mahasiswa</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('doenpkm.*') ? 'active' : '' }}" href="{{ route('doenpkm.index') }}"><i class="bi bi-circle-fill text-warning"></i> K5 — Dosen & PkM</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('sarpraskeuangan.*') ? 'active' : '' }}" href="{{ route('sarpraskeuangan.index') }}"><i class="bi bi-circle-fill text-success"></i> K6 — Sarpras & Keu</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('mutu.*') ? 'active' : '' }}" href="{{ route('mutu.index') }}"><i class="bi bi-circle-fill text-success"></i> K7 — Mutu</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('tatakelola.*') ? 'active' : '' }}" href="{{ route('tatakelola.index') }}"><i class="bi bi-circle-fill text-warning"></i> K8 — Tata Kelola</a></li>
+    </ul>
 
-    @php
-        $subKriterias = $narasis->filter(fn($n, $kode) => preg_match('/^2\.\d+$/', $kode));
-    @endphp
-
-    <!-- OUTER ACCORDION FOR 2.1 to 2.4 -->
     <div class="accordion mb-5" id="accordionKurikulum">
         @foreach($subKriterias as $kode => $sub)
         @php
@@ -387,7 +338,7 @@
                                             <th class="py-3">Link</th>
                                             <th class="py-3">PIC</th>
                                             <th class="py-3">Deadline</th>
-                                            <th class="py-3 text-center">Catatan</th>
+                                            <th class="py-3 text-center">Aksi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -442,7 +393,9 @@
                                             </td>
                                             <td class="text-center">
                                                 <div class="d-flex justify-content-center gap-1">
-                                                    <button type="button" class="btn btn-sm text-secondary p-1 border-0 shadow-none" title="Catatan" style="background:transparent;"><i class="bi bi-chat-left-text" style="font-size:14px;"></i></button>
+                                                    <button type="button" class="btn btn-sm {{ $bukti->catatan ? 'text-primary' : 'text-secondary' }} p-1 border-0 shadow-none" title="Catatan" style="background:transparent;" data-bs-toggle="modal" data-bs-target="#modalCatatanBukti{{ $bukti->id }}">
+                                                        <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
+                                                    </button>
                                                     <form action="{{ route('kurikulum.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
                                                         @csrf
                                                         @method('DELETE')
@@ -460,6 +413,37 @@
                                 </table>
                             @endif
                         </div>
+                        
+                        <!-- Modals Catatan Bukti -->
+                        @foreach($kurikulum->buktis->where('kriteria_kode', $sub->kriteria_kode) as $bukti)
+                            <div class="modal fade" id="modalCatatanBukti{{ $bukti->id }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="{{ route('kurikulum.bukti.update', $bukti->id) }}" method="POST">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-header">
+                                                <h5 class="modal-title fs-6 fw-bold">Catatan Bukti Pendukung</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-2 text-muted" style="font-size: 0.85rem;">
+                                                    Nama Bukti: <span class="fw-medium text-dark">{{ $bukti->nama_bukti }}</span>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-medium" style="font-size: 0.85rem;">Catatan / Keterangan</label>
+                                                    <textarea name="catatan" class="form-control" rows="4" placeholder="Tulis catatan atau keterangan tambahan di sini...">{{ $bukti->catatan }}</textarea>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Tutup</button>
+                                                <button type="submit" class="btn btn-sm text-white" style="background:#5520B8;">Simpan Catatan</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                         @if($plusCount > 0)
                         <div class="mt-3 text-muted" style="font-size: 0.8rem; font-style: italic;">
                             + {{ $plusCount }} dokumen bukti lain pada sub-kriteria ini — lihat Tracker Terpusat untuk rincian lengkap.
@@ -552,7 +536,10 @@
         <span class="badge rounded-pill" style="background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 0.35rem 0.6rem;">UNIV</span>
         
         <span class="badge rounded-pill" style="background-color: #fee2e2; color: #991b1b; font-weight: 600; padding: 0.35rem 0.6rem;">WAJIB</span>
-        <span class="badge rounded-pill" style="background-color: #fef3c7; color: #92400e; font-weight: 600; padding: 0.35rem 0.6rem;">BO@push('scripts')
+        <span class="badge rounded-pill" style="background-color: #fef3c7; color: #92400e; font-weight: 600; padding: 0.35rem 0.6rem;">BOLEH SEBAGIAN</span>
+    </div>
+
+@push('scripts')
     <script>
         $(document).ready(function() {
             $('.bukti-input').on('change', function() {
@@ -594,8 +581,6 @@
                     }
                 });
             });
-        });
-    </script>  });
         });
     </script>
 @endpush

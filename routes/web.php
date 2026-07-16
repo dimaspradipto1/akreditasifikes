@@ -63,4 +63,32 @@ Route::middleware(['auth', 'checkrole'])->group(function () {
     Route::post('/mahasiswa/bukti', [App\Http\Controllers\MahasiswaController::class, 'storeBukti'])->name('mahasiswa.bukti.store');
     Route::put('/mahasiswa/bukti/{bukti}', [App\Http\Controllers\MahasiswaController::class, 'updateBukti'])->name('mahasiswa.bukti.update');
     Route::delete('/mahasiswa/bukti/{bukti}', [App\Http\Controllers\MahasiswaController::class, 'destroyBukti'])->name('mahasiswa.bukti.destroy');
+
+    // Doenpkm Resource and Custom Routes
+    Route::resource('doenpkm', App\Http\Controllers\DoenpkmController::class);
+    Route::put('/doenpkm/narasi/{narasi}', [App\Http\Controllers\DoenpkmController::class, 'updateNarasi'])->name('doenpkm.narasi.update');
+    Route::post('/doenpkm/bukti', [App\Http\Controllers\DoenpkmController::class, 'storeBukti'])->name('doenpkm.bukti.store');
+    Route::put('/doenpkm/bukti/{bukti}', [App\Http\Controllers\DoenpkmController::class, 'updateBukti'])->name('doenpkm.bukti.update');
+    Route::delete('/doenpkm/bukti/{bukti}', [App\Http\Controllers\DoenpkmController::class, 'destroyBukti'])->name('doenpkm.bukti.destroy');
+
+    // Sarpraskeuangan Resource and Custom Routes
+    Route::resource('sarpraskeuangan', App\Http\Controllers\SarpraskeuanganController::class);
+    Route::put('/sarpraskeuangan/narasi/{narasi}', [App\Http\Controllers\SarpraskeuanganController::class, 'updateNarasi'])->name('sarpraskeuangan.narasi.update');
+    Route::post('/sarpraskeuangan/bukti', [App\Http\Controllers\SarpraskeuanganController::class, 'storeBukti'])->name('sarpraskeuangan.bukti.store');
+    Route::put('/sarpraskeuangan/bukti/{bukti}', [App\Http\Controllers\SarpraskeuanganController::class, 'updateBukti'])->name('sarpraskeuangan.bukti.update');
+    Route::delete('/sarpraskeuangan/bukti/{bukti}', [App\Http\Controllers\SarpraskeuanganController::class, 'destroyBukti'])->name('sarpraskeuangan.bukti.destroy');
+
+    // Mutu Resource and Custom Routes
+    Route::resource('mutu', App\Http\Controllers\MutuController::class);
+    Route::put('/mutu/narasi/{narasi}', [App\Http\Controllers\MutuController::class, 'updateNarasi'])->name('mutu.narasi.update');
+    Route::post('/mutu/bukti', [App\Http\Controllers\MutuController::class, 'storeBukti'])->name('mutu.bukti.store');
+    Route::put('/mutu/bukti/{bukti}', [App\Http\Controllers\MutuController::class, 'updateBukti'])->name('mutu.bukti.update');
+    Route::delete('/mutu/bukti/{bukti}', [App\Http\Controllers\MutuController::class, 'destroyBukti'])->name('mutu.bukti.destroy');
+
+    // Tatakelola Resource and Custom Routes
+    Route::resource('tatakelola', App\Http\Controllers\TatakelolaController::class);
+    Route::put('/tatakelola/narasi/{narasi}', [App\Http\Controllers\TatakelolaController::class, 'updateNarasi'])->name('tatakelola.narasi.update');
+    Route::post('/tatakelola/bukti', [App\Http\Controllers\TatakelolaController::class, 'storeBukti'])->name('tatakelola.bukti.store');
+    Route::put('/tatakelola/bukti/{bukti}', [App\Http\Controllers\TatakelolaController::class, 'updateBukti'])->name('tatakelola.bukti.update');
+    Route::delete('/tatakelola/bukti/{bukti}', [App\Http\Controllers\TatakelolaController::class, 'destroyBukti'])->name('tatakelola.bukti.destroy');
 });

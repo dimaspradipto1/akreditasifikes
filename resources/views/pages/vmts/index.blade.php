@@ -68,39 +68,148 @@
             </ol>
         </nav>
         <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Kriteria 1 — Visi, Misi, Tujuan & Strategi</h1>
-        <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - 1 sub-kriteria pada kriteria ini</small>
+        <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - {{ $narasis->count() }} sub-kriteria pada kriteria ini</small>
     </div>
-    <div class="text-end">
-        <small class="text-muted d-block mb-1">Status simulasi kriteria</small>
-        <h4 class="text-success fw-bold m-0">Baik</h4>
+    <div class="text-end d-flex gap-2 align-items-center justify-content-end">
+        <button class="btn btn-light border shadow-sm btn-sm px-3 fw-medium">
+            <i class="bi bi-file-earmark-pdf me-1 text-danger"></i> Export PDF
+        </button>
+        <button class="btn btn-primary shadow-sm btn-sm px-3 fw-medium" style="background-color: #185fa5; border: none;">
+            <i class="bi bi-cloud-arrow-up me-1"></i> Simpan Semua
+        </button>
     </div>
 </div>
 
 <section class="section">
-    <!-- Top KPI Cards -->
-    <div class="row mb-4 g-3">
+    <!-- Ringkasan Metrik -->
+    <div class="row g-3 mb-4">
+        <!-- Progress Narasi -->
         <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">% Narasi Lengkap (Kriteria)</small>
-                <h3 class="fw-bold m-0">{{ $pctNarasi }}%</h3>
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #eef2ff; color: #4f46e5;">
+                        <i class="bi bi-card-text fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Progress Narasi</div>
+                        <div class="fs-4 fw-bold text-dark" style="line-height: 1;">{{ $pctNarasi }}%</div>
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <!-- Bukti Tersedia -->
         <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">% Bukti Tersedia (Kriteria)</small>
-                <h3 class="fw-bold m-0">{{ $pctBukti }}%</h3>
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #eff6ff; color: #2563eb;">
+                        <i class="bi bi-folder-check fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Bukti Tersedia</div>
+                        <div class="fs-4 fw-bold text-dark" style="line-height: 1;">{{ $pctBukti }}%</div>
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <!-- Sub Memenuhi -->
         <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">Sub-Kriteria Memenuhi</small>
-                <h3 class="fw-bold m-0 text-success">1 dari 1</h3>
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #ecfdf5; color: #16a34a;">
+                        <i class="bi bi-check-circle fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sub Memenuhi</div>
+                        <div class="fs-4 fw-bold text-success" style="line-height: 1;">{{ $narasis->where('status', 'Memenuhi')->count() }} <span class="text-muted fw-normal fs-6">dari {{ $narasis->count() }}</span></div>
+                    </div>
+                </div>
             </div>
         </div>
+        
+        <!-- Wajib Belum -->
         <div class="col-md-3">
-            <div class="kriteria-card">
-                <small class="text-muted d-block mb-2">Sub-Kriteria WAJIB Belum Memenuhi</small>
-                <h3 class="fw-bold m-0 text-success">0</h3>
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-exclamation-triangle fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Wajib Belum</div>
+                        <div class="fs-4 fw-bold text-danger" style="line-height: 1;">{{ $narasis->where('status', '!=', 'Memenuhi')->count() }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Horizontal Navigation -->
+    <ul class="nav nav-pills nav-pills-kriteria mb-4 border-bottom pb-3">
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('vmts.*') ? 'active' : '' }}" href="{{ route('vmts.index') }}"><i class="bi bi-circle-fill text-success"></i> K1 — VMTS</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('kurikulum.*') ? 'active' : '' }}" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('penilaian.*') ? 'active' : '' }}" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('mahasiswa.*') ? 'active' : '' }}" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mahasiswa</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('doenpkm.*') ? 'active' : '' }}" href="{{ route('doenpkm.index') }}"><i class="bi bi-circle-fill text-warning"></i> K5 — Dosen & PkM</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('sarpraskeuangan.*') ? 'active' : '' }}" href="{{ route('sarpraskeuangan.index') }}"><i class="bi bi-circle-fill text-success"></i> K6 — Sarpras & Keu</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('mutu.*') ? 'active' : '' }}" href="{{ route('mutu.index') }}"><i class="bi bi-circle-fill text-success"></i> K7 — Mutu</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('tatakelola.*') ? 'active' : '' }}" href="{{ route('tatakelola.index') }}"><i class="bi bi-circle-fill text-warning"></i> K8 — Tata Kelola</a></li>
+    </ul>
+
+    <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #eef2ff; color: #4f46e5;">
+                        <i class="bi bi-card-text fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Progress Narasi</div>
+                        <div class="fs-4 fw-bold text-dark" style="line-height: 1;">{{ $pctNarasi }}%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bukti Tersedia -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #eff6ff; color: #2563eb;">
+                        <i class="bi bi-folder-check fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Bukti Tersedia</div>
+                        <div class="fs-4 fw-bold text-dark" style="line-height: 1;">{{ $pctBukti }}%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sub Memenuhi -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #ecfdf5; color: #16a34a;">
+                        <i class="bi bi-check-circle fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sub Memenuhi</div>
+                        <div class="fs-4 fw-bold text-success" style="line-height: 1;">{{ $narasis->where('status', 'Memenuhi')->count() }} <span class="text-muted fw-normal fs-6">dari {{ $narasis->count() }}</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Wajib Belum -->
+        <div class="col-md-3">
+            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
+                <div class="card-body p-3 d-flex align-items-center">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #fef2f2; color: #dc2626;">
+                        <i class="bi bi-exclamation-triangle fs-4"></i>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Wajib Belum</div>
+                        <div class="fs-4 fw-bold text-danger" style="line-height: 1;">{{ $narasis->where('status', '!=', 'Memenuhi')->count() }}</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -108,28 +217,28 @@
     <!-- Horizontal Navigation -->
     <ul class="nav nav-pills nav-pills-kriteria mb-4 border-bottom pb-3">
         <li class="nav-item">
-            <a class="nav-link active" href="{{ route('vmts.index') }}"><i class="bi bi-circle-fill text-primary"></i> K1 — VMTS</a>
+            <a class="nav-link {{ request()->routeIs('vmts.*') ? 'active' : '' }}" href="{{ route('vmts.index') }}"><i class="bi bi-circle-fill text-success"></i> K1 — VMTS</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a>
+            <a class="nav-link {{ request()->routeIs('kurikulum.*') ? 'active' : '' }}" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a>
+            <a class="nav-link {{ request()->routeIs('penilaian.*') ? 'active' : '' }}" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mhs</a>
+            <a class="nav-link {{ request()->routeIs('mahasiswa.*') ? 'active' : '' }}" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mhs</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-warning"></i> K5 — Dosen&PkM</a>
+            <a class="nav-link {{ request()->routeIs('doenpkm.*') ? 'active' : '' }}" href="{{ route('doenpkm.index') }}"><i class="bi bi-circle-fill text-warning"></i> K5 — Dosen&PkM</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-success"></i> K6 — Sarpras&Keu</a>
+            <a class="nav-link {{ request()->routeIs('sarpraskeuangan.*') ? 'active' : '' }}" href="{{ route('sarpraskeuangan.index') }}"><i class="bi bi-circle-fill text-success"></i> K6 — Sarpras&Keu</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-success"></i> K7 — Mutu</a>
+            <a class="nav-link {{ request()->routeIs('mutu.*') ? 'active' : '' }}" href="{{ route('mutu.index') }}"><i class="bi bi-circle-fill text-success"></i> K7 — Mutu</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#"><i class="bi bi-circle-fill text-warning"></i> K8 — Tata Kelola</a>
+            <a class="nav-link {{ request()->routeIs('tatakelola.*') ? 'active' : '' }}" href="{{ route('tatakelola.index') }}"><i class="bi bi-circle-fill text-warning"></i> K8 — Tata Kelola</a>
         </li>
     </ul>
 
@@ -240,7 +349,7 @@
                                                     <th class="py-3">Link</th>
                                                     <th class="py-3">PIC</th>
                                                     <th class="py-3">Deadline</th>
-                                                    <th class="py-3 text-center">Catatan</th>
+                                                    <th class="py-3 text-center">Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -264,7 +373,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse($vmts->buktis->where('elemen_kode', $narasi->elemen_kode) as $index => $bukti)
+                                                @foreach($vmts->buktis->where('elemen_kode', $narasi->elemen_kode) as $index => $bukti)
                                                 <tr style="border-bottom: 1px solid #f1f5f9;" class="bukti-row" data-id="{{ $bukti->id }}">
                                                     <td class="text-muted">{{ $loop->iteration }}</td>
                                                     <td class="fw-medium text-dark">{{ $bukti->nama_bukti }}</td>
@@ -295,7 +404,9 @@
                                                     </td>
                                                     <td class="text-center">
                                                         <div class="d-flex justify-content-center gap-1">
-                                                            <button type="button" class="btn btn-sm text-secondary p-1 border-0 shadow-none" title="Catatan" style="background:transparent;"><i class="bi bi-chat-left-text" style="font-size:14px;"></i></button>
+                                                            <button type="button" class="btn btn-sm {{ $bukti->catatan ? 'text-primary' : 'text-secondary' }} p-1 border-0 shadow-none" title="Catatan" style="background:transparent;" data-bs-toggle="modal" data-bs-target="#modalCatatanBukti{{ $bukti->id }}">
+                                                                <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
+                                                            </button>
                                                             <form action="{{ route('vmts.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -304,11 +415,42 @@
                                                         </div>
                                                     </td>
                                                 </tr>
-                                                @endforelse
+                                                @endforeach
                                             </tbody>
                                         </table>
                                     @endif
                                 </div>
+                                
+                                <!-- Modals Catatan Bukti -->
+                                @foreach($vmts->buktis->where('elemen_kode', $narasi->elemen_kode) as $bukti)
+                                    <div class="modal fade" id="modalCatatanBukti{{ $bukti->id }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form action="{{ route('vmts.bukti.update', $bukti->id) }}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title fs-6 fw-bold">Catatan Bukti Pendukung</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-2 text-muted" style="font-size: 0.85rem;">
+                                                            Nama Bukti: <span class="fw-medium text-dark">{{ $bukti->nama_bukti }}</span>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-medium" style="font-size: 0.85rem;">Catatan / Keterangan</label>
+                                                            <textarea name="catatan" class="form-control" rows="4" placeholder="Tulis catatan atau keterangan tambahan di sini...">{{ $bukti->catatan }}</textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Tutup</button>
+                                                        <button type="submit" class="btn btn-sm text-white" style="background:#5520B8;">Simpan Catatan</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
                             </div>
                         </div>
                     </div>

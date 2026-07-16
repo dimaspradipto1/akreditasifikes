@@ -62,6 +62,7 @@ class KurikulumController extends Controller
         }
 
         $narasis = $kurikulum->narasis()->get()->keyBy('kriteria_kode');
+        $subKriterias = $narasis->filter(fn($n) => !str_contains($n->kriteria_kode, '_EU'));
 
         // Kalkulasi persentase kelengkapan
         $totalNarasi = $narasis->count();
@@ -70,7 +71,7 @@ class KurikulumController extends Controller
         $pctBukti = $totalNarasi > 0 ? (int) round($narasis->avg('bukti_persen')) : 0;
 
         // Render index page without DataTable
-        return view('pages.kurikulum.index', compact('kurikulum', 'narasis', 'pctNarasi', 'pctBukti'));
+        return view('pages.kurikulum.index', compact('kurikulum', 'narasis', 'subKriterias', 'pctNarasi', 'pctBukti'));
     }
 
     /**
@@ -134,8 +135,9 @@ class KurikulumController extends Controller
     /**
      * Update existing Bukti.
      */
-    public function updateBukti(KurikulumRequest $request, KurikulumBukti $bukti)
+    public function updateBukti(KurikulumRequest $request, $id)
     {
+        $bukti = \App\Models\KurikulumBukti::findOrFail($id);
         $updateData = $request->validated();
         if(isset($updateData['status_bukti'])) {
             $updateData['status'] = $updateData['status_bukti'];
@@ -157,8 +159,9 @@ class KurikulumController extends Controller
     /**
      * Remove Bukti.
      */
-    public function destroyBukti(KurikulumBukti $bukti)
+    public function destroyBukti($id)
     {
+        $bukti = \App\Models\KurikulumBukti::findOrFail($id);
         $kurikulum_id = $bukti->kurikulum_id;
         $kriteria_kode = $bukti->kriteria_kode;
         $bukti->delete();

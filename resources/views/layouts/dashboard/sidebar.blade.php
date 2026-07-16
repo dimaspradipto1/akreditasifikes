@@ -38,22 +38,22 @@
                         </a>
                     </li>
                     <li>
-                        <a href="components-buttons.html">
+                        <a href="{{ route('doenpkm.index') }}">
                             <i class="bi bi-circle"></i><span>5. Dosen, Tendik, Penelitian & PkM</span>
                         </a>
                     </li>
                     <li>
-                        <a href="components-cards.html">
+                        <a href="{{ route('sarpraskeuangan.index') }}">
                             <i class="bi bi-circle"></i><span>6. Sarana, Prasarana & Keuangan</span>
                         </a>
                     </li>
                     <li>
-                        <a href="components-carousel.html">
+                        <a href="{{ route('mutu.index') }}">
                             <i class="bi bi-circle"></i><span>7. Penjaminan Mutu</span>
                         </a>
                     </li>
                     <li>
-                        <a href="components-list-group.html">
+                        <a href="{{ route('tatakelola.index') }}">
                             <i class="bi bi-circle"></i><span>8. Tata Kelola & Administrasi</span>
                         </a>
                     </li>

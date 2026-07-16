@@ -64,10 +64,10 @@
             <ol class="breadcrumb mb-1" style="font-size: 0.85rem;">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
                 <li class="breadcrumb-item">S1 Kesehatan Lingkungan</li>
-                <li class="breadcrumb-item active">K3 — Penilaian</li>
+                <li class="breadcrumb-item active">K8 — Tata Kelola</li>
             </ol>
         </nav>
-        <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Kriteria 3 — Penilaian</h1>
+        <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Kriteria 8 — Tata Kelola</h1>
         <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - {{ $subKriterias->count() }} sub-kriteria pada kriteria ini</small>
     </div>
     <div class="text-end d-flex gap-2 align-items-center justify-content-end">
@@ -155,7 +155,7 @@
         <li class="nav-item"><a class="nav-link {{ request()->routeIs('tatakelola.*') ? 'active' : '' }}" href="{{ route('tatakelola.index') }}"><i class="bi bi-circle-fill text-warning"></i> K8 — Tata Kelola</a></li>
     </ul>
 
-    <div class="accordion mb-5" id="accordionPenilaian">
+    <div class="accordion mb-5" id="accordionKurikulum">
         @foreach($subKriterias as $kode => $sub)
         @php
             $euKriterias = $narasis->filter(fn($n, $k) => str_starts_with($k, $sub->kriteria_kode . '_EU'));
@@ -169,12 +169,8 @@
                     <span class="text-dark fw-bold flex-grow-1" style="font-size: 1.1rem;">{{ $sub->kriteria_nama }}</span>
                 </button>
                 <div class="me-4 d-flex align-items-center gap-3" style="z-index: 2;">
-                    @if($sub->kriteria_kode == '3.2')
-                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;">BOLEH SEBAGIAN</span>
-                    @else
-                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;">WAJIB</span>
-                    @endif
-                    <span class="badge {{ $sub->status == 'Memenuhi' ? 'bg-success bg-opacity-10 text-success border border-success' : ($sub->status == 'Memenuhi Sebagian' ? 'bg-warning bg-opacity-10 text-warning border border-warning' : 'bg-danger bg-opacity-10 text-danger border border-danger') }}" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;"><i class="bi {{ $sub->status == 'Memenuhi' ? 'bi-check-circle-fill' : ($sub->status == 'Memenuhi Sebagian' ? 'bi-circle-fill' : 'bi-x') }} me-1"></i> {{ $sub->status == 'Belum Memenuhi' ? 'Tidak Memenuhi' : $sub->status }}</span>
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;">WAJIB</span>
+                    <span class="badge {{ $sub->status == 'Memenuhi' ? 'bg-success bg-opacity-10 text-success border border-success' : 'bg-warning bg-opacity-10 text-warning border border-warning' }}" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;"><i class="bi {{ $sub->status == 'Memenuhi' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill' }} me-1"></i> {{ $sub->status }}</span>
                     
                     <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
                         <span class="me-2">Narasi {{ $sub->narasi_persen ?? 0 }}%</span>
@@ -187,7 +183,7 @@
                 </div>
             </h2>
 
-            <div id="collapseSub{{ $sub->id }}" class="accordion-collapse collapse" aria-labelledby="headingSub{{ $sub->id }}" data-bs-parent="#accordionPenilaian">
+            <div id="collapseSub{{ $sub->id }}" class="accordion-collapse collapse" aria-labelledby="headingSub{{ $sub->id }}" data-bs-parent="#accordionKurikulum">
                 <div class="accordion-body p-4" style="background-color: #f8fafc;">
                     
                     @if($hasEU)
@@ -216,29 +212,29 @@
                                 </h2>
                                 <div id="collapseEU{{ $euNarasi->id }}" class="accordion-collapse collapse" aria-labelledby="headingEU{{ $euNarasi->id }}" data-bs-parent="#accordionEU{{ $sub->id }}">
                                     <div class="accordion-body bg-white p-4">
-                                        <form id="form-narasi-{{ $euNarasi->id }}" action="{{ route('penilaian.narasi.update', $euNarasi->id) }}" method="POST">
+                                        <form id="form-narasi-{{ $euNarasi->id }}" action="{{ route('tatakelola.narasi.update', $euNarasi->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold" style="font-size: 0.85rem; color: #334155;">A. Deskripsi Kondisi Saat Ini</label>
-                                                <textarea class="form-control" name="kondisi_saat_ini" rows="2" placeholder="Tulis deskripsi kondisi saat ini...">{{ $euNarasi->kondisi_saat_ini }}</textarea>
+                                                <textarea class="form-control" name="kondisi_saat_ini" rows="2" placeholder="Jelaskan kondisi saat ini...">{{ $euNarasi->kondisi_saat_ini }}</textarea>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold" style="font-size: 0.85rem; color: #334155;">B. Data & Fakta Pendukung</label>
-                                                <textarea class="form-control" name="data_fakta" rows="2" placeholder="Tulis data & fakta pendukung...">{{ $euNarasi->data_fakta }}</textarea>
+                                                <textarea class="form-control" name="data_fakta" rows="2" placeholder="Sebutkan data/fakta...">{{ $euNarasi->data_fakta }}</textarea>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold" style="font-size: 0.85rem; color: #334155;">C. Analisis Capaian vs Standar</label>
-                                                <textarea class="form-control" name="analisis" rows="2" placeholder="Tulis analisis capaian vs standar...">{{ $euNarasi->analisis }}</textarea>
+                                                <textarea class="form-control" name="analisis" rows="2" placeholder="Analisis capaian terhadap standar LAM-PTKes...">{{ $euNarasi->analisis }}</textarea>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold" style="font-size: 0.85rem; color: #334155;">D. Permasalahan/Kelemahan</label>
-                                                <textarea class="form-control" name="permasalahan" rows="2" placeholder="Tulis permasalahan/kelemahan...">{{ $euNarasi->permasalahan }}</textarea>
+                                                <textarea class="form-control" name="permasalahan" rows="2" placeholder="Permasalahan yang ditemukan...">{{ $euNarasi->permasalahan }}</textarea>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold" style="font-size: 0.85rem; color: #334155;">E. Rencana Perbaikan & Pengembangan</label>
-                                                <textarea class="form-control" name="rencana_perbaikan" rows="2" placeholder="Tulis rencana perbaikan & pengembangan...">{{ $euNarasi->rencana_perbaikan }}</textarea>
+                                                <textarea class="form-control" name="rencana_perbaikan" rows="2" placeholder="Rencana tindak lanjut...">{{ $euNarasi->rencana_perbaikan }}</textarea>
                                             </div>
 
                                             <div class="d-flex justify-content-between align-items-center pt-3 mt-4 border-top">
@@ -262,7 +258,7 @@
                         <!-- Form Standar A-E untuk sub-kriteria tanpa EU -->
                         <div class="bg-white p-4 rounded shadow-sm mb-5" style="border: 1px solid #e2e8f0;">
                         <div class="bg-white p-4 rounded shadow-sm" style="border: 1px solid #e2e8f0;">
-                            <form id="form-narasi-{{ $sub->id }}" action="{{ route('penilaian.narasi.update', $sub->id) }}" method="POST">
+                            <form id="form-narasi-{{ $sub->id }}" action="{{ route('tatakelola.narasi.update', $sub->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 
@@ -318,7 +314,10 @@
                     <h5 class="fw-bold mb-1 mt-4" style="font-size: 1rem; color: #1e3a8a;">Bagian B — Daftar Bukti Pendukung</h5>
                     @php
                         $docCount = 8;
+                        if ($sub->kriteria_kode == '2.1') $docCount = 8;
+                        
                         $plusCount = 4;
+                        if ($sub->kriteria_kode == '2.1') $plusCount = 4;
                     @endphp
                     <p class="text-muted mb-4" style="font-size: 0.85rem;">{{ $docCount }} dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</p>
                     
@@ -329,7 +328,7 @@
                             </button>
                         </div>
                         <div class="table-responsive">
-                            @if($penilaian->buktis->where('kriteria_kode', $sub->kriteria_kode)->isEmpty())
+                            @if($tatakelola->buktis->where('kriteria_kode', $sub->kriteria_kode)->isEmpty())
                                 <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
                                     <thead>
                                         <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
@@ -363,7 +362,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($penilaian->buktis->where('kriteria_kode', $sub->kriteria_kode) as $index => $bukti)
+                                        @forelse($tatakelola->buktis->where('kriteria_kode', $sub->kriteria_kode) as $index => $bukti)
                                         <tr style="border-bottom: 1px solid #f1f5f9;" class="bukti-row" data-id="{{ $bukti->id }}">
                                             <td class="text-muted">{{ $loop->iteration }}</td>
                                             <td class="fw-medium text-dark">{{ $bukti->nama_bukti }}</td>
@@ -397,7 +396,7 @@
                                                     <button type="button" class="btn btn-sm {{ $bukti->catatan ? 'text-primary' : 'text-secondary' }} p-1 border-0 shadow-none" title="Catatan" style="background:transparent;" data-bs-toggle="modal" data-bs-target="#modalCatatanBukti{{ $bukti->id }}">
                                                         <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
                                                     </button>
-                                                    <form action="{{ route('penilaian.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
+                                                    <form action="{{ route('tatakelola.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
@@ -416,11 +415,11 @@
                         </div>
                         
                         <!-- Modals Catatan Bukti -->
-                        @foreach($penilaian->buktis->where('kriteria_kode', $sub->kriteria_kode) as $bukti)
+                        @foreach($tatakelola->buktis->where('kriteria_kode', $sub->kriteria_kode) as $bukti)
                             <div class="modal fade" id="modalCatatanBukti{{ $bukti->id }}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
-                                        <form action="{{ route('penilaian.bukti.update', $bukti->id) }}" method="POST">
+                                        <form action="{{ route('tatakelola.bukti.update', $bukti->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <div class="modal-header">
@@ -460,9 +459,9 @@
         <div class="modal fade" id="modalTambahBukti{{ $sub->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="{{ route('penilaian.bukti.store') }}" method="POST">
+                    <form action="{{ route('tatakelola.bukti.store') }}" method="POST">
                         @csrf
-                        <input type="hidden" name="penilaian_id" value="{{ $penilaian->id ?? 1 }}">
+                        <input type="hidden" name="tatakelola_id" value="{{ $tatakelola->id ?? 1 }}">
                         <input type="hidden" name="kriteria_kode" value="{{ $sub->kriteria_kode }}">
                         <div class="modal-header">
                             <h5 class="modal-title">Tambah Dokumen Bukti ({{ $sub->kriteria_kode }})</h5>
@@ -539,7 +538,6 @@
         <span class="badge rounded-pill" style="background-color: #fee2e2; color: #991b1b; font-weight: 600; padding: 0.35rem 0.6rem;">WAJIB</span>
         <span class="badge rounded-pill" style="background-color: #fef3c7; color: #92400e; font-weight: 600; padding: 0.35rem 0.6rem;">BOLEH SEBAGIAN</span>
     </div>
-</div>
 
 @push('scripts')
     <script>
@@ -557,7 +555,7 @@
                 data[fieldName] = fieldValue;
                 
                 $.ajax({
-                    url: '/penilaian/bukti/' + buktiId,
+                    url: '/tatakelola/bukti/' + buktiId,
                     type: 'POST',
                     data: data,
                     success: function(response) {
