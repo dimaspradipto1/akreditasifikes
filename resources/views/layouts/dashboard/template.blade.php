@@ -33,6 +33,12 @@
     {{--  datatables CSS  --}}
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.4/css/dataTables.bootstrap5.css">
 
+    <style>
+        /* Hide accordion arrows on all menus */
+        .accordion-button::after {
+            display: none !important;
+        }
+    </style>
 </head>
 
 <body>
