@@ -172,17 +172,25 @@ class TrackerController extends Controller
             $allBukti = $allBukti->merge($buktis);
         }
 
-        // Sort by kriteria and kode_eu
-        $allBukti = $allBukti->sortBy([
-            ['kriteria', 'asc'],
-            ['kode_eu', 'asc']
-        ])->values();
-
         // Calculate stats
         $totalBukti = $allBukti->count();
         $prodiCount = $allBukti->where('level', 'PRODI')->count();
         $fikesCount = $allBukti->where('level', 'FIKES')->count();
         $univCount = $allBukti->where('level', 'UNIV')->count();
+
+        // Change status to 'Otomatis' for FIKES and UNIV so the view shows the badge
+        $allBukti = $allBukti->map(function($b) {
+            if ($b->level === 'FIKES' || $b->level === 'UNIV') {
+                $b->status = 'Otomatis'; 
+            }
+            return $b;
+        });
+
+        // Sort by kriteria and kode_eu
+        $allBukti = $allBukti->sortBy([
+            ['kriteria', 'asc'],
+            ['kode_eu', 'asc']
+        ])->values();
 
         return view('pages.tracker.index', compact(
             'allBukti',

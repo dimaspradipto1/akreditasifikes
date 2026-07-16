@@ -74,8 +74,8 @@
                 </a>
             </li>
 
-              <li class="nav-item">
-                <a class="nav-link collapsed" href="{{ route('user.index') }}">
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="{{ route('dokumen-bersama.index') }}">
                     <i class="bi bi-file-earmark"></i>
                     <span>Dokumen Bersama</span>
                 </a>

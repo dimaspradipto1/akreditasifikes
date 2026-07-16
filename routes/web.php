@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\VmtsController;
 use App\Http\Controllers\MatriksController;
 use App\Http\Controllers\TrackerController;
+use App\Http\Controllers\DokumenBersamaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -30,6 +31,10 @@ Route::middleware(['auth', 'checkrole'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/matriks', [MatriksController::class, 'index'])->name('matriks.index');
     Route::get('/tracker-bukti', [TrackerController::class, 'index'])->name('tracker.index');
+    
+    // Dokumen Bersama
+    Route::get('/dokumen-bersama', [DokumenBersamaController::class, 'index'])->name('dokumen-bersama.index');
+    Route::put('/dokumen-bersama/update', [DokumenBersamaController::class, 'update'])->name('dokumen-bersama.update');
 
     // User CRUD Resource
     Route::resource('user', UserController::class);
