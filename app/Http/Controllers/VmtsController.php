@@ -130,26 +130,17 @@ class VmtsController extends Controller
     /**
      * Update bukti persen per elemen_kode
      */
-    private function updateBuktiPersen($vmts_id, $elemen_kode)
+    private function updateBuktiPersen($vmts_id, $elemen_kode = null)
     {
-        $narasi = VmtsNarasi::where('vmts_id', $vmts_id)
-            ->where('elemen_kode', $elemen_kode)
-            ->first();
-
-        if ($narasi) {
-            $totalBukti = VmtsBukti::where('vmts_id', $vmts_id)
-                ->where('elemen_kode', $elemen_kode)
-                ->count();
-                
-            $tersediaBukti = VmtsBukti::where('vmts_id', $vmts_id)
-                ->where('elemen_kode', $elemen_kode)
-                ->where('status', 'Tersedia')
-                ->count();
-                
-            $pct = $totalBukti > 0 ? round(($tersediaBukti / $totalBukti) * 100) : 0;
-            $narasi->update(['bukti_persen' => $pct]);
-            return $pct;
-        }
-        return 0;
+        $totalBukti = VmtsBukti::where('vmts_id', $vmts_id)->count();
+            
+        $tersediaBukti = VmtsBukti::where('vmts_id', $vmts_id)
+            ->where('status', 'Tersedia')
+            ->count();
+            
+        $pct = $totalBukti > 0 ? round(($tersediaBukti / $totalBukti) * 100) : 0;
+        
+        VmtsNarasi::where('vmts_id', $vmts_id)->update(['bukti_persen' => $pct]);
+        return $pct;
     }
 }

@@ -161,28 +161,28 @@
             $euKriterias = $narasis->filter(fn($n, $k) => str_starts_with($k, $sub->kriteria_kode . '_EU'));
             $hasEU = $euKriterias->isNotEmpty();
         @endphp
-        <div class="accordion-item mb-3 shadow-sm border-0" style="border-radius: 12px; overflow: hidden; background-color: #fff;">
+        <div class="accordion-item mb-3 shadow-sm border-0" style="border-radius: 12px; overflow: hidden; background-color: #fff; border: 1px solid #e2e8f0 !important;">
             
-            <h2 class="accordion-header d-flex align-items-center" id="headingSub{{ $sub->id }}" style="border-bottom: 1px solid #e2e8f0;">
-                <button class="accordion-button collapsed flex-grow-1 shadow-none bg-white py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSub{{ $sub->id }}" aria-expanded="false" aria-controls="collapseSub{{ $sub->id }}">
+            <h2 class="accordion-header" id="headingSub{{ $sub->id }}">
+                <button class="accordion-button collapsed shadow-none bg-white py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSub{{ $sub->id }}" aria-expanded="false" aria-controls="collapseSub{{ $sub->id }}">
                     <span class="text-primary fw-bold me-3" style="font-size: 1.1rem;">{{ $sub->kriteria_kode }}</span>
                     <span class="text-dark fw-bold flex-grow-1" style="font-size: 1.1rem;">{{ $sub->kriteria_nama }}</span>
-                </button>
-                <div class="me-4 d-flex align-items-center gap-3" style="z-index: 2;">
-                    @if(in_array($sub->kriteria_kode, ['4.2', '4.3']))
-                        <span class="badge bg-warning bg-opacity-10 text-warning border border-warning" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;">BOLEH SEBAGIAN</span>
-                    @else
-                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;">WAJIB</span>
-                    @endif
-                    <span class="badge {{ $sub->status == 'Memenuhi' ? 'bg-success bg-opacity-10 text-success border border-success' : ($sub->status == 'Memenuhi Sebagian' ? 'bg-warning bg-opacity-10 text-warning border border-warning' : 'bg-danger bg-opacity-10 text-danger border border-danger') }}" style="font-size: 0.7rem; padding: 0.3rem 0.5rem;"><i class="bi {{ $sub->status == 'Memenuhi' ? 'bi-check-circle-fill' : ($sub->status == 'Memenuhi Sebagian' ? 'bi-circle-fill' : 'bi-x') }} me-1"></i> {{ $sub->status == 'Belum Memenuhi' ? 'Tidak Memenuhi' : $sub->status }}</span>
-                                        <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
+                    <div class="ms-3 d-flex align-items-center gap-3" style="z-index: 2;">
+                        @if(in_array($sub->kriteria_kode, ['4.2', '4.3']))
+                            <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;">BOLEH SEBAGIAN</span>
+                        @else
+                            <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;">WAJIB</span>
+                        @endif
+                        <span class="badge rounded-pill {{ $sub->status == 'Memenuhi' ? 'bg-success bg-opacity-10 text-success' : ($sub->status == 'Memenuhi Sebagian' ? 'bg-warning bg-opacity-10 text-warning' : 'bg-danger bg-opacity-10 text-danger') }}" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi {{ $sub->status == 'Memenuhi' ? 'bi-check-circle-fill' : ($sub->status == 'Memenuhi Sebagian' ? 'bi-circle-fill' : 'bi-x') }} me-1"></i> {{ $sub->status == 'Belum Memenuhi' ? 'Tidak Memenuhi' : $sub->status }}</span>
+                        <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
                             <span class="me-2">Narasi {{ $sub->narasi_persen ?? 0 }}%</span>
                             <span class="bukti-pct-display" data-kriteria="{{ $sub->kriteria_kode }}">Bukti {{ $sub->bukti_persen ?? 0 }}%</span>
                         </div>
-                    
-                    <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
+                        <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
                             <div class="progress-bar-combined" data-narasi-pct="{{ $sub->narasi_persen ?? 0 }}" data-kriteria="{{ $sub->kriteria_kode }}" style="width: {{ (($sub->narasi_persen ?? 0) + ($sub->bukti_persen ?? 0)) / 2 }}%; background: #2f7a42; height: 100%; transition: width 0.3s ease;"></div>
+                        </div>
                     </div>
+                </button>
             </h2>
 
                 <div id="collapseSub{{ $sub->id }}" class="accordion-collapse collapse" aria-labelledby="headingSub{{ $sub->id }}" data-bs-parent="#accordionMahasiswa">

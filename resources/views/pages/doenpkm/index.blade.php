@@ -73,7 +73,7 @@
             </ol>
         </nav>
         <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Kriteria 5 — Dosen & PkM</h1>
-        <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - {{ $subKriterias->count() }} sub-kriteria pada kriteria ini</small>
+        <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - {{ count($elements) }} sub-kriteria pada kriteria ini</small>
     </div>
     <div class="text-end d-flex gap-2 align-items-center justify-content-end">
         <button class="btn btn-light border shadow-sm btn-sm px-3 fw-medium">
@@ -127,7 +127,7 @@
                     </div>
                     <div>
                         <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sub Memenuhi</div>
-                        <div class="fs-4 fw-bold text-success" style="line-height: 1;">{{ $narasis->where('status', 'Memenuhi')->count() }} <span class="text-muted fw-normal fs-6">dari {{ $subKriterias->count() }}</span></div>
+                        <div class="fs-4 fw-bold text-success" style="line-height: 1;">{{ $narasis->where('status', 'Memenuhi')->count() }} <span class="fs-6 fw-normal text-muted">dari {{ count($elements) }}</span></div>
                     </div>
                 </div>
             </div>
@@ -174,37 +174,38 @@
                 $isTidakMemenuhi = !$isMemenuhi;
             @endphp
             <div class="accordion-item mb-3 shadow-sm border-0" style="border-radius: 12px; overflow: hidden; background-color: #fff; border: 1px solid #e2e8f0;">
-                <h2 class="accordion-header d-flex align-items-center" id="headingSub_{{ str_replace('.', '_', $subKode) }}" style="border-bottom: 1px solid #e2e8f0;">
+                <h2 class="accordion-header" id="headingSub_{{ str_replace('.', '_', $subKode) }}">
                     <button class="accordion-button collapsed flex-grow-1 shadow-none bg-white py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSub_{{ str_replace('.', '_', $subKode) }}" aria-expanded="false" aria-controls="collapseSub_{{ str_replace('.', '_', $subKode) }}">
                         <span class="text-primary fw-bold me-3" style="font-size: 1.1rem;">{{ $subKode }}</span>
                         <span class="text-dark fw-bold flex-grow-1" style="font-size: 1.1rem;">{{ $subData['title'] }}</span>
-                    </button>
-                    <div class="me-4 d-flex align-items-center gap-3" style="z-index: 2;">
-                        @if($subData['type'] == 'WAJIB')
-                            <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;">WAJIB</span>
-                        @else
-                            <span class="badge rounded-pill" style="font-size: 0.7rem; background-color: #fef3c7; color: #92400e; font-weight: 600; padding: 0.35rem 0.6rem; border: 1px solid #f59e0b;">BOLEH SEBAGIAN</span>
-                        @endif
-
-                        @if($isMemenuhi)
-                            <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi bi-check-circle-fill me-1"></i> Memenuhi</span>
-                        @else
+                        
+                        <div class="ms-3 d-flex align-items-center gap-3" style="z-index: 2;">
                             @if($subData['type'] == 'WAJIB')
-                                <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi bi-x-circle-fill me-1"></i> Tidak Memenuhi</span>
+                                <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;">WAJIB</span>
                             @else
-                                <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi bi-circle-fill text-warning me-1" style="font-size:8px;"></i> Memenuhi Sebagian</span>
+                                <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;">BOLEH SEBAGIAN</span>
                             @endif
-                        @endif
-                        
-                        <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
-                            <span class="me-2">Narasi {{ $subPctNarasi }}%</span>
-                            <span class="bukti-pct-display">Bukti {{ $subPctBukti }}%</span>
+
+                            @if($isMemenuhi)
+                                <span class="badge rounded-pill bg-success bg-opacity-10 text-success" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi bi-check-circle-fill me-1"></i> Memenuhi</span>
+                            @else
+                                @if($subData['type'] == 'WAJIB')
+                                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi bi-x-circle-fill me-1"></i> Tidak Memenuhi</span>
+                                @else
+                                    <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi bi-circle-fill text-warning me-1" style="font-size:8px;"></i> Memenuhi Sebagian</span>
+                                @endif
+                            @endif
+                            
+                            <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
+                                <span class="me-2">Narasi {{ $subPctNarasi }}%</span>
+                                <span class="bukti-pct-display">Bukti {{ $subPctBukti }}%</span>
+                            </div>
+                            
+                            <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
+                                <div class="progress-bar {{ $isMemenuhi ? 'bg-success' : ($subData['type'] == 'WAJIB' ? 'bg-danger' : 'bg-warning') }} progress-bar-combined" data-narasi-pct="{{ $subPctNarasi }}" role="progressbar" style="width: {{ ($subPctNarasi + $subPctBukti) / 2 }}%"></div>
+                            </div>
                         </div>
-                        
-                        <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
-                            <div class="progress-bar {{ $isMemenuhi ? 'bg-success' : ($subData['type'] == 'WAJIB' ? 'bg-danger' : 'bg-warning') }} progress-bar-combined" data-narasi-pct="{{ $subPctNarasi }}" role="progressbar" style="width: {{ ($subPctNarasi + $subPctBukti) / 2 }}%"></div>
-                        </div>
-                    </div>
+                    </button>
                 </h2>
 
                 <div id="collapseSub_{{ str_replace('.', '_', $subKode) }}" class="accordion-collapse collapse" aria-labelledby="headingSub_{{ str_replace('.', '_', $subKode) }}" data-bs-parent="#accordionDoenpkm">

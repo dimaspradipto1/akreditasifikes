@@ -155,92 +155,6 @@
         <li class="nav-item"><a class="nav-link {{ request()->routeIs('tatakelola.*') ? 'active' : '' }}" href="{{ route('tatakelola.index') }}"><i class="bi bi-circle-fill text-warning"></i> K8 — Tata Kelola</a></li>
     </ul>
 
-    <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
-                <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #eef2ff; color: #4f46e5;">
-                        <i class="bi bi-card-text fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Progress Narasi</div>
-                        <div class="fs-4 fw-bold text-dark" style="line-height: 1;">{{ $pctNarasi }}%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Bukti Tersedia -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
-                <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #eff6ff; color: #2563eb;">
-                        <i class="bi bi-folder-check fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Bukti Tersedia</div>
-                        <div class="fs-4 fw-bold text-dark" style="line-height: 1;">{{ $pctBukti }}%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sub Memenuhi -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
-                <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #ecfdf5; color: #16a34a;">
-                        <i class="bi bi-check-circle fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sub Memenuhi</div>
-                        <div class="fs-4 fw-bold text-success" style="line-height: 1;">{{ $narasis->where('status', 'Memenuhi')->count() }} <span class="text-muted fw-normal fs-6">dari {{ $narasis->count() }}</span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Wajib Belum -->
-        <div class="col-md-3">
-            <div class="card shadow-sm border-0 h-100" style="border-radius: 12px; background: #ffffff;">
-                <div class="card-body p-3 d-flex align-items-center">
-                    <div class="rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px; background-color: #fef2f2; color: #dc2626;">
-                        <i class="bi bi-exclamation-triangle fs-4"></i>
-                    </div>
-                    <div>
-                        <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Wajib Belum</div>
-                        <div class="fs-4 fw-bold text-danger" style="line-height: 1;">{{ $narasis->where('status', '!=', 'Memenuhi')->count() }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Horizontal Navigation -->
-    <ul class="nav nav-pills nav-pills-kriteria mb-4 border-bottom pb-3">
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('vmts.*') ? 'active' : '' }}" href="{{ route('vmts.index') }}"><i class="bi bi-circle-fill text-success"></i> K1 — VMTS</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('kurikulum.*') ? 'active' : '' }}" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('penilaian.*') ? 'active' : '' }}" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('mahasiswa.*') ? 'active' : '' }}" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mhs</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('doenpkm.*') ? 'active' : '' }}" href="{{ route('doenpkm.index') }}"><i class="bi bi-circle-fill text-warning"></i> K5 — Dosen&PkM</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('sarpraskeuangan.*') ? 'active' : '' }}" href="{{ route('sarpraskeuangan.index') }}"><i class="bi bi-circle-fill text-success"></i> K6 — Sarpras&Keu</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('mutu.*') ? 'active' : '' }}" href="{{ route('mutu.index') }}"><i class="bi bi-circle-fill text-success"></i> K7 — Mutu</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ request()->routeIs('tatakelola.*') ? 'active' : '' }}" href="{{ route('tatakelola.index') }}"><i class="bi bi-circle-fill text-warning"></i> K8 — Tata Kelola</a>
-        </li>
-    </ul>
 
     <!-- Main Content Accordion -->
     <div class="accordion mb-5" id="accordionVMTS">
@@ -249,20 +163,20 @@
                 <button class="accordion-button flex-grow-1 shadow-none bg-white py-3" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSub1_1" aria-expanded="true" aria-controls="collapseSub1_1">
                     <span class="text-primary fw-bold me-3" style="font-size: 1.1rem;">1.1</span>
                     <span class="text-dark fw-bold flex-grow-1" style="font-size: 1.1rem;">Pernyataan Visi, Misi, Tujuan, dan Strategi</span>
+                    <div class="ms-3 me-4 d-flex align-items-center gap-3" style="z-index: 2;">
+                        <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;">WAJIB</span>
+                        <span class="badge rounded-pill {{ $pctNarasi == 100 ? 'bg-success bg-opacity-10 text-success' : 'bg-warning bg-opacity-10 text-warning' }}" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi {{ $pctNarasi == 100 ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill' }} me-1"></i> {{ $pctNarasi == 100 ? 'Memenuhi' : 'Belum Memenuhi' }}</span>
+                        
+                        <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
+                            <span class="me-2">Narasi {{ $pctNarasi }}%</span>
+                            <span class="bukti-pct-display">Bukti {{ $pctBukti }}%</span>
+                        </div>
+                        
+                        <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
+                            <div class="progress-bar bg-success progress-bar-combined" data-narasi-pct="{{ $pctNarasi }}" role="progressbar" style="width: {{ ($pctNarasi + $pctBukti) / 2 }}%"></div>
+                        </div>
+                    </div>
                 </button>
-                <div class="me-4 d-flex align-items-center gap-3" style="z-index: 2;">
-                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;">WAJIB</span>
-                    <span class="badge rounded-pill {{ $pctNarasi == 100 ? 'bg-success bg-opacity-10 text-success border border-success' : 'bg-warning bg-opacity-10 text-warning border border-warning' }}" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi {{ $pctNarasi == 100 ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill' }} me-1"></i> {{ $pctNarasi == 100 ? 'Memenuhi' : 'Belum Memenuhi' }}</span>
-                    
-                    <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
-                        <span class="me-2">Narasi {{ $pctNarasi }}%</span>
-                        <span class="bukti-pct-display">Bukti {{ $pctBukti }}%</span>
-                    </div>
-                    
-                    <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
-                        <div class="progress-bar bg-success progress-bar-combined" data-narasi-pct="{{ $pctNarasi }}" role="progressbar" style="width: {{ ($pctNarasi + $pctBukti) / 2 }}%"></div>
-                    </div>
-                </div>
             </h2>
 
             <div id="collapseSub1_1" class="accordion-collapse collapse show" aria-labelledby="headingSub1_1" data-bs-parent="#accordionVMTS">
@@ -328,188 +242,6 @@
                                         </div>
                                     </div>
                                 </form>
-                                </form>
-
-                                <!-- Bagian B untuk EU ini -->
-                                <hr class="my-4">
-                                <div class="section-title mb-3" style="font-size: 1rem; color: #1e3a8a;">Bagian B — Daftar Bukti Pendukung ({{ $narasi->elemen_kode }})</div>
-                                <div class="mb-3 text-end">
-                                    <button class="btn btn-sm text-white" style="background: #5520B8;" data-bs-toggle="modal" data-bs-target="#modalTambahBukti{{ $narasi->id }}">
-                                        <i class="bi bi-plus-circle me-1"></i> Tambah Bukti
-                                    </button>
-                                </div>
-                                <div class="table-responsive bg-white rounded shadow-sm" style="border: 1px solid #e2e8f0; padding: 1rem;">
-                                    @if($vmts->buktis->where('elemen_kode', $narasi->elemen_kode)->isEmpty())
-                                        <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
-                                            <thead>
-                                                <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
-                                                    <th class="py-3">Nama Bukti</th>
-                                                    <th class="py-3">Level</th>
-                                                    <th class="py-3">Status</th>
-                                                    <th class="py-3">Link</th>
-                                                    <th class="py-3">PIC</th>
-                                                    <th class="py-3">Deadline</th>
-                                                    <th class="py-3 text-center">Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td colspan="7" class="text-center text-muted py-4">Belum ada dokumen bukti.</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    @else
-                                        <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
-                                            <thead>
-                                                <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
-                                                    <th class="py-3" style="width: 5%;">No</th>
-                                                    <th class="py-3" style="width: 25%;">Nama Bukti</th>
-                                                    <th class="py-3">Level</th>
-                                                    <th class="py-3">Status</th>
-                                                    <th class="py-3">Link</th>
-                                                    <th class="py-3">PIC</th>
-                                                    <th class="py-3">Deadline</th>
-                                                    <th class="py-3 text-center">Aksi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach($vmts->buktis->where('elemen_kode', $narasi->elemen_kode) as $index => $bukti)
-                                                <tr style="border-bottom: 1px solid #f1f5f9;" class="bukti-row" data-id="{{ $bukti->id }}">
-                                                    <td class="text-muted">{{ $loop->iteration }}</td>
-                                                    <td class="fw-medium text-dark">{{ $bukti->nama_bukti }}</td>
-                                                    <td>
-                                                        @if($bukti->level == 'PRODI')
-                                                            <span class="badge rounded-pill" style="background-color: #fef08a; color: #854d0e; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
-                                                        @elseif($bukti->level == 'FIKES')
-                                                            <span class="badge rounded-pill" style="background-color: #d1fae5; color: #065f46; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
-                                                        @else
-                                                            <span class="badge rounded-pill" style="background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        <select name="status_bukti" class="form-select form-select-sm shadow-none bukti-input" style="width: 120px; font-size: 0.8rem; border-color: #cbd5e1; color: #334155; border-radius: 6px; cursor: pointer;">
-                                                            <option value="Tersedia" {{ $bukti->status == 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
-                                                            <option value="Tidak Ada" {{ $bukti->status == 'Tidak Ada' ? 'selected' : '' }}>Tidak Ada</option>
-                                                            <option value="Belum Memenuhi" {{ $bukti->status == 'Belum Memenuhi' ? 'selected' : '' }}>Belum Memenuhi</option>
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" name="link" class="form-control form-control-sm shadow-none bukti-input" placeholder="tautan / lokasi file" value="{{ $bukti->link }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 160px;">
-                                                    </td>
-                                                    <td>
-                                                        <input type="text" name="pic" class="form-control form-control-sm shadow-none bukti-input" placeholder="nama PIC" value="{{ $bukti->pic }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 120px;">
-                                                    </td>
-                                                    <td>
-                                                        <input type="date" name="deadline" class="form-control form-control-sm shadow-none text-muted bukti-input" value="{{ $bukti->deadline }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; width: 130px;">
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <div class="d-flex justify-content-center gap-1">
-                                                            <button type="button" class="btn btn-sm {{ $bukti->catatan ? 'text-primary' : 'text-secondary' }} p-1 border-0 shadow-none" title="Catatan" style="background:transparent;" data-bs-toggle="modal" data-bs-target="#modalCatatanBukti{{ $bukti->id }}">
-                                                                <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
-                                                            </button>
-                                                            <form action="{{ route('vmts.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
-                                                            </form>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                @endforeach
-                                            </tbody>
-                                        </table>
-                                    @endif
-                                </div>
-                                
-                                <!-- Modals Catatan Bukti -->
-                                @foreach($vmts->buktis->where('elemen_kode', $narasi->elemen_kode) as $bukti)
-                                    <div class="modal fade" id="modalCatatanBukti{{ $bukti->id }}" tabindex="-1" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content">
-                                                <form action="{{ route('vmts.bukti.update', $bukti->id) }}" method="POST">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title fs-6 fw-bold">Catatan Bukti Pendukung</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="mb-2 text-muted" style="font-size: 0.85rem;">
-                                                            Nama Bukti: <span class="fw-medium text-dark">{{ $bukti->nama_bukti }}</span>
-                                                        </div>
-                                                        <div class="mb-3">
-                                                            <label class="form-label fw-medium" style="font-size: 0.85rem;">Catatan / Keterangan</label>
-                                                            <textarea name="catatan" class="form-control" rows="4" placeholder="Tulis catatan atau keterangan tambahan di sini...">{{ $bukti->catatan }}</textarea>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-light btn-sm" data-bs-dismiss="modal">Tutup</button>
-                                                        <button type="submit" class="btn btn-sm text-white" style="background:#5520B8;">Simpan Catatan</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Modal Tambah Bukti per EU -->
-                    <div class="modal fade" id="modalTambahBukti{{ $narasi->id }}" tabindex="-1" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <form action="{{ route('vmts.bukti.store') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="vmts_id" value="{{ $vmts->id }}">
-                                    <input type="hidden" name="elemen_kode" value="{{ $narasi->elemen_kode }}">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title fs-6 fw-bold">Tambah Bukti Pendukung ({{ $narasi->elemen_kode }})</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="mb-3">
-                                            <label class="form-label">Nama Bukti <span class="text-danger">*</span></label>
-                                            <input type="text" name="nama_bukti" class="form-control" required>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Level <span class="text-danger">*</span></label>
-                                            <select name="level" class="form-select" required>
-                                                <option value="PRODI">PRODI</option>
-                                                <option value="FIKES">FIKES</option>
-                                                <option value="UNIV">UNIV</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Status <span class="text-danger">*</span></label>
-                                            <select name="status_bukti" class="form-select" required>
-                                                <option value="Tersedia">Tersedia</option>
-                                                <option value="Tidak Ada">Tidak Ada</option>
-                                                <option value="Belum Memenuhi">Belum Memenuhi</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Link Dokumen</label>
-                                            <input type="url" name="link" class="form-control" placeholder="https://...">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">PIC</label>
-                                            <input type="text" name="pic" class="form-control" placeholder="Nama Penanggung Jawab">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Deadline</label>
-                                            <input type="date" name="deadline" class="form-control">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Catatan</label>
-                                            <textarea name="catatan" class="form-control" rows="2"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
-                                        <button type="submit" class="btn text-white btn-sm" style="background:#5520B8;">Simpan</button>
-                                    </div>
-                                </form>
                             </div>
                         </div>
                     </div>
@@ -519,11 +251,191 @@
 
 
 
+        <!-- Bagian B untuk Daftar Bukti Pendukung (Ditampilkan untuk semua sub-kriteria) -->
+    <h5 class="fw-bold mb-1 mt-5" style="font-size: 1rem; color: #1e3a8a;">Bagian B — Daftar Bukti Pendukung</h5>
+    <p class="text-muted mb-4" style="font-size: 0.85rem;">Dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</p>
+    
+    <div class="bg-white p-3 rounded shadow-sm" style="border: 1px solid #e2e8f0;">
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-sm text-white" style="background: #5520B8;" data-bs-toggle="modal" data-bs-target="#modalTambahBuktiVMTS">
+                <i class="bi bi-plus-circle me-1"></i> Tambah Bukti
+            </button>
+        </div>
+        <div class="table-responsive">
+            @if($vmts->buktis->isEmpty())
+                <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
+                            <th class="py-3">Nama Bukti</th>
+                            <th class="py-3">Level</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Link</th>
+                            <th class="py-3">PIC</th>
+                            <th class="py-3">Deadline</th>
+                            <th class="py-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">Belum ada dokumen bukti.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            @else
+                <table class="table table-borderless table-hover align-middle" style="font-size: 0.85rem; margin-bottom: 0;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #e2e8f0; color: #64748b; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;">
+                            <th class="py-3" style="width: 25%;">Nama Bukti</th>
+                            <th class="py-3">Level</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Link</th>
+                            <th class="py-3">PIC</th>
+                            <th class="py-3">Deadline</th>
+                            <th class="py-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($vmts->buktis as $index => $bukti)
+                        <tr style="border-bottom: 1px solid #f1f5f9;" class="bukti-row" data-id="{{ $bukti->id }}">
+                            <td class="fw-medium text-dark">{{ $bukti->nama_bukti }}</td>
+                            <td>
+                                @if($bukti->level == 'PRODI')
+                                    <span class="badge rounded-pill" style="background-color: #fef08a; color: #854d0e; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
+                                @elseif($bukti->level == 'FIKES')
+                                    <span class="badge rounded-pill" style="background-color: #d1fae5; color: #065f46; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
+                                @else
+                                    <span class="badge rounded-pill" style="background-color: #dbeafe; color: #1e40af; font-weight: 600; padding: 0.35rem 0.6rem;">{{ $bukti->level }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <select name="status_bukti" class="form-select form-select-sm shadow-none bukti-input" style="width: 120px; font-size: 0.8rem; border-color: #cbd5e1; color: #334155; border-radius: 6px; cursor: pointer;" {{ $bukti->level != 'PRODI' ? 'disabled' : '' }}>
+                                    <option value="Tersedia" {{ $bukti->status == 'Tersedia' ? 'selected' : '' }}>Tersedia</option>
+                                    <option value="Tidak Ada" {{ $bukti->status == 'Tidak Ada' ? 'selected' : '' }}>Tidak Ada</option>
+                                    <option value="Belum Memenuhi" {{ $bukti->status == 'Belum Memenuhi' ? 'selected' : '' }}>Belum Memenuhi</option>
+                                </select>
+                            </td>
+                            <td>
+                                <input type="text" name="link" class="form-control form-control-sm shadow-none bukti-input" placeholder="tautan / lokasi file" value="{{ $bukti->link }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 160px;" {{ $bukti->level != 'PRODI' ? 'readonly' : '' }}>
+                            </td>
+                            <td>
+                                <input type="text" name="pic" class="form-control form-control-sm shadow-none bukti-input" placeholder="nama PIC" value="{{ $bukti->pic }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; min-width: 120px;" {{ $bukti->level != 'PRODI' ? 'readonly' : '' }}>
+                            </td>
+                            <td>
+                                <input type="date" name="deadline" class="form-control form-control-sm shadow-none text-muted bukti-input" value="{{ $bukti->deadline }}" style="font-size: 0.8rem; border-color: #cbd5e1; border-radius: 6px; width: 130px;" {{ $bukti->level != 'PRODI' ? 'readonly' : '' }}>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-1">
+                                    <button type="button" class="btn btn-sm {{ $bukti->catatan ? 'text-primary' : 'text-secondary' }} p-1 border-0 shadow-none" title="Catatan" style="background:transparent;" data-bs-toggle="modal" data-bs-target="#modalCatatanBukti{{ $bukti->id }}">
+                                        <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
+                                    </button>
+                                    @if($bukti->level == 'PRODI')
+                                    <form action="{{ route('vmts.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
+                                    </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <!-- Modal Catatan Bukti -->
+                        <div class="modal fade" id="modalCatatanBukti{{ $bukti->id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form action="{{ route('vmts.bukti.update', $bukti->id) }}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="modal-header">
+                                            <h5 class="modal-title fs-6 fw-bold">Catatan Bukti: {{ $bukti->nama_bukti }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Catatan / Keterangan Tambahan</label>
+                                                <textarea name="catatan" class="form-control" rows="4">{{ $bukti->catatan }}</textarea>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Tutup</button>
+                                            <button type="submit" class="btn text-white btn-sm" style="background:#5520B8;">Simpan Catatan</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        @endforeach
+                    </tbody>
+                </table>
+                <div class="text-muted mt-3" style="font-size: 0.8rem; font-style: italic;">+ dokumen bukti lain pada sub-kriteria ini — lihat Tracker Terpusat untuk rincian lengkap.</div>
+            @endif
+        </div>
+    </div>
+    
+    <!-- Modal Tambah Bukti VMTS -->
+    <div class="modal fade" id="modalTambahBuktiVMTS" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="{{ route('vmts.bukti.store') }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="vmts_id" value="{{ $vmts->id }}">
+                    <input type="hidden" name="elemen_kode" value="1.1">
+                    <div class="modal-header">
+                        <h5 class="modal-title fs-6 fw-bold">Tambah Bukti Pendukung</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label class="form-label">Nama Bukti <span class="text-danger">*</span></label>
+                            <input type="text" name="nama_bukti" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Level <span class="text-danger">*</span></label>
+                            <select name="level" class="form-select" required>
+                                <option value="PRODI">PRODI</option>
+                                <option value="FIKES">FIKES</option>
+                                <option value="UNIV">UNIV</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status <span class="text-danger">*</span></label>
+                            <select name="status_bukti" class="form-select" required>
+                                <option value="Tersedia">Tersedia</option>
+                                <option value="Tidak Ada">Tidak Ada</option>
+                                <option value="Belum Memenuhi">Belum Memenuhi</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Link Dokumen</label>
+                            <input type="url" name="link" class="form-control" placeholder="https://...">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">PIC</label>
+                            <input type="text" name="pic" class="form-control" placeholder="Nama Penanggung Jawab">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Deadline</label>
+                            <input type="date" name="deadline" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Catatan</label>
+                            <textarea name="catatan" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn text-white btn-sm" style="background:#5520B8;">Simpan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
                 </div>
             </div>
         </div>
     </div>
-    
+
     <!-- Legend -->
     <div class="d-flex flex-wrap align-items-center mt-4 gap-3 px-1" style="font-size: 0.85rem;">
         <div class="d-flex align-items-center gap-2">

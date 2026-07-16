@@ -87,6 +87,18 @@ class TatakelolaController extends Controller
             } else {
                 $narasi->kriteria_nama = $kriterias[$kode]['nama'] ?? '';
             }
+            
+            // Decode narasi_text to support 5 blocks without DB columns
+            $decoded = json_decode($narasi->narasi_text, true);
+            if (is_array($decoded)) {
+                $narasi->kondisi_saat_ini = $decoded['kondisi_saat_ini'] ?? '';
+                $narasi->data_fakta = $decoded['data_fakta'] ?? '';
+                $narasi->analisis = $decoded['analisis'] ?? '';
+            } else {
+                $narasi->kondisi_saat_ini = $narasi->narasi_text;
+                $narasi->data_fakta = '';
+                $narasi->analisis = '';
+            }
         }
         
         $subKriterias = $narasis->filter(fn($n) => !str_contains($n->kriteria_kode, '_EU'));
@@ -111,6 +123,15 @@ class TatakelolaController extends Controller
     {
         $narasi = \App\Models\TatakelolaNarasi::findOrFail($id);
         $data = $request->validated();
+        
+        // Encode missing columns into narasi_text to avoid migration
+        $narasi_text = [
+            'kondisi_saat_ini' => $data['kondisi_saat_ini'] ?? '',
+            'data_fakta' => $data['data_fakta'] ?? '',
+            'analisis' => $data['analisis'] ?? '',
+        ];
+        $data['narasi_text'] = json_encode($narasi_text);
+        unset($data['kondisi_saat_ini'], $data['data_fakta'], $data['analisis']);
 
         if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
             $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
