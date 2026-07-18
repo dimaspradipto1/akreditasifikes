@@ -66,82 +66,94 @@ class SarpraskeuanganController extends Controller
         ));
     }
 
-    public function updateNarasi(SarpraskeuanganRequest $request, $id)
+    public function store(SarpraskeuanganRequest $request)
     {
-        $narasi = \App\Models\SarpraskeuanganNarasi::findOrFail($id);
-        $narasi->update($request->validated());
+        if ($request->has('type') && $request->type === 'bukti') {
+            $sarpraskeuangan_id = $request->input('sarpraskeuangan_id');
+            $kriteria_kode = $request->input('kriteria_kode');
 
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Tersimpan']);
+            \App\Models\SarpraskeuanganBukti::create([
+                'sarpraskeuangan_id' => $sarpraskeuangan_id,
+                'kriteria_kode' => $kriteria_kode,
+                'nama_bukti' => $request->input('nama_bukti'),
+                'level' => $request->input('level'),
+                'status' => $request->input('status_bukti'),
+                'link' => $request->input('link'),
+                'pic' => $request->input('pic'),
+                'deadline' => $request->input('deadline'),
+                'catatan' => $request->input('catatan'),
+            ]);
+
+            $this->updateBuktiPersen($sarpraskeuangan_id, $kriteria_kode);
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
+        }
+        return redirect()->back();
+    }
+
+    public function update(Request $request, $id)
+    {
+        if ($request->has('type') && $request->type === 'narasi') {
+            $narasi = \App\Models\SarpraskeuanganNarasi::findOrFail($id);
+            $narasi->update($request->validate([
+                'narasi' => 'nullable|string',
+                'status' => 'required|string',
+                'narasi_persen' => 'nullable|integer'
+            ]));
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Tersimpan']);
+            }
+
+            Alert::success('Berhasil!', 'Narasi berhasil diperbarui.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
 
-        Alert::success('Berhasil!', 'Narasi berhasil diperbarui.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\SarpraskeuanganBukti::findOrFail($id);
+            $bukti->update([
+                'nama_bukti' => $request->input('nama_bukti', $bukti->nama_bukti),
+                'level' => $request->input('level', $bukti->level),
+                'status' => $request->input('status_bukti', $bukti->status),
+                'link' => $request->input('link', $bukti->link),
+                'pic' => $request->input('pic', $bukti->pic),
+                'deadline' => $request->input('deadline', $bukti->deadline),
+                'catatan' => $request->input('catatan', $bukti->catatan),
+            ]);
 
-        return redirect()->back();
-    }
+            $this->updateBuktiPersen($bukti->sarpraskeuangan_id, $bukti->kriteria_kode);
 
-    public function storeBukti(SarpraskeuanganRequest $request)
-    {
-        $sarpraskeuangan_id = $request->input('sarpraskeuangan_id');
-        $kriteria_kode = $request->input('kriteria_kode');
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.']);
+            }
 
-        \App\Models\SarpraskeuanganBukti::create([
-            'sarpraskeuangan_id' => $sarpraskeuangan_id,
-            'kriteria_kode' => $kriteria_kode,
-            'nama_bukti' => $request->input('nama_bukti'),
-            'level' => $request->input('level'),
-            'status' => $request->input('status_bukti'),
-            'link' => $request->input('link'),
-            'pic' => $request->input('pic'),
-            'deadline' => $request->input('deadline'),
-            'catatan' => $request->input('catatan'),
-        ]);
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
 
-        $this->updateBuktiPersen($sarpraskeuangan_id, $kriteria_kode);
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
-        return redirect()->back();
-    }
-
-    public function updateBukti(Request $request, $id)
-    {
-        $bukti = \App\Models\SarpraskeuanganBukti::findOrFail($id);
-        $bukti->update([
-            'nama_bukti' => $request->input('nama_bukti', $bukti->nama_bukti),
-            'level' => $request->input('level', $bukti->level),
-            'status' => $request->input('status_bukti', $bukti->status),
-            'link' => $request->input('link', $bukti->link),
-            'pic' => $request->input('pic', $bukti->pic),
-            'deadline' => $request->input('deadline', $bukti->deadline),
-            'catatan' => $request->input('catatan', $bukti->catatan),
-        ]);
-
-        $this->updateBuktiPersen($bukti->sarpraskeuangan_id, $bukti->kriteria_kode);
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.']);
+            return redirect()->back();
         }
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
         return redirect()->back();
     }
 
-    public function destroyBukti($id)
+    public function destroy(Request $request, $id)
     {
-        $bukti = \App\Models\SarpraskeuanganBukti::findOrFail($id);
-        $sarpraskeuangan_id = $bukti->sarpraskeuangan_id;
-        $kriteria_kode = $bukti->kriteria_kode;
-        $bukti->delete();
-        $this->updateBuktiPersen($sarpraskeuangan_id, $kriteria_kode);
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\SarpraskeuanganBukti::findOrFail($id);
+            $sarpraskeuangan_id = $bukti->sarpraskeuangan_id;
+            $kriteria_kode = $bukti->kriteria_kode;
+            $bukti->delete();
+            $this->updateBuktiPersen($sarpraskeuangan_id, $kriteria_kode);
 
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
 
+            return redirect()->back();
+        }
         return redirect()->back();
     }
 

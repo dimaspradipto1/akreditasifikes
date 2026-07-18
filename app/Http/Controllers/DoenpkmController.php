@@ -129,68 +129,77 @@ class DoenpkmController extends Controller
         ));
     }
 
-    public function updateNarasi(DoenpkmRequest $request, DoenpkmNarasi $narasi)
+    public function store(DoenpkmRequest $request)
     {
-        $data = $request->validated();
-        if (isset($data['status'])) {
-            $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+        if ($request->has('type') && $request->type === 'bukti') {
+            $data = $request->validated();
+            if(isset($data['status_bukti'])) {
+                $data['status'] = $data['status_bukti'];
+                unset($data['status_bukti']);
+            }
+            $bukti = DoenpkmBukti::create($data);
+            $this->updateBuktiPersen($bukti->doenpkm_id, $bukti->elemen_kode);
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
-        $narasi->update($data);
-
-        Alert::success('Berhasil!', 'Narasi ' . $narasi->elemen_kode . ' berhasil disimpan.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
         return redirect()->back();
     }
 
-    public function storeBukti(DoenpkmRequest $request)
+    public function update(DoenpkmRequest $request, $id)
     {
-        $data = $request->validated();
-        if(isset($data['status_bukti'])) {
-            $data['status'] = $data['status_bukti'];
-            unset($data['status_bukti']);
+        if ($request->has('type') && $request->type === 'narasi') {
+            $narasi = \App\Models\DoenpkmNarasi::findOrFail($id);
+            $data = $request->validated();
+            if (isset($data['status'])) {
+                $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+            }
+            $narasi->update($data);
+
+            Alert::success('Berhasil!', 'Narasi ' . $narasi->elemen_kode . ' berhasil disimpan.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
-        $bukti = DoenpkmBukti::create($data);
-        $this->updateBuktiPersen($bukti->doenpkm_id, $bukti->elemen_kode);
 
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\DoenpkmBukti::findOrFail($id);
+            $updateData = $request->validated();
+            if(isset($updateData['status_bukti'])) {
+                $updateData['status'] = $updateData['status_bukti'];
+                unset($updateData['status_bukti']);
+            }
+            $bukti->update($updateData);
+            $newPctBukti = $this->updateBuktiPersen($bukti->doenpkm_id, $bukti->elemen_kode);
 
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.', 'pctBukti' => $newPctBukti, 'elemen_kode' => $bukti->elemen_kode]);
+            }
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
+        }
         return redirect()->back();
     }
 
-    public function updateBukti(DoenpkmRequest $request, $id)
+    public function destroy(Request $request, $id)
     {
-        $bukti = \App\Models\DoenpkmBukti::findOrFail($id);
-        $updateData = $request->validated();
-        if(isset($updateData['status_bukti'])) {
-            $updateData['status'] = $updateData['status_bukti'];
-            unset($updateData['status_bukti']);
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\DoenpkmBukti::findOrFail($id);
+            $doenpkm_id = $bukti->doenpkm_id;
+            $elemen_kode = $bukti->elemen_kode;
+            $bukti->delete();
+            $this->updateBuktiPersen($doenpkm_id, $elemen_kode);
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
-        $bukti->update($updateData);
-        $newPctBukti = $this->updateBuktiPersen($bukti->doenpkm_id, $bukti->elemen_kode);
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.', 'pctBukti' => $newPctBukti, 'elemen_kode' => $bukti->elemen_kode]);
-        }
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
-        return redirect()->back();
-    }
-
-    public function destroyBukti($id)
-    {
-        $bukti = \App\Models\DoenpkmBukti::findOrFail($id);
-        $doenpkm_id = $bukti->doenpkm_id;
-        $elemen_kode = $bukti->elemen_kode;
-        $bukti->delete();
-        $this->updateBuktiPersen($doenpkm_id, $elemen_kode);
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
         return redirect()->back();
     }
 

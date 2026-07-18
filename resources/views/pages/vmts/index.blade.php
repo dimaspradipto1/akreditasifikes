@@ -201,9 +201,10 @@
                         </h2>
                         <div id="collapse{{ $narasi->id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $narasi->id }}" data-bs-parent="#accordionEU">
                             <div class="accordion-body bg-white p-4">
-                                <form id="form-narasi-{{ $narasi->id }}" action="{{ route('vmts.narasi.update', $narasi->id) }}" method="POST">
+                                <form id="form-narasi-{{ $narasi->id }}" action="{{ route('vmts.update', $narasi->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
+                                    <input type="hidden" name="type" value="narasi">
                                     
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold" style="font-size: 0.85rem; color: #334155;">A. Deskripsi Kondisi Saat Ini</label>
@@ -325,9 +326,10 @@
                                         <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
                                     </button>
                                     @if($bukti->level == 'PRODI')
-                                    <form action="{{ route('vmts.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
+                                    <form action="{{ route('vmts.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
                                         @csrf
                                         @method('DELETE')
+                                        <input type="hidden" name="type" value="bukti">
                                         <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
                                     </form>
                                     @endif
@@ -339,9 +341,10 @@
                         <div class="modal fade" id="modalCatatanBukti{{ $bukti->id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <form action="{{ route('vmts.bukti.update', $bukti->id) }}" method="POST">
+                                    <form action="{{ route('vmts.update', $bukti->id) }}" method="POST">
                                         @csrf
                                         @method('PUT')
+                                        <input type="hidden" name="type" value="bukti">
                                         <div class="modal-header">
                                             <h5 class="modal-title fs-6 fw-bold">Catatan Bukti: {{ $bukti->nama_bukti }}</h5>
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -372,8 +375,9 @@
     <div class="modal fade" id="modalTambahBuktiVMTS" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="{{ route('vmts.bukti.store') }}" method="POST">
+                <form action="{{ route('vmts.store') }}" method="POST">
                     @csrf
+                    <input type="hidden" name="type" value="bukti">
                     <input type="hidden" name="vmts_id" value="{{ $vmts->id }}">
                     <input type="hidden" name="elemen_kode" value="1.1">
                     <div class="modal-header">
@@ -471,12 +475,13 @@
                 
                 var data = {
                     _token: '{{ csrf_token() }}',
-                    _method: 'PUT'
+                    _method: 'PUT',
+                    type: 'bukti'
                 };
                 data[fieldName] = fieldValue;
                 
                 $.ajax({
-                    url: '/vmts/bukti/' + buktiId,
+                    url: '/vmts/' + buktiId,
                     type: 'POST',
                     data: data,
                     success: function(response) {

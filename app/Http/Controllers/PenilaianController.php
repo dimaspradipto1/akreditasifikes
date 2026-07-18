@@ -96,107 +96,102 @@ class PenilaianController extends Controller
         ));
     }
 
-    /**
-     * Update Narasi via AJAX or standard form submission.
-     */
-    public function updateNarasi(PenilaianRequest $request, $id)
+    public function store(PenilaianRequest $request)
     {
         class_exists(\App\Models\Penilaian::class);
-        $narasi = \App\Models\PenilaianNarasi::findOrFail($id);
-        $narasi->update($request->validated());
-
-        // Recalculate parent progress if this is an EU
-        if (str_contains($narasi->kriteria_kode, '_EU')) {
-            $parentKode = explode('_', $narasi->kriteria_kode)[0];
-            $parent = \App\Models\PenilaianNarasi::where('penilaian_id', $narasi->penilaian_id)
-                ->where('kriteria_kode', $parentKode)
-                ->first();
-
-            if ($parent) {
-                $allEUs = \App\Models\PenilaianNarasi::where('penilaian_id', $narasi->penilaian_id)
-                    ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
-                    ->get();
-                
-                $totalEU = $allEUs->count();
-                $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
-                
-                $narasiPersen = $totalEU > 0 ? round(($lengkapEU / $totalEU) * 100) : 0;
-                
-                $status = ($narasiPersen == 100) ? 'Memenuhi' : 'Belum Memenuhi';
-                
-                $parent->update([
-                    'narasi_persen' => $narasiPersen,
-                    'status' => $status
-                ]);
+        if ($request->has('type') && $request->type === 'bukti') {
+            $data = $request->validated();
+            if(isset($data['status_bukti'])) {
+                $data['status'] = $data['status_bukti'];
+                unset($data['status_bukti']);
             }
+            $bukti = \App\Models\PenilaianBukti::create($data);
+            $this->updateBuktiPersen($bukti->penilaian_id, $bukti->kriteria_kode);
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
-
-        Alert::success('Berhasil!', 'Narasi ' . $narasi->kriteria_kode . ' berhasil disimpan.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
         return redirect()->back();
     }
 
-    /**
-     * Store new Bukti.
-     */
-    public function storeBukti(PenilaianRequest $request)
+    public function update(PenilaianRequest $request, $id)
     {
         class_exists(\App\Models\Penilaian::class);
-        $data = $request->validated();
-        if(isset($data['status_bukti'])) {
-            $data['status'] = $data['status_bukti'];
-            unset($data['status_bukti']);
+        
+        if ($request->has('type') && $request->type === 'narasi') {
+            $narasi = \App\Models\PenilaianNarasi::findOrFail($id);
+            $narasi->update($request->validated());
+
+            if (str_contains($narasi->kriteria_kode, '_EU')) {
+                $parentKode = explode('_', $narasi->kriteria_kode)[0];
+                $parent = \App\Models\PenilaianNarasi::where('penilaian_id', $narasi->penilaian_id)
+                    ->where('kriteria_kode', $parentKode)
+                    ->first();
+
+                if ($parent) {
+                    $allEUs = \App\Models\PenilaianNarasi::where('penilaian_id', $narasi->penilaian_id)
+                        ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
+                        ->get();
+                    
+                    $totalEU = $allEUs->count();
+                    $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
+                    
+                    $narasiPersen = $totalEU > 0 ? round(($lengkapEU / $totalEU) * 100) : 0;
+                    
+                    $status = ($narasiPersen == 100) ? 'Memenuhi' : 'Belum Memenuhi';
+                    
+                    $parent->update([
+                        'narasi_persen' => $narasiPersen,
+                        'status' => $status
+                    ]);
+                }
+            }
+
+            Alert::success('Berhasil!', 'Narasi ' . $narasi->kriteria_kode . ' berhasil disimpan.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
-        $bukti = \App\Models\PenilaianBukti::create($data);
-        $this->updateBuktiPersen($bukti->penilaian_id, $bukti->kriteria_kode);
 
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\PenilaianBukti::findOrFail($id);
+            $updateData = $request->validated();
+            if(isset($updateData['status_bukti'])) {
+                $updateData['status'] = $updateData['status_bukti'];
+                unset($updateData['status_bukti']);
+            }
+            $bukti->update($updateData);
+            $newPctBukti = $this->updateBuktiPersen($bukti->penilaian_id, $bukti->kriteria_kode);
 
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.', 'pctBukti' => $newPctBukti, 'kriteria_kode' => $bukti->kriteria_kode]);
+            }
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
+        }
         return redirect()->back();
     }
 
-    /**
-     * Update Bukti.
-     */
-    public function updateBukti(PenilaianRequest $request, $id)
+    public function destroy(Request $request, $id)
     {
         class_exists(\App\Models\Penilaian::class);
-        $bukti = \App\Models\PenilaianBukti::findOrFail($id);
-        $updateData = $request->validated();
-        if(isset($updateData['status_bukti'])) {
-            $updateData['status'] = $updateData['status_bukti'];
-            unset($updateData['status_bukti']);
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\PenilaianBukti::findOrFail($id);
+            $penilaian_id = $bukti->penilaian_id;
+            $kriteria_kode = $bukti->kriteria_kode;
+            $bukti->delete();
+            $this->updateBuktiPersen($penilaian_id, $kriteria_kode);
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
-        $bukti->update($updateData);
-        $newPctBukti = $this->updateBuktiPersen($bukti->penilaian_id, $bukti->kriteria_kode);
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.', 'pctBukti' => $newPctBukti, 'kriteria_kode' => $bukti->kriteria_kode]);
-        }
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
-        return redirect()->back();
-    }
-
-    /**
-     * Remove Bukti.
-     */
-    public function destroyBukti($id)
-    {
-        class_exists(\App\Models\Penilaian::class);
-        $bukti = \App\Models\PenilaianBukti::findOrFail($id);
-        $penilaian_id = $bukti->penilaian_id;
-        $kriteria_kode = $bukti->kriteria_kode;
-        $bukti->delete();
-        $this->updateBuktiPersen($penilaian_id, $kriteria_kode);
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
         return redirect()->back();
     }
 

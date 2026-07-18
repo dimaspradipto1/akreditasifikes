@@ -216,9 +216,10 @@
                                 </h2>
                                 <div id="collapseEU{{ $euNarasi->id }}" class="accordion-collapse collapse" aria-labelledby="headingEU{{ $euNarasi->id }}" data-bs-parent="#accordionEU{{ $sub->id }}">
                                     <div class="accordion-body bg-white p-4">
-                                        <form id="form-narasi-{{ $euNarasi->id }}" action="{{ route('mahasiswa.narasi.update', $euNarasi->id) }}" method="POST">
+                                        <form id="form-narasi-{{ $euNarasi->id }}" action="{{ route('mahasiswa.update', $euNarasi->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
+                                            <input type="hidden" name="type" value="narasi">
                                             
                                             <div class="mb-3">
                                                 <label class="form-label fw-semibold" style="font-size: 0.85rem; color: #334155;">A. Deskripsi Kondisi Saat Ini</label>
@@ -272,9 +273,10 @@
                     @else
                         <!-- Form Standar A-E untuk sub-kriteria tanpa EU -->
                         <div class="bg-white p-4 rounded shadow-sm mb-5" style="border: 1px solid #e2e8f0;">
-                            <form id="form-eu-{{ $sub->id }}" action="{{ route('mahasiswa.narasi.update', $sub->id) }}" method="POST">
+                            <form id="form-eu-{{ $sub->id }}" action="{{ route('mahasiswa.update', $sub->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
+                                <input type="hidden" name="type" value="narasi">
                                 
                                 <div class="mb-4">
                                     <label class="form-label fw-semibold" style="font-size: 0.85rem; color: #334155;">Status Pemenuhan</label>
@@ -392,9 +394,10 @@
                                                 <button type="button" class="btn btn-sm {{ $bukti->catatan ? 'text-primary' : 'text-secondary' }} p-1 border-0 shadow-none" title="Catatan" style="background:transparent;" data-bs-toggle="modal" data-bs-target="#modalCatatanBukti{{ $bukti->id }}">
                                                     <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
                                                 </button>
-                                                <form action="{{ route('mahasiswa.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
+                                                <form action="{{ route('mahasiswa.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
                                                     @csrf
                                                     @method('DELETE')
+                                                    <input type="hidden" name="type" value="bukti">
                                                     <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
                                                 </form>
                                             </div>
@@ -414,9 +417,10 @@
                             <div class="modal fade" id="modalCatatanBukti{{ $bukti->id }}" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
-                                        <form action="{{ route('mahasiswa.bukti.update', $bukti->id) }}" method="POST">
+                                        <form action="{{ route('mahasiswa.update', $bukti->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
+                                            <input type="hidden" name="type" value="bukti">
                                             <div class="modal-header">
                                                 <h5 class="modal-title fs-6 fw-bold">Catatan Bukti Pendukung</h5>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -454,8 +458,9 @@
         <div class="modal fade" id="modalTambahBukti{{ $sub->id }}" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form action="{{ route('mahasiswa.bukti.store') }}" method="POST">
+                    <form action="{{ route('mahasiswa.store') }}" method="POST">
                         @csrf
+                        <input type="hidden" name="type" value="bukti">
                         <input type="hidden" name="mahasiswa_id" value="{{ $mahasiswa->id ?? 1 }}">
                         <input type="hidden" name="kriteria_kode" value="{{ $sub->kriteria_kode }}">
                         <div class="modal-header">
@@ -548,12 +553,13 @@
                 
                 var data = {
                     _token: '{{ csrf_token() }}',
-                    _method: 'PUT'
+                    _method: 'PUT',
+                    type: 'bukti'
                 };
                 data[fieldName] = fieldValue;
                 
                 $.ajax({
-                    url: '/mahasiswa/bukti/' + buktiId,
+                    url: '/mahasiswa/' + buktiId,
                     type: 'POST',
                     data: data,
                     success: function(response) {

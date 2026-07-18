@@ -235,9 +235,10 @@
                                     </h2>
                                     <div id="collapse{{ $narasi->id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $narasi->id }}" data-bs-parent="#accordionEU_{{ str_replace('.', '_', $subKode) }}">
                                         <div class="accordion-body bg-white p-4">
-                                            <form id="form-narasi-{{ $narasi->id }}" action="{{ route('doenpkm.narasi.update', $narasi->id) }}" method="POST">
+                                            <form id="form-narasi-{{ $narasi->id }}" action="{{ route('doenpkm.update', $narasi->id) }}" method="POST">
                                                 @csrf
                                                 @method('PUT')
+                                                <input type="hidden" name="type" value="narasi">
                                                 
                                                 <div class="mb-3">
                                                     <label class="form-label fw-semibold" style="font-size: 0.85rem; color: #334155;">A. Deskripsi Kondisi Saat Ini</label>
@@ -360,9 +361,10 @@
                                                         <button type="button" class="btn btn-sm {{ $bukti->catatan ? 'text-primary' : 'text-secondary' }} p-1 border-0 shadow-none" title="Catatan" style="background:transparent;" data-bs-toggle="modal" data-bs-target="#modalCatatanBukti{{ $bukti->id }}">
                                                             <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
                                                         </button>
-                                                        <form action="{{ route('doenpkm.bukti.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
+                                                        <form action="{{ route('doenpkm.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
                                                             @csrf
                                                             @method('DELETE')
+                                                            <input type="hidden" name="type" value="bukti">
                                                             <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
                                                         </form>
                                                     </div>
@@ -377,9 +379,10 @@
                                         <div class="modal fade" id="modalCatatanBukti{{ $bukti->id }}" tabindex="-1" aria-hidden="true">
                                             <div class="modal-dialog">
                                                 <div class="modal-content">
-                                                    <form action="{{ route('doenpkm.bukti.update', $bukti->id) }}" method="POST">
+                                                    <form action="{{ route('doenpkm.update', $bukti->id) }}" method="POST">
                                                         @csrf
                                                         @method('PUT')
+                                                        <input type="hidden" name="type" value="bukti">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title fs-6 fw-bold">Catatan Bukti Pendukung</h5>
                                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -414,8 +417,9 @@
                         <div class="modal fade" id="modalTambahBukti{{ str_replace('.', '_', $subKode) }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <form action="{{ route('doenpkm.bukti.store') }}" method="POST">
+                                    <form action="{{ route('doenpkm.store') }}" method="POST">
                                         @csrf
+                                        <input type="hidden" name="type" value="bukti">
                                         <input type="hidden" name="doenpkm_id" value="{{ $doenpkm->id }}">
                                         <!-- Bukti applies to the whole sub-kriteria, e.g. 5.1 -->
                                         <input type="hidden" name="elemen_kode" value="{{ $subKode }}">
@@ -513,12 +517,13 @@
                 
                 var data = {
                     _token: '{{ csrf_token() }}',
-                    _method: 'PUT'
+                    _method: 'PUT',
+                    type: 'bukti'
                 };
                 data[fieldName] = fieldValue;
                 
                 $.ajax({
-                    url: '/doenpkm/bukti/' + buktiId,
+                    url: '/doenpkm/' + buktiId,
                     type: 'POST',
                     data: data,
                     success: function(response) {

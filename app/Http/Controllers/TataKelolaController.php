@@ -119,127 +119,141 @@ class TatakelolaController extends Controller
         ));
     }
 
-    public function updateNarasi(TatakelolaRequest $request, $id)
+    public function store(TatakelolaRequest $request)
     {
-        $narasi = \App\Models\TatakelolaNarasi::findOrFail($id);
-        $data = $request->validated();
-        
-        // Encode missing columns into narasi_text to avoid migration
-        $narasi_text = [
-            'kondisi_saat_ini' => $data['kondisi_saat_ini'] ?? '',
-            'data_fakta' => $data['data_fakta'] ?? '',
-            'analisis' => $data['analisis'] ?? '',
-        ];
-        $data['narasi_text'] = json_encode($narasi_text);
-        unset($data['kondisi_saat_ini'], $data['data_fakta'], $data['analisis']);
+        if ($request->has('type') && $request->type === 'bukti') {
+            $tatakelola_id = $request->input('tatakelola_id');
+            $kriteria_kode = $request->input('kriteria_kode');
 
-        if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
-            $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+            \App\Models\TatakelolaBukti::create([
+                'tatakelola_id' => $tatakelola_id,
+                'kriteria_kode' => $kriteria_kode,
+                'nama_bukti' => $request->input('nama_bukti'),
+                'level' => $request->input('level'),
+                'status' => $request->input('status_bukti'),
+                'link' => $request->input('link'),
+                'pic' => $request->input('pic'),
+                'deadline' => $request->input('deadline'),
+                'catatan' => $request->input('catatan'),
+            ]);
+
+            $this->updateBuktiPersen($tatakelola_id, $kriteria_kode);
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
+        }
+        return redirect()->back();
+    }
+
+    public function update(Request $request, $id)
+    {
+        if ($request->has('type') && $request->type === 'narasi') {
+            $narasi = \App\Models\TatakelolaNarasi::findOrFail($id);
+            $data = $request->validate([
+                'status' => 'required|string',
+                'kondisi_saat_ini' => 'nullable|string',
+                'data_fakta' => 'nullable|string',
+                'analisis' => 'nullable|string',
+                'narasi_persen' => 'nullable|integer'
+            ]);
+            
+            // Encode missing columns into narasi_text to avoid migration
+            $narasi_text = [
+                'kondisi_saat_ini' => $data['kondisi_saat_ini'] ?? '',
+                'data_fakta' => $data['data_fakta'] ?? '',
+                'analisis' => $data['analisis'] ?? '',
+            ];
+            $data['narasi_text'] = json_encode($narasi_text);
+            unset($data['kondisi_saat_ini'], $data['data_fakta'], $data['analisis']);
+
+            if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
+                $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+            }
+
+            $narasi->update($data);
+
+            // Jika ini adalah EU, update rata-rata narasi_persen ke parent
+            if (str_contains($narasi->kriteria_kode, '_EU')) {
+                $parentKode = explode('_EU', $narasi->kriteria_kode)[0];
+                $parent = \App\Models\TatakelolaNarasi::where('tatakelola_id', $narasi->tatakelola_id)
+                    ->where('kriteria_kode', $parentKode)
+                    ->first();
+                    
+                if ($parent) {
+                    $allEUs = \App\Models\TatakelolaNarasi::where('tatakelola_id', $narasi->tatakelola_id)
+                        ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
+                        ->get();
+                        
+                    $totalEU = $allEUs->count();
+                    $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
+                    $narasiPersen = $totalEU > 0 ? round(($lengkapEU / $totalEU) * 100) : 0;
+                    
+                    $status = ($narasiPersen == 100) ? 'Memenuhi' : (($narasiPersen > 0) ? 'Memenuhi Sebagian' : 'Belum Memenuhi');
+                    
+                    $parent->update([
+                        'narasi_persen' => $narasiPersen,
+                        'status' => $status
+                    ]);
+                }
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Tersimpan']);
+            }
+
+            Alert::success('Berhasil!', 'Narasi berhasil diperbarui.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
 
-        $narasi->update($data);
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\TatakelolaBukti::findOrFail($id);
+            $bukti->update([
+                'nama_bukti' => $request->input('nama_bukti', $bukti->nama_bukti),
+                'level' => $request->input('level', $bukti->level),
+                'status' => $request->input('status_bukti', $bukti->status),
+                'link' => $request->input('link', $bukti->link),
+                'pic' => $request->input('pic', $bukti->pic),
+                'deadline' => $request->input('deadline', $bukti->deadline),
+                'catatan' => $request->input('catatan', $bukti->catatan),
+            ]);
 
-        // Jika ini adalah EU, update rata-rata narasi_persen ke parent
-        if (str_contains($narasi->kriteria_kode, '_EU')) {
-            $parentKode = explode('_EU', $narasi->kriteria_kode)[0];
-            $parent = \App\Models\TatakelolaNarasi::where('tatakelola_id', $narasi->tatakelola_id)
-                ->where('kriteria_kode', $parentKode)
-                ->first();
-                
-            if ($parent) {
-                $allEUs = \App\Models\TatakelolaNarasi::where('tatakelola_id', $narasi->tatakelola_id)
-                    ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
-                    ->get();
-                    
-                $totalEU = $allEUs->count();
-                $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
-                $narasiPersen = $totalEU > 0 ? round(($lengkapEU / $totalEU) * 100) : 0;
-                
-                $status = ($narasiPersen == 100) ? 'Memenuhi' : (($narasiPersen > 0) ? 'Memenuhi Sebagian' : 'Belum Memenuhi');
-                
-                $parent->update([
-                    'narasi_persen' => $narasiPersen,
-                    'status' => $status
+            $newPct = $this->updateBuktiPersen($bukti->tatakelola_id, $bukti->kriteria_kode);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Berhasil diperbarui.',
+                    'pctBukti' => $newPct,
+                    'kriteria_kode' => $bukti->kriteria_kode
                 ]);
             }
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Tersimpan']);
-        }
-
-        Alert::success('Berhasil!', 'Narasi berhasil diperbarui.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
         return redirect()->back();
     }
 
-    public function storeBukti(TatakelolaRequest $request)
+    public function destroy(Request $request, $id)
     {
-        $tatakelola_id = $request->input('tatakelola_id');
-        $kriteria_kode = $request->input('kriteria_kode');
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\TatakelolaBukti::findOrFail($id);
+            $tatakelola_id = $bukti->tatakelola_id;
+            $kriteria_kode = $bukti->kriteria_kode;
+            $bukti->delete();
+            $this->updateBuktiPersen($tatakelola_id, $kriteria_kode);
 
-        \App\Models\TatakelolaBukti::create([
-            'tatakelola_id' => $tatakelola_id,
-            'kriteria_kode' => $kriteria_kode,
-            'nama_bukti' => $request->input('nama_bukti'),
-            'level' => $request->input('level'),
-            'status' => $request->input('status_bukti'),
-            'link' => $request->input('link'),
-            'pic' => $request->input('pic'),
-            'deadline' => $request->input('deadline'),
-            'catatan' => $request->input('catatan'),
-        ]);
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
 
-        $this->updateBuktiPersen($tatakelola_id, $kriteria_kode);
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
-        return redirect()->back();
-    }
-
-    public function updateBukti(Request $request, $id)
-    {
-        $bukti = \App\Models\TatakelolaBukti::findOrFail($id);
-        $bukti->update([
-            'nama_bukti' => $request->input('nama_bukti', $bukti->nama_bukti),
-            'level' => $request->input('level', $bukti->level),
-            'status' => $request->input('status_bukti', $bukti->status),
-            'link' => $request->input('link', $bukti->link),
-            'pic' => $request->input('pic', $bukti->pic),
-            'deadline' => $request->input('deadline', $bukti->deadline),
-            'catatan' => $request->input('catatan', $bukti->catatan),
-        ]);
-
-        $newPct = $this->updateBuktiPersen($bukti->tatakelola_id, $bukti->kriteria_kode);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true, 
-                'message' => 'Berhasil diperbarui.',
-                'pctBukti' => $newPct,
-                'kriteria_kode' => $bukti->kriteria_kode
-            ]);
+            return redirect()->back();
         }
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
-        return redirect()->back();
-    }
-
-    public function destroyBukti($id)
-    {
-        $bukti = \App\Models\TatakelolaBukti::findOrFail($id);
-        $tatakelola_id = $bukti->tatakelola_id;
-        $kriteria_kode = $bukti->kriteria_kode;
-        $bukti->delete();
-        $this->updateBuktiPersen($tatakelola_id, $kriteria_kode);
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
         return redirect()->back();
     }
 

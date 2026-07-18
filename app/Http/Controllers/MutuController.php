@@ -77,119 +77,130 @@ class MutuController extends Controller
         ));
     }
 
-    public function updateNarasi(MutuRequest $request, $id)
+    public function store(MutuRequest $request)
     {
-        $narasi = \App\Models\MutuNarasi::findOrFail($id);
-        $data = $request->validated();
+        if ($request->has('type') && $request->type === 'bukti') {
+            $mutu_id = $request->input('mutu_id');
+            $kriteria_kode = $request->input('kriteria_kode');
 
-        if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
-            $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+            \App\Models\MutuBukti::create([
+                'mutu_id' => $mutu_id,
+                'kriteria_kode' => $kriteria_kode,
+                'nama_bukti' => $request->input('nama_bukti'),
+                'level' => $request->input('level'),
+                'status' => $request->input('status_bukti'),
+                'link' => $request->input('link'),
+                'pic' => $request->input('pic'),
+                'deadline' => $request->input('deadline'),
+                'catatan' => $request->input('catatan'),
+            ]);
+
+            $this->updateBuktiPersen($mutu_id, $kriteria_kode);
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
+        }
+        return redirect()->back();
+    }
+
+    public function update(Request $request, $id)
+    {
+        if ($request->has('type') && $request->type === 'narasi') {
+            $narasi = \App\Models\MutuNarasi::findOrFail($id);
+            $data = $request->validate([
+                'status' => 'required|string',
+                'narasi' => 'nullable|string'
+            ]);
+
+            if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
+                $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+            }
+
+            $narasi->update($data);
+
+            // Jika ini adalah EU, update rata-rata narasi_persen ke parent
+            if (str_contains($narasi->kriteria_kode, '_EU')) {
+                $parentKode = explode('_EU', $narasi->kriteria_kode)[0];
+                $parent = \App\Models\MutuNarasi::where('mutu_id', $narasi->mutu_id)
+                    ->where('kriteria_kode', $parentKode)
+                    ->first();
+                    
+                if ($parent) {
+                    $allEUs = \App\Models\MutuNarasi::where('mutu_id', $narasi->mutu_id)
+                        ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
+                        ->get();
+                        
+                    $totalEU = $allEUs->count();
+                    $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
+                    $narasiPersen = $totalEU > 0 ? round(($lengkapEU / $totalEU) * 100) : 0;
+                    
+                    $status = ($narasiPersen == 100) ? 'Memenuhi' : (($narasiPersen > 0) ? 'Memenuhi Sebagian' : 'Belum Memenuhi');
+                    
+                    $parent->update([
+                        'narasi_persen' => $narasiPersen,
+                        'status' => $status
+                    ]);
+                }
+            }
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Tersimpan']);
+            }
+
+            Alert::success('Berhasil!', 'Narasi berhasil diperbarui.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
 
-        $narasi->update($data);
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\MutuBukti::findOrFail($id);
+            
+            $bukti->update([
+                'nama_bukti' => $request->input('nama_bukti', $bukti->nama_bukti),
+                'level' => $request->input('level', $bukti->level),
+                'status' => $request->input('status_bukti', $bukti->status),
+                'link' => $request->input('link', $bukti->link),
+                'pic' => $request->input('pic', $bukti->pic),
+                'deadline' => $request->input('deadline', $bukti->deadline),
+                'catatan' => $request->input('catatan', $bukti->catatan),
+            ]);
 
-        // Jika ini adalah EU, update rata-rata narasi_persen ke parent
-        if (str_contains($narasi->kriteria_kode, '_EU')) {
-            $parentKode = explode('_EU', $narasi->kriteria_kode)[0];
-            $parent = \App\Models\MutuNarasi::where('mutu_id', $narasi->mutu_id)
-                ->where('kriteria_kode', $parentKode)
-                ->first();
-                
-            if ($parent) {
-                $allEUs = \App\Models\MutuNarasi::where('mutu_id', $narasi->mutu_id)
-                    ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
-                    ->get();
-                    
-                $totalEU = $allEUs->count();
-                $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
-                $narasiPersen = $totalEU > 0 ? round(($lengkapEU / $totalEU) * 100) : 0;
-                
-                $status = ($narasiPersen == 100) ? 'Memenuhi' : (($narasiPersen > 0) ? 'Memenuhi Sebagian' : 'Belum Memenuhi');
-                
-                $parent->update([
-                    'narasi_persen' => $narasiPersen,
-                    'status' => $status
+            $newPct = $this->updateBuktiPersen($bukti->mutu_id, $bukti->kriteria_kode);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Berhasil diperbarui.',
+                    'pctBukti' => $newPct,
+                    'kriteria_kode' => $bukti->kriteria_kode
                 ]);
             }
+
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
+
+            return redirect()->back();
         }
-
-        if ($request->ajax()) {
-            return response()->json(['success' => true, 'message' => 'Tersimpan']);
-        }
-
-        Alert::success('Berhasil!', 'Narasi berhasil diperbarui.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
         return redirect()->back();
     }
 
-    public function storeBukti(MutuRequest $request)
+    public function destroy(Request $request, $id)
     {
-        $mutu_id = $request->input('mutu_id');
-        $kriteria_kode = $request->input('kriteria_kode');
+        if ($request->has('type') && $request->type === 'bukti') {
+            $bukti = \App\Models\MutuBukti::findOrFail($id);
+            $mutu_id = $bukti->mutu_id;
+            $kriteria_kode = $bukti->kriteria_kode;
+            $bukti->delete();
+            $this->updateBuktiPersen($mutu_id, $kriteria_kode);
 
-        \App\Models\MutuBukti::create([
-            'mutu_id' => $mutu_id,
-            'kriteria_kode' => $kriteria_kode,
-            'nama_bukti' => $request->input('nama_bukti'),
-            'level' => $request->input('level'),
-            'status' => $request->input('status_bukti'),
-            'link' => $request->input('link'),
-            'pic' => $request->input('pic'),
-            'deadline' => $request->input('deadline'),
-            'catatan' => $request->input('catatan'),
-        ]);
+            Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
+                ->toToast()->autoclose(3000)->timerProgressBar();
 
-        $this->updateBuktiPersen($mutu_id, $kriteria_kode);
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
-        return redirect()->back();
-    }
-
-    public function updateBukti(Request $request, $id)
-    {
-        $bukti = \App\Models\MutuBukti::findOrFail($id);
-        
-        $bukti->update([
-            'nama_bukti' => $request->input('nama_bukti', $bukti->nama_bukti),
-            'level' => $request->input('level', $bukti->level),
-            'status' => $request->input('status_bukti', $bukti->status),
-            'link' => $request->input('link', $bukti->link),
-            'pic' => $request->input('pic', $bukti->pic),
-            'deadline' => $request->input('deadline', $bukti->deadline),
-            'catatan' => $request->input('catatan', $bukti->catatan),
-        ]);
-
-        $newPct = $this->updateBuktiPersen($bukti->mutu_id, $bukti->kriteria_kode);
-
-        if ($request->ajax()) {
-            return response()->json([
-                'success' => true, 
-                'message' => 'Berhasil diperbarui.',
-                'pctBukti' => $newPct,
-                'kriteria_kode' => $bukti->kriteria_kode
-            ]);
+            return redirect()->back();
         }
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
-        return redirect()->back();
-    }
-
-    public function destroyBukti($id)
-    {
-        $bukti = \App\Models\MutuBukti::findOrFail($id);
-        $mutu_id = $bukti->mutu_id;
-        $kriteria_kode = $bukti->kriteria_kode;
-        $bukti->delete();
-        $this->updateBuktiPersen($mutu_id, $kriteria_kode);
-
-        Alert::success('Berhasil!', 'Bukti pendukung berhasil dihapus.')
-            ->toToast()->autoclose(3000)->timerProgressBar();
-
         return redirect()->back();
     }
 

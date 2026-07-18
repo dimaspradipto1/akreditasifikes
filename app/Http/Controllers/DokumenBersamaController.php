@@ -26,42 +26,15 @@ class DokumenBersamaController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id();
-        $allDocs = collect();
+        $allDocs = \App\Models\DokumenBersama::all();
 
-        // Helper to fetch and merge buktis
-        $fetchBuktis = function($modelClass, $buktiClass, $relationId) use ($userId, &$allDocs) {
-            $parent = $modelClass::where('user_id', '=', $userId)->first();
-            if ($parent) {
-                $buktis = $buktiClass::where($relationId, '=', $parent->id)
-                    ->whereIn('level', ['UNIV', 'FIKES'])
-                    ->get();
-                $allDocs = $allDocs->merge($buktis);
-            }
-        };
-
-        $fetchBuktis(Vmts::class, VmtsBukti::class, 'vmts_id');
-        $fetchBuktis(Kurikulum::class, KurikulumBukti::class, 'kurikulum_id');
-        $fetchBuktis(Penilaian::class, PenilaianBukti::class, 'penilaian_id');
-        $fetchBuktis(Mahasiswa::class, MahasiswaBukti::class, 'mahasiswa_id');
-        $fetchBuktis(Doenpkm::class, DoenpkmBukti::class, 'doenpkm_id');
-        $fetchBuktis(Sarpraskeuangan::class, SarpraskeuanganBukti::class, 'sarpraskeuangan_id');
-        $fetchBuktis(Mutu::class, MutuBukti::class, 'mutu_id');
-        $fetchBuktis(Tatakelola::class, TatakelolaBukti::class, 'tatakelola_id');
-
-        // Group by nama_dokumen to get unique list
-        $uniqueDocs = $allDocs->unique(function ($item) {
-            return strtolower(trim($item->nama_bukti));
-        });
-
-        // Split by level
-        $univDocs = $uniqueDocs->where('level', 'UNIV')->values();
-        $fikesDocs = $uniqueDocs->where('level', 'FIKES')->values();
+        $univDocs = $allDocs->where('level', 'UNIV')->values();
+        $fikesDocs = $allDocs->where('level', 'FIKES')->values();
 
         $univTersedia = $univDocs->whereIn('status', ['Ada', 'Tersedia'])->count();
         $fikesTersedia = $fikesDocs->whereIn('status', ['Ada', 'Tersedia'])->count();
 
-        $totalDocs = $univDocs->count() + $fikesDocs->count();
+        $totalDocs = $allDocs->count();
 
         return view('pages.dokumen-bersama.index', compact(
             'univDocs',
@@ -72,21 +45,47 @@ class DokumenBersamaController extends Controller
         ));
     }
 
-    public function update(Request $request)
+    public function store(Request $request)
     {
-        $namaDokumen = $request->input('nama_dokumen');
-        if (!$namaDokumen) {
-            return response()->json(['success' => false, 'message' => 'Nama dokumen tidak valid'], 400);
-        }
+        $request->validate([
+            'kode' => 'required',
+            'nama_dokumen' => 'required',
+            'level' => 'required|in:UNIV,FIKES',
+        ]);
 
-        $userId = Auth::id();
+        \App\Models\DokumenBersama::create([
+            'kode' => $request->kode,
+            'nama_dokumen' => $request->nama_dokumen,
+            'deskripsi' => $request->deskripsi,
+            'jenis' => $request->jenis ?? '-',
+            'level' => $request->level,
+            'status' => 'Belum Ada',
+            'link' => '',
+            'pic' => '',
+            'deadline' => null,
+            'catatan' => '',
+        ]);
 
-        // Helper to update buktis
-        $updateBuktis = function($modelClass, $buktiClass, $relationId) use ($userId, $namaDokumen, $request) {
-            $parent = $modelClass::where('user_id', '=', $userId)->first();
-            if ($parent) {
-                $buktiClass::where($relationId, '=', $parent->id)
-                    ->where('nama_bukti', '=', $namaDokumen)
+        return redirect()->back()->with('success', 'Dokumen berhasil ditambahkan!');
+    }
+
+    public function update(Request $request, $id)
+    {
+        $dokumenBersama = \App\Models\DokumenBersama::findOrFail($id);
+
+        if ($request->has('inline')) {
+            $dokumenBersama->update([
+                'status' => $request->status,
+                'link' => $request->link,
+                'pic' => $request->pic,
+                'deadline' => $request->deadline,
+                'catatan' => $request->catatan,
+            ]);
+
+            $namaDokumen = $dokumenBersama->nama_dokumen;
+
+            $updateBuktis = function($buktiClass) use ($namaDokumen, $request) {
+                $buktiClass::where('nama_bukti', '=', $namaDokumen)
                     ->update([
                         'status' => $request->status,
                         'link' => $request->link,
@@ -94,21 +93,65 @@ class DokumenBersamaController extends Controller
                         'deadline' => $request->deadline,
                         'catatan' => $request->catatan,
                     ]);
-            }
-        };
+            };
 
-        $updateBuktis(Vmts::class, VmtsBukti::class, 'vmts_id');
-        $updateBuktis(Kurikulum::class, KurikulumBukti::class, 'kurikulum_id');
-        $updateBuktis(Penilaian::class, PenilaianBukti::class, 'penilaian_id');
-        $updateBuktis(Mahasiswa::class, MahasiswaBukti::class, 'mahasiswa_id');
-        $updateBuktis(Doenpkm::class, DoenpkmBukti::class, 'doenpkm_id');
-        $updateBuktis(Sarpraskeuangan::class, SarpraskeuanganBukti::class, 'sarpraskeuangan_id');
-        $updateBuktis(Mutu::class, MutuBukti::class, 'mutu_id');
-        $updateBuktis(Tatakelola::class, TatakelolaBukti::class, 'tatakelola_id');
+            $updateBuktis(VmtsBukti::class);
+            $updateBuktis(KurikulumBukti::class);
+            $updateBuktis(PenilaianBukti::class);
+            $updateBuktis(MahasiswaBukti::class);
+            $updateBuktis(DoenpkmBukti::class);
+            $updateBuktis(SarpraskeuanganBukti::class);
+            $updateBuktis(MutuBukti::class);
+            $updateBuktis(TatakelolaBukti::class);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Semua dokumen terkait berhasil diperbarui'
+            return response()->json([
+                'success' => true,
+                'message' => 'Semua dokumen terkait berhasil diperbarui'
+            ]);
+        }
+
+        $request->validate([
+            'kode' => 'required',
+            'nama_dokumen' => 'required',
+            'level' => 'required|in:UNIV,FIKES',
         ]);
+
+        $oldNama = $dokumenBersama->nama_dokumen;
+        
+        $dokumenBersama->update([
+            'kode' => $request->kode,
+            'nama_dokumen' => $request->nama_dokumen,
+            'deskripsi' => $request->deskripsi,
+            'jenis' => $request->jenis ?? '-',
+            'level' => $request->level,
+        ]);
+        
+        if ($oldNama !== $request->nama_dokumen) {
+            $updateBuktis = function($buktiClass) use ($oldNama, $request) {
+                $buktiClass::where('nama_bukti', '=', $oldNama)
+                    ->update([
+                        'nama_bukti' => $request->nama_dokumen
+                    ]);
+            };
+
+            $updateBuktis(VmtsBukti::class);
+            $updateBuktis(KurikulumBukti::class);
+            $updateBuktis(PenilaianBukti::class);
+            $updateBuktis(MahasiswaBukti::class);
+            $updateBuktis(DoenpkmBukti::class);
+            $updateBuktis(SarpraskeuanganBukti::class);
+            $updateBuktis(MutuBukti::class);
+            $updateBuktis(TatakelolaBukti::class);
+        }
+
+        return redirect()->back()->with('success', 'Dokumen berhasil diperbarui!');
+    }
+
+    public function destroy($id)
+    {
+        $dokumenBersama = \App\Models\DokumenBersama::findOrFail($id);
+        $dokumenBersama->delete();
+        
+        return redirect()->back()->with('success', 'Dokumen berhasil dihapus!');
     }
 }
