@@ -42,7 +42,9 @@ Route::middleware(['auth', 'checkrole'])->group(function () {
     // User CRUD Resource
     Route::resource('user', UserController::class);
     // VMTS Resource
-    Route::resource('vmts', VmtsController::class);
+    Route::post('/dashboard/jadwal', [DashboardController::class, 'updateJadwal'])->name('dashboard.jadwal.update');
+
+    Route::resource('kriteria1', VmtsController::class);
 
     // Kurikulum Resource
     Route::resource('kurikulum', KurikulumController::class);

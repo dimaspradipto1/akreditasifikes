@@ -1,681 +1,408 @@
 @extends('layouts.dashboard.template')
 
+@section('title', 'Dashboard')
+
 @section('content')
-    <div class="pagetitle">
-        <h1>Dashboard</h1>
-        <nav>
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="index.html">Home</a></li>
-                <li class="breadcrumb-item active">Dashboard</li>
-            </ol>
-        </nav>
+<style>
+    .metric-card {
+        background: #ffffff;
+        border-radius: 8px;
+        padding: 1.25rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        height: 100%;
+    }
+    .metric-title {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    
+    .progress-wrapper {
+        margin-bottom: 1.5rem;
+    }
+    .progress-wrapper .kriteria-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 0.2rem;
+    }
+    .progress-wrapper .kriteria-labels {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-bottom: 0.4rem;
+        display: flex;
+        gap: 1rem;
+    }
+    .custom-progress {
+        height: 6px;
+        background-color: #f1f5f9;
+        border-radius: 4px;
+        margin-bottom: 4px;
+        overflow: hidden;
+    }
+    .custom-progress-bar {
+        height: 100%;
+        border-radius: 4px;
+    }
+    .bg-success-custom { background-color: #16a34a; }
+    .bg-warning-custom { background-color: #d97706; }
+    .bg-danger-custom { background-color: #dc2626; }
+    
+    .card-custom {
+        background: #ffffff;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    .card-title-custom {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 0.25rem;
+    }
+    .card-subtitle-custom {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-bottom: 1.5rem;
+    }
+    
+    .doc-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .doc-label {
+        width: 250px;
+        font-size: 0.9rem;
+        color: #334155;
+        font-weight: 500;
+    }
+    .doc-progress-container {
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .doc-progress {
+        flex-grow: 1;
+        height: 8px;
+        background-color: #f1f5f9;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    .doc-value {
+        width: 80px;
+        text-align: right;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #1e3a8a;
+    }
+    
+    .activity-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f1f5f9;
+        font-size: 0.85rem;
+        color: #334155;
+    }
+    .activity-row:last-child {
+        border-bottom: none;
+    }
+    .activity-time {
+        color: #94a3b8;
+        white-space: nowrap;
+        margin-left: 1rem;
+    }
+    
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 4px;
+    }
+</style>
+
+@php
+    function getColorClass($value) {
+        if ($value >= 80) return 'bg-success-custom';
+        if ($value >= 50) return 'bg-warning-custom';
+        return 'bg-danger-custom';
+    }
+@endphp
+
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item text-muted" style="font-size: 0.85rem;">Dashboard / S1 Kesehatan Lingkungan</li>
+                </ol>
+            </nav>
+            <h1 class="h3 fw-bold text-dark mb-1">Dashboard Kesiapan Akreditasi</h1>
+            <p class="text-muted mb-0" style="font-size: 0.85rem;">S1 Kesehatan Lingkungan (Sarjana) - FIKes Universitas XYZ - Instrumen Baru LAM-PTKes 2025</p>
+        </div>
+        <div class="text-end" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#editJadwalModal" title="Klik untuk edit jadwal">
+            <div class="text-muted" style="font-size: 0.8rem;">Sisa waktu pengajuan <i class="bi bi-pencil-square ms-1"></i></div>
+            <div class="fw-bold {{ $sisaHari < 0 ? 'text-danger' : 'text-warning' }}" style="font-size: 1.25rem;">
+                {{ $sisaHari < 0 ? 'Waktu Habis' : $sisaHari . ' hari' }}
+            </div>
+        </div>
     </div>
 
-    <section class="section dashboard">
-        <div class="row">
-
-            <!-- Left side columns -->
-            <div class="col-lg-8">
-                <div class="row">
-
-                    <!-- Sales Card -->
-                    <div class="col-xxl-4 col-md-6">
-                        <div class="card info-card sales-card">
-
-                            <div class="filter">
-                                <a class="icon" href="#" data-bs-toggle="dropdown"><i
-                                        class="bi bi-three-dots"></i></a>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                    <li class="dropdown-header text-start">
-                                        <h6>Filter</h6>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="#">Today</a></li>
-                                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                                </ul>
-                            </div>
-
-                            <div class="card-body">
-                                <h5 class="card-title">Sales <span>| Today</span></h5>
-
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-cart"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>145</h6>
-                                        <span class="text-success small pt-1 fw-bold">12%</span> <span
-                                            class="text-muted small pt-2 ps-1">increase</span>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div><!-- End Sales Card -->
-
-                    <!-- Revenue Card -->
-                    <div class="col-xxl-4 col-md-6">
-                        <div class="card info-card revenue-card">
-
-                            <div class="filter">
-                                <a class="icon" href="#" data-bs-toggle="dropdown"><i
-                                        class="bi bi-three-dots"></i></a>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                    <li class="dropdown-header text-start">
-                                        <h6>Filter</h6>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="#">Today</a></li>
-                                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                                </ul>
-                            </div>
-
-                            <div class="card-body">
-                                <h5 class="card-title">Revenue <span>| This Month</span></h5>
-
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-currency-dollar"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>$3,264</h6>
-                                        <span class="text-success small pt-1 fw-bold">8%</span> <span
-                                            class="text-muted small pt-2 ps-1">increase</span>
-
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div><!-- End Revenue Card -->
-
-                    <!-- Customers Card -->
-                    <div class="col-xxl-4 col-xl-12">
-
-                        <div class="card info-card customers-card">
-
-                            <div class="filter">
-                                <a class="icon" href="#" data-bs-toggle="dropdown"><i
-                                        class="bi bi-three-dots"></i></a>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                    <li class="dropdown-header text-start">
-                                        <h6>Filter</h6>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="#">Today</a></li>
-                                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                                </ul>
-                            </div>
-
-                            <div class="card-body">
-                                <h5 class="card-title">Customers <span>| This Year</span></h5>
-
-                                <div class="d-flex align-items-center">
-                                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-people"></i>
-                                    </div>
-                                    <div class="ps-3">
-                                        <h6>1244</h6>
-                                        <span class="text-danger small pt-1 fw-bold">12%</span> <span
-                                            class="text-muted small pt-2 ps-1">decrease</span>
-
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-
-                    </div><!-- End Customers Card -->
-
-                    <!-- Reports -->
-                    <div class="col-12">
-                        <div class="card">
-
-                            <div class="filter">
-                                <a class="icon" href="#" data-bs-toggle="dropdown"><i
-                                        class="bi bi-three-dots"></i></a>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                    <li class="dropdown-header text-start">
-                                        <h6>Filter</h6>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="#">Today</a></li>
-                                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                                </ul>
-                            </div>
-
-                            <div class="card-body">
-                                <h5 class="card-title">Reports <span>/Today</span></h5>
-
-                                <!-- Line Chart -->
-                                <div id="reportsChart"></div>
-
-                                <script>
-                                    document.addEventListener("DOMContentLoaded", () => {
-                                        new ApexCharts(document.querySelector("#reportsChart"), {
-                                            series: [{
-                                                name: 'Sales',
-                                                data: [31, 40, 28, 51, 42, 82, 56],
-                                            }, {
-                                                name: 'Revenue',
-                                                data: [11, 32, 45, 32, 34, 52, 41]
-                                            }, {
-                                                name: 'Customers',
-                                                data: [15, 11, 32, 18, 9, 24, 11]
-                                            }],
-                                            chart: {
-                                                height: 350,
-                                                type: 'area',
-                                                toolbar: {
-                                                    show: false
-                                                },
-                                            },
-                                            markers: {
-                                                size: 4
-                                            },
-                                            colors: ['#4154f1', '#2eca6a', '#ff771d'],
-                                            fill: {
-                                                type: "gradient",
-                                                gradient: {
-                                                    shadeIntensity: 1,
-                                                    opacityFrom: 0.3,
-                                                    opacityTo: 0.4,
-                                                    stops: [0, 90, 100]
-                                                }
-                                            },
-                                            dataLabels: {
-                                                enabled: false
-                                            },
-                                            stroke: {
-                                                curve: 'smooth',
-                                                width: 2
-                                            },
-                                            xaxis: {
-                                                type: 'datetime',
-                                                categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z",
-                                                    "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z",
-                                                    "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z",
-                                                    "2018-09-19T06:30:00.000Z"
-                                                ]
-                                            },
-                                            tooltip: {
-                                                x: {
-                                                    format: 'dd/MM/yy HH:mm'
-                                                },
-                                            }
-                                        }).render();
-                                    });
-                                </script>
-                                <!-- End Line Chart -->
-
-                            </div>
-
-                        </div>
-                    </div><!-- End Reports -->
-
-                    <!-- Recent Sales -->
-                    <div class="col-12">
-                        <div class="card recent-sales overflow-auto">
-
-                            <div class="filter">
-                                <a class="icon" href="#" data-bs-toggle="dropdown"><i
-                                        class="bi bi-three-dots"></i></a>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                    <li class="dropdown-header text-start">
-                                        <h6>Filter</h6>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="#">Today</a></li>
-                                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                                </ul>
-                            </div>
-
-                            <div class="card-body">
-                                <h5 class="card-title">Recent Sales <span>| Today</span></h5>
-
-                                <table class="table table-borderless datatable">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">#</th>
-                                            <th scope="col">Customer</th>
-                                            <th scope="col">Product</th>
-                                            <th scope="col">Price</th>
-                                            <th scope="col">Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2457</a></th>
-                                            <td>Brandon Jacob</td>
-                                            <td><a href="#" class="text-primary">At praesentium minu</a>
-                                            </td>
-                                            <td>$64</td>
-                                            <td><span class="badge bg-success">Approved</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2147</a></th>
-                                            <td>Bridie Kessler</td>
-                                            <td><a href="#" class="text-primary">Blanditiis dolor omnis
-                                                    similique</a></td>
-                                            <td>$47</td>
-                                            <td><span class="badge bg-warning">Pending</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2049</a></th>
-                                            <td>Ashleigh Langosh</td>
-                                            <td><a href="#" class="text-primary">At recusandae
-                                                    consectetur</a></td>
-                                            <td>$147</td>
-                                            <td><span class="badge bg-success">Approved</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2644</a></th>
-                                            <td>Angus Grady</td>
-                                            <td><a href="#" class="text-primar">Ut voluptatem id earum
-                                                    et</a></td>
-                                            <td>$67</td>
-                                            <td><span class="badge bg-danger">Rejected</span></td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#">#2644</a></th>
-                                            <td>Raheem Lehner</td>
-                                            <td><a href="#" class="text-primary">Sunt similique
-                                                    distinctio</a></td>
-                                            <td>$165</td>
-                                            <td><span class="badge bg-success">Approved</span></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                            </div>
-
-                        </div>
-                    </div><!-- End Recent Sales -->
-
-                    <!-- Top Selling -->
-                    <div class="col-12">
-                        <div class="card top-selling overflow-auto">
-
-                            <div class="filter">
-                                <a class="icon" href="#" data-bs-toggle="dropdown"><i
-                                        class="bi bi-three-dots"></i></a>
-                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                                    <li class="dropdown-header text-start">
-                                        <h6>Filter</h6>
-                                    </li>
-
-                                    <li><a class="dropdown-item" href="#">Today</a></li>
-                                    <li><a class="dropdown-item" href="#">This Month</a></li>
-                                    <li><a class="dropdown-item" href="#">This Year</a></li>
-                                </ul>
-                            </div>
-
-                            <div class="card-body pb-0">
-                                <h5 class="card-title">Top Selling <span>| Today</span></h5>
-
-                                <table class="table table-borderless">
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">Preview</th>
-                                            <th scope="col">Product</th>
-                                            <th scope="col">Price</th>
-                                            <th scope="col">Sold</th>
-                                            <th scope="col">Revenue</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th scope="row"><a href="#"><img src="assets/img/product-1.jpg"
-                                                        alt=""></a></th>
-                                            <td><a href="#" class="text-primary fw-bold">Ut inventore ipsa
-                                                    voluptas nulla</a></td>
-                                            <td>$64</td>
-                                            <td class="fw-bold">124</td>
-                                            <td>$5,828</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#"><img src="assets/img/product-2.jpg"
-                                                        alt=""></a></th>
-                                            <td><a href="#" class="text-primary fw-bold">Exercitationem
-                                                    similique doloremque</a></td>
-                                            <td>$46</td>
-                                            <td class="fw-bold">98</td>
-                                            <td>$4,508</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#"><img src="assets/img/product-3.jpg"
-                                                        alt=""></a></th>
-                                            <td><a href="#" class="text-primary fw-bold">Doloribus nisi
-                                                    exercitationem</a></td>
-                                            <td>$59</td>
-                                            <td class="fw-bold">74</td>
-                                            <td>$4,366</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#"><img src="assets/img/product-4.jpg"
-                                                        alt=""></a></th>
-                                            <td><a href="#" class="text-primary fw-bold">Officiis quaerat
-                                                    sint rerum error</a></td>
-                                            <td>$32</td>
-                                            <td class="fw-bold">63</td>
-                                            <td>$2,016</td>
-                                        </tr>
-                                        <tr>
-                                            <th scope="row"><a href="#"><img src="assets/img/product-5.jpg"
-                                                        alt=""></a></th>
-                                            <td><a href="#" class="text-primary fw-bold">Sit unde debitis
-                                                    delectus repellendus</a></td>
-                                            <td>$79</td>
-                                            <td class="fw-bold">41</td>
-                                            <td>$3,239</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                            </div>
-
-                        </div>
-                    </div><!-- End Top Selling -->
-
-                </div>
-            </div><!-- End Left side columns -->
-
-            <!-- Right side columns -->
-            <div class="col-lg-4">
-
-                <!-- Recent Activity -->
-                <div class="card">
-                    <div class="filter">
-                        <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            <li class="dropdown-header text-start">
-                                <h6>Filter</h6>
-                            </li>
-
-                            <li><a class="dropdown-item" href="#">Today</a></li>
-                            <li><a class="dropdown-item" href="#">This Month</a></li>
-                            <li><a class="dropdown-item" href="#">This Year</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="card-body">
-                        <h5 class="card-title">Recent Activity <span>| Today</span></h5>
-
-                        <div class="activity">
-
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">32 min</div>
-                                <i class='bi bi-circle-fill activity-badge text-success align-self-start'></i>
-                                <div class="activity-content">
-                                    Quia quae rerum <a href="#" class="fw-bold text-dark">explicabo
-                                        officiis</a> beatae
-                                </div>
-                            </div><!-- End activity item-->
-
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">56 min</div>
-                                <i class='bi bi-circle-fill activity-badge text-danger align-self-start'></i>
-                                <div class="activity-content">
-                                    Voluptatem blanditiis blanditiis eveniet
-                                </div>
-                            </div><!-- End activity item-->
-
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">2 hrs</div>
-                                <i class='bi bi-circle-fill activity-badge text-primary align-self-start'></i>
-                                <div class="activity-content">
-                                    Voluptates corrupti molestias voluptatem
-                                </div>
-                            </div><!-- End activity item-->
-
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">1 day</div>
-                                <i class='bi bi-circle-fill activity-badge text-info align-self-start'></i>
-                                <div class="activity-content">
-                                    Tempore autem saepe <a href="#" class="fw-bold text-dark">occaecati
-                                        voluptatem</a> tempore
-                                </div>
-                            </div><!-- End activity item-->
-
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">2 days</div>
-                                <i class='bi bi-circle-fill activity-badge text-warning align-self-start'></i>
-                                <div class="activity-content">
-                                    Est sit eum reiciendis exercitationem
-                                </div>
-                            </div><!-- End activity item-->
-
-                            <div class="activity-item d-flex">
-                                <div class="activite-label">4 weeks</div>
-                                <i class='bi bi-circle-fill activity-badge text-muted align-self-start'></i>
-                                <div class="activity-content">
-                                    Dicta dolorem harum nulla eius. Ut quidem quidem sit quas
-                                </div>
-                            </div><!-- End activity item-->
-
-                        </div>
-
-                    </div>
-                </div><!-- End Recent Activity -->
-
-                <!-- Budget Report -->
-                <div class="card">
-                    <div class="filter">
-                        <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            <li class="dropdown-header text-start">
-                                <h6>Filter</h6>
-                            </li>
-
-                            <li><a class="dropdown-item" href="#">Today</a></li>
-                            <li><a class="dropdown-item" href="#">This Month</a></li>
-                            <li><a class="dropdown-item" href="#">This Year</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="card-body pb-0">
-                        <h5 class="card-title">Budget Report <span>| This Month</span></h5>
-
-                        <div id="budgetChart" style="min-height: 400px;" class="echart"></div>
-
-                        <script>
-                            document.addEventListener("DOMContentLoaded", () => {
-                                var budgetChart = echarts.init(document.querySelector("#budgetChart")).setOption({
-                                    legend: {
-                                        data: ['Allocated Budget', 'Actual Spending']
-                                    },
-                                    radar: {
-                                        // shape: 'circle',
-                                        indicator: [{
-                                                name: 'Sales',
-                                                max: 6500
-                                            },
-                                            {
-                                                name: 'Administration',
-                                                max: 16000
-                                            },
-                                            {
-                                                name: 'Information Technology',
-                                                max: 30000
-                                            },
-                                            {
-                                                name: 'Customer Support',
-                                                max: 38000
-                                            },
-                                            {
-                                                name: 'Development',
-                                                max: 52000
-                                            },
-                                            {
-                                                name: 'Marketing',
-                                                max: 25000
-                                            }
-                                        ]
-                                    },
-                                    series: [{
-                                        name: 'Budget vs spending',
-                                        type: 'radar',
-                                        data: [{
-                                                value: [4200, 3000, 20000, 35000, 50000, 18000],
-                                                name: 'Allocated Budget'
-                                            },
-                                            {
-                                                value: [5000, 14000, 28000, 26000, 42000, 21000],
-                                                name: 'Actual Spending'
-                                            }
-                                        ]
-                                    }]
-                                });
-                            });
-                        </script>
-
-                    </div>
-                </div><!-- End Budget Report -->
-
-                <!-- Website Traffic -->
-                <div class="card">
-                    <div class="filter">
-                        <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            <li class="dropdown-header text-start">
-                                <h6>Filter</h6>
-                            </li>
-
-                            <li><a class="dropdown-item" href="#">Today</a></li>
-                            <li><a class="dropdown-item" href="#">This Month</a></li>
-                            <li><a class="dropdown-item" href="#">This Year</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="card-body pb-0">
-                        <h5 class="card-title">Website Traffic <span>| Today</span></h5>
-
-                        <div id="trafficChart" style="min-height: 400px;" class="echart"></div>
-
-                        <script>
-                            document.addEventListener("DOMContentLoaded", () => {
-                                echarts.init(document.querySelector("#trafficChart")).setOption({
-                                    tooltip: {
-                                        trigger: 'item'
-                                    },
-                                    legend: {
-                                        top: '5%',
-                                        left: 'center'
-                                    },
-                                    series: [{
-                                        name: 'Access From',
-                                        type: 'pie',
-                                        radius: ['40%', '70%'],
-                                        avoidLabelOverlap: false,
-                                        label: {
-                                            show: false,
-                                            position: 'center'
-                                        },
-                                        emphasis: {
-                                            label: {
-                                                show: true,
-                                                fontSize: '18',
-                                                fontWeight: 'bold'
-                                            }
-                                        },
-                                        labelLine: {
-                                            show: false
-                                        },
-                                        data: [{
-                                                value: 1048,
-                                                name: 'Search Engine'
-                                            },
-                                            {
-                                                value: 735,
-                                                name: 'Direct'
-                                            },
-                                            {
-                                                value: 580,
-                                                name: 'Email'
-                                            },
-                                            {
-                                                value: 484,
-                                                name: 'Union Ads'
-                                            },
-                                            {
-                                                value: 300,
-                                                name: 'Video Ads'
-                                            }
-                                        ]
-                                    }]
-                                });
-                            });
-                        </script>
-
-                    </div>
-                </div><!-- End Website Traffic -->
-
-                <!-- News & Updates Traffic -->
-                <div class="card">
-                    <div class="filter">
-                        <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                            <li class="dropdown-header text-start">
-                                <h6>Filter</h6>
-                            </li>
-
-                            <li><a class="dropdown-item" href="#">Today</a></li>
-                            <li><a class="dropdown-item" href="#">This Month</a></li>
-                            <li><a class="dropdown-item" href="#">This Year</a></li>
-                        </ul>
-                    </div>
-
-                    <div class="card-body pb-0">
-                        <h5 class="card-title">News &amp; Updates <span>| Today</span></h5>
-
-                        <div class="news">
-                            <div class="post-item clearfix">
-                                <img src="assets/img/news-1.jpg" alt="">
-                                <h4><a href="#">Nihil blanditiis at in nihil autem</a></h4>
-                                <p>Sit recusandae non aspernatur laboriosam. Quia enim eligendi sed ut harum...</p>
-                            </div>
-
-                            <div class="post-item clearfix">
-                                <img src="assets/img/news-2.jpg" alt="">
-                                <h4><a href="#">Quidem autem et impedit</a></h4>
-                                <p>Illo nemo neque maiores vitae officiis cum eum turos elan dries werona nande...
-                                </p>
-                            </div>
-
-                            <div class="post-item clearfix">
-                                <img src="assets/img/news-3.jpg" alt="">
-                                <h4><a href="#">Id quia et et ut maxime similique occaecati ut</a></h4>
-                                <p>Fugiat voluptas vero eaque accusantium eos. Consequuntur sed ipsam et totam...
-                                </p>
-                            </div>
-
-                            <div class="post-item clearfix">
-                                <img src="assets/img/news-4.jpg" alt="">
-                                <h4><a href="#">Laborum corporis quo dara net para</a></h4>
-                                <p>Qui enim quia optio. Eligendi aut asperiores enim repellendusvel rerum cuder...
-                                </p>
-                            </div>
-
-                            <div class="post-item clearfix">
-                                <img src="assets/img/news-5.jpg" alt="">
-                                <h4><a href="#">Et dolores corrupti quae illo quod dolor</a></h4>
-                                <p>Odit ut eveniet modi reiciendis. Atque cupiditate libero beatae dignissimos
-                                    eius...</p>
-                            </div>
-
-                        </div><!-- End sidebar recent posts-->
-
-                    </div>
-                </div><!-- End News & Updates -->
-
-            </div><!-- End Right side columns -->
-
+    <!-- 4 Metrics -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="metric-card bg-light">
+                <div class="metric-title">Proyeksi Status Akreditasi</div>
+                <div class="metric-value {{ $proyeksi_warna ?? 'text-success' }}">{{ $proyeksi_status ?? 'Unggul' }} 4 Tahun</div>
+            </div>
         </div>
-    </section>
+        <div class="col-md-3">
+            <div class="metric-card bg-light">
+                <div class="metric-title">Rata-rata % Narasi Lengkap</div>
+                <div class="metric-value">{{ round($avg_narasi_total ?? 81) }}%</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card bg-light">
+                <div class="metric-title">Rata-rata % Bukti Tersedia</div>
+                <div class="metric-value">{{ round($avg_bukti_total ?? 70) }}%</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="metric-card bg-light">
+                <div class="metric-title">Sub Kriteria WAJIB Belum Memenuhi</div>
+                <div class="metric-value text-success">{{ $wajib_belum_memenuhi ?? 0 }} dari {{ $wajib_total ?? 17 }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Row -->
+    <div class="row g-4 mb-4">
+        <!-- Progress Kriteria -->
+        <div class="col-lg-7">
+            <div class="card-custom">
+                <div class="card-title-custom">Progres Narasi & Bukti per Kriteria</div>
+                <div class="card-subtitle-custom">Klik nama kriteria di sidebar untuk membuka detail & mengisi</div>
+                
+                <div class="mt-4">
+                    @foreach($kriteria_stats as $key => $stat)
+                    <div class="progress-wrapper">
+                        <div class="kriteria-title">{{ $key }}. {{ $stat['nama'] }}</div>
+                        <div class="kriteria-labels">
+                            <span class="{{ $stat['narasi'] >= 80 ? 'text-success' : ($stat['narasi'] >= 50 ? 'text-warning' : 'text-danger') }}">Narasi {{ $stat['narasi'] }}%</span>
+                            <span class="{{ $stat['bukti'] >= 80 ? 'text-success' : ($stat['bukti'] >= 50 ? 'text-warning' : 'text-danger') }}">Bukti {{ $stat['bukti'] }}%</span>
+                        </div>
+                        <div class="custom-progress">
+                            <div class="custom-progress-bar {{ getColorClass($stat['narasi']) }}" style="width: {{ $stat['narasi'] }}%"></div>
+                        </div>
+                        <div class="custom-progress">
+                            <div class="custom-progress-bar {{ getColorClass($stat['bukti']) }}" style="width: {{ $stat['bukti'] }}%"></div>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <!-- Radar Chart -->
+        <div class="col-lg-5">
+            <div class="card-custom h-100">
+                <div class="card-title-custom">Skor Capaian (Radar 8 Kriteria)</div>
+                <div class="card-subtitle-custom">Rata-rata % narasi + % bukti per kriteria</div>
+                
+                <div id="radarChart" style="min-height: 400px; width: 100%;" class="echart mt-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dokumen Bersama -->
+    <div class="card-custom mb-4">
+        <div class="card-title-custom">Dokumen Bersama (Universitas & FIKes)</div>
+        <div class="card-subtitle-custom">Diisi satu kali oleh Tim LPM/Rektorat & Dekanat/GPM FIKes — otomatis terbaca oleh halaman Kriteria</div>
+        
+        <div class="mt-4">
+            <!-- UNIV -->
+            <div class="doc-row">
+                <div class="doc-label">
+                    <div>Dokumen Universitas</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">(DOK UNIV)<br>Diisi Tim LPM/Rektorat</div>
+                </div>
+                <div class="doc-progress-container">
+                    <div class="doc-progress">
+                        <div class="custom-progress-bar bg-success-custom" style="width: {{ $dokumen['univ']['pct'] ?? 0 }}%"></div>
+                    </div>
+                    <div class="doc-value">{{ $dokumen['univ']['tersedia'] ?? 0 }}/{{ $dokumen['univ']['total'] ?? 15 }} ({{ $dokumen['univ']['pct'] ?? 0 }}%)</div>
+                </div>
+            </div>
+            
+            <!-- FIKES -->
+            <div class="doc-row">
+                <div class="doc-label">
+                    <div>Dokumen FIKes</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">(DOK FIKES)<br>Diisi Tim Dekanat/GPM FIKes</div>
+                </div>
+                <div class="doc-progress-container">
+                    <div class="doc-progress">
+                        <div class="custom-progress-bar bg-success-custom" style="width: {{ $dokumen['fikes']['pct'] ?? 0 }}%"></div>
+                    </div>
+                    <div class="doc-value">{{ $dokumen['fikes']['tersedia'] ?? 0 }}/{{ $dokumen['fikes']['total'] ?? 15 }} ({{ $dokumen['fikes']['pct'] ?? 0 }}%)</div>
+                </div>
+            </div>
+            
+            <a href="{{ route('dokumen-bersama.index') }}" class="text-decoration-underline mt-2 d-inline-block" style="font-size: 0.85rem; color: #5520B8; font-weight: 500;">Lihat detail Dokumen Bersama →</a>
+        </div>
+    </div>
+
+    <!-- Aktivitas Terbaru -->
+    <div class="card-custom mb-4">
+        <div class="card-title-custom" style="margin-bottom: 1.5rem;">Aktivitas Terbaru</div>
+        
+        <div>
+            @foreach($aktivitas as $act)
+            <div class="activity-row">
+                <div>{!! $act['teks'] !!}</div>
+                <div class="activity-time">{{ $act['waktu'] }}</div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="d-flex gap-4 text-muted" style="font-size: 0.75rem; font-weight: 500; margin-top: 1rem;">
+        <div><span class="legend-dot bg-success-custom"></span> Memenuhi / Lengkap</div>
+        <div><span class="legend-dot bg-warning-custom"></span> Boleh sebagian - belum lengkap</div>
+        <div><span class="legend-dot bg-danger-custom"></span> Syarat perlu (WAJIB) belum memenuhi</div>
+    </div>
+
+</div>
+
+<!-- Load ECharts -->
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Data dari Controller
+        const kriteriaData = @json($kriteria_stats);
+        
+        // Menyiapkan data untuk chart
+        const indicator = [
+            { name: 'Visi', max: 100 },
+            { name: 'Kurikulum', max: 100 },
+            { name: 'Penilaian', max: 100 },
+            { name: 'Mahasiswa', max: 100 },
+            { name: 'Dosen', max: 100 },
+            { name: 'Sarana', max: 100 },
+            { name: 'Penjaminan Mutu', max: 100 },
+            { name: 'Tata Kelola', max: 100 }
+        ];
+        
+        // Rata-rata per kriteria
+        const dataValues = [
+            (kriteriaData['K1'].narasi + kriteriaData['K1'].bukti) / 2,
+            (kriteriaData['K2'].narasi + kriteriaData['K2'].bukti) / 2,
+            (kriteriaData['K3'].narasi + kriteriaData['K3'].bukti) / 2,
+            (kriteriaData['K4'].narasi + kriteriaData['K4'].bukti) / 2,
+            (kriteriaData['K5'].narasi + kriteriaData['K5'].bukti) / 2,
+            (kriteriaData['K6'].narasi + kriteriaData['K6'].bukti) / 2,
+            (kriteriaData['K7'].narasi + kriteriaData['K7'].bukti) / 2,
+            (kriteriaData['K8'].narasi + kriteriaData['K8'].bukti) / 2,
+        ];
+        
+        const myChart = echarts.init(document.querySelector("#radarChart"));
+        
+        myChart.setOption({
+            radar: {
+                indicator: indicator,
+                splitArea: {
+                    show: false
+                },
+                axisName: {
+                    color: '#64748b',
+                    fontSize: 10
+                },
+                splitLine: {
+                    lineStyle: {
+                        color: ['#e2e8f0']
+                    }
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: '#e2e8f0'
+                    }
+                }
+            },
+            series: [{
+                name: 'Skor Capaian',
+                type: 'radar',
+                data: [
+                    {
+                        value: dataValues,
+                        name: 'Skor',
+                        areaStyle: {
+                            color: 'rgba(34, 197, 94, 0.2)'
+                        },
+                        lineStyle: {
+                            color: '#22c55e',
+                            width: 2
+                        },
+                        itemStyle: {
+                            color: '#22c55e',
+                            borderColor: '#eab308',
+                            borderWidth: 2
+                        }
+                    }
+                ]
+            }],
+            tooltip: {
+                trigger: 'item'
+            }
+        });
+        
+        // Resize chart on window resize
+        window.addEventListener('resize', function() {
+            myChart.resize();
+        });
+    });
+</script>
+
+<!-- Modal Edit Jadwal -->
+<div class="modal fade" id="editJadwalModal" tabindex="-1" aria-labelledby="editJadwalModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form action="{{ route('dashboard.jadwal.update') }}" method="POST">
+                @csrf
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editJadwalModalLabel">Pengaturan Jadwal Akreditasi</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="akreditasi_start_date" class="form-label">Tanggal Mulai Pengajuan</label>
+                        <input type="date" class="form-control" id="akreditasi_start_date" name="akreditasi_start_date" value="{{ $akreditasi_start_date ?? '' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="akreditasi_end_date" class="form-label">Tanggal Target / Akhir</label>
+                        <input type="date" class="form-control" id="akreditasi_end_date" name="akreditasi_end_date" value="{{ $akreditasi_end_date ?? '' }}" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">Simpan Jadwal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection

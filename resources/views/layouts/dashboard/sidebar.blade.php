@@ -4,7 +4,7 @@
         <ul class="sidebar-nav" id="sidebar-nav">
 
             <li class="nav-item">
-                <a class="nav-link " href="index.html">
+                <a class="nav-link " href="{{ route('dashboard') }}">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
                 </a>
@@ -18,7 +18,7 @@
                 </a>
                 <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
                     <li>
-                        <a href="{{ route('vmts.index') }}">
+                        <a href="{{ route('kriteria1.index') }}">
                             <i class="bi bi-circle"></i><span>1. Visi, Misi, Tujuan & Strategi</span>
                         </a>
                     </li>

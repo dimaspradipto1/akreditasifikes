@@ -77,7 +77,27 @@
     </div>
     <div class="text-end">
         <div class="text-muted mb-1" style="font-size: 0.85rem;">Status simulasi kriteria</div>
-        <div class="fs-4 fw-bold text-success" style="line-height: 1;">Baik</div>
+        @php
+            $totalPct = ($pctNarasi + $pctBukti) / 2;
+            if($totalPct >= 85) {
+                $statusSimulasi = "Unggul";
+                $statusBg = "bg-success text-white";
+            } elseif($totalPct >= 70) {
+                $statusSimulasi = "Baik Sekali";
+                $statusBg = "bg-primary text-white";
+            } elseif($totalPct >= 50) {
+                $statusSimulasi = "Baik";
+                $statusBg = "bg-warning text-dark";
+            } else {
+                $statusSimulasi = "Tidak Memenuhi";
+                $statusBg = "bg-danger text-white";
+            }
+        @endphp
+        <div class="fs-4 fw-bold" style="line-height: 1;">
+            <span class="badge {{ $statusBg }} px-3 py-2 rounded-3" style="font-size: 1.1rem;">
+                {{ $statusSimulasi }} ({{ round($totalPct) }}%)
+            </span>
+        </div>
     </div>
 </div>
 
