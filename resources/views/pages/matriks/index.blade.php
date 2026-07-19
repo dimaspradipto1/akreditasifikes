@@ -5,12 +5,12 @@
     <nav>
         <ol class="breadcrumb" style="font-size: 0.85rem; margin-bottom: 0.5rem; background: transparent; padding: 0;">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item">S1 Kesehatan Lingkungan</li>
+            <li class="breadcrumb-item">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }}</li>
             <li class="breadcrumb-item active">Matriks 26 Sub-Kriteria</li>
         </ol>
     </nav>
     <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Matriks 26 Sub-Kriteria</h1>
-    <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - Peta navigasi seluruh sub-kriteria — klik nama sub-kriteria untuk membuka halaman Kriteria terkait</small>
+    <small class="text-muted">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }} ({{ $settings_data['prodi_jenjang'] ?? 'Sarjana' }}) - Peta navigasi seluruh sub-kriteria — klik nama sub-kriteria untuk membuka halaman Kriteria terkait</small>
 </div>
 
 <section class="section dashboard">

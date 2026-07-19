@@ -59,9 +59,33 @@ class DashboardController extends Controller
             'K8' => ['nama' => 'Tata Kelola & Administrasi', 'narasi' => round($k8_narasi), 'bukti' => round($k8_bukti)],
         ];
 
-        // 3. Hitung Rata-rata Keseluruhan
-        $avg_narasi_total = array_sum(array_column($kriteria_stats, 'narasi')) / 8;
-        $avg_bukti_total = array_sum(array_column($kriteria_stats, 'bukti')) / 8;
+        // Bobot dari pengaturan (atau default jika belum diatur)
+        $weights = [
+            '1' => \App\Models\Setting::where('key', 'bobot_k1')->value('value') ?? 15,
+            '2' => \App\Models\Setting::where('key', 'bobot_k2')->value('value') ?? 15,
+            '3' => \App\Models\Setting::where('key', 'bobot_k3')->value('value') ?? 12,
+            '4' => \App\Models\Setting::where('key', 'bobot_k4')->value('value') ?? 12,
+            '5' => \App\Models\Setting::where('key', 'bobot_k5')->value('value') ?? 18,
+            '6' => \App\Models\Setting::where('key', 'bobot_k6')->value('value') ?? 12,
+            '7' => \App\Models\Setting::where('key', 'bobot_k7')->value('value') ?? 8,
+            '8' => \App\Models\Setting::where('key', 'bobot_k8')->value('value') ?? 8,
+        ];
+
+        // Normalisasi total bobot menjadi pengali desimal
+        $totalWeight = array_sum($weights);
+        if ($totalWeight == 0) $totalWeight = 100;
+        
+        $avg_narasi_total = 0;
+        $avg_bukti_total = 0;
+        
+        foreach($kriteria_stats as $key => $stat) {
+            $num = str_replace('K', '', $key);
+            $weightMult = $weights[$num] / $totalWeight;
+            
+            $avg_narasi_total += $stat['narasi'] * $weightMult;
+            $avg_bukti_total += $stat['bukti'] * $weightMult;
+        }
+
         $skor_capaian = ($avg_narasi_total + $avg_bukti_total) / 2;
 
         // Proyeksi Status

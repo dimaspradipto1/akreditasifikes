@@ -95,6 +95,16 @@ class DokumenBersamaController extends Controller
                     ]);
             };
 
+            // Force autoloader to load files containing multiple classes
+            class_exists(\App\Models\Vmts::class);
+            class_exists(\App\Models\Kurikulum::class);
+            class_exists(\App\Models\Penilaian::class);
+            class_exists(\App\Models\Mahasiswa::class);
+            class_exists(\App\Models\Doenpkm::class);
+            class_exists(\App\Models\Sarpraskeuangan::class);
+            class_exists(\App\Models\Mutu::class);
+            class_exists(\App\Models\Tatakelola::class);
+
             $updateBuktis(VmtsBukti::class);
             $updateBuktis(KurikulumBukti::class);
             $updateBuktis(PenilaianBukti::class);
@@ -133,6 +143,16 @@ class DokumenBersamaController extends Controller
                         'nama_bukti' => $request->nama_dokumen
                     ]);
             };
+
+            // Force autoloader to load files containing multiple classes
+            class_exists(\App\Models\Vmts::class);
+            class_exists(\App\Models\Kurikulum::class);
+            class_exists(\App\Models\Penilaian::class);
+            class_exists(\App\Models\Mahasiswa::class);
+            class_exists(\App\Models\Doenpkm::class);
+            class_exists(\App\Models\Sarpraskeuangan::class);
+            class_exists(\App\Models\Mutu::class);
+            class_exists(\App\Models\Tatakelola::class);
 
             $updateBuktis(VmtsBukti::class);
             $updateBuktis(KurikulumBukti::class);

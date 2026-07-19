@@ -13,7 +13,7 @@
             <li class="nav-item">
                 <a class="nav-link collapsed" data-bs-target="#components-nav" data-bs-toggle="collapse"
                     href="#" style="font-size: 14px">
-                    <i class="bi bi-menu-button-wide"></i><span>8 KRITERIA — S1 Kesehatan</span><i
+                    <i class="bi bi-menu-button-wide"></i><span>8 KRITERIA — {{ explode(' ', $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan')[0] ?? 'S1' }} {{ explode(' ', $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan')[1] ?? 'Kesehatan' }}</span><i
                         class="bi bi-chevron-down ms-auto"></i>
                 </a>
                 <ul id="components-nav" class="nav-content collapse " data-bs-parent="#sidebar-nav">
@@ -74,7 +74,7 @@
                 </a>
             </li>
 
-            <li class="nav-item">
+              <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('dokumen-bersama.index') }}">
                     <i class="bi bi-file-earmark"></i>
                     <span>Dokumen Bersama</span>
@@ -83,10 +83,26 @@
 
             <li class="nav-heading">Pages</li>
 
+            @if(auth()->check() && auth()->user()->role == 'admin')
             <li class="nav-item">
                 <a class="nav-link collapsed" href="{{ route('user.index') }}">
-                    <i class="bi bi-file-earmark"></i>
+                    <i class="bi bi-person"></i>
                     <span>Manajemen User</span>
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('settings.*') ? '' : 'collapsed' }}" href="{{ route('settings.index') }}">
+                    <i class="bi bi-gear"></i>
+                    <span>Pengaturan</span>
+                </a>
+            </li>
+            @endif
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('laporan.*') ? '' : 'collapsed' }}" href="{{ route('laporan.index') }}">
+                    <i class="bi bi-download"></i>
+                    <span>Laporan & Ekspor</span>
                 </a>
             </li>
 

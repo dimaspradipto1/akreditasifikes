@@ -107,4 +107,46 @@ class AuthController extends Controller
         return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan.');
     }
 
+    /**
+     * Switch role (khusus untuk admin)
+     */
+    public function switchRole($role)
+    {
+        // Hanya admin yang bisa initiate switch, ATAU orang yang sedang menggunakan fitur impersonate (jika mau kembali ke admin, opsional)
+        if (Auth::user()->role !== 'admin') {
+            return back()->with('error', 'Akses ditolak. Anda bukan admin.');
+        }
+
+        // Cari user pertama yang memiliki role tersebut
+        $targetUser = User::where('role', $role)->first();
+
+        if (!$targetUser) {
+            return back()->with('error', 'Tidak ada akun dengan role ' . $role . ' di dalam database.');
+        }
+
+        // Simpan sesi bahwa ini adalah admin yang sedang menyamar
+        session()->put('impersonated_by', Auth::id());
+
+        Auth::login($targetUser);
+
+        return redirect()->route('dashboard')->with('success', 'Berhasil beralih peran (Login As) menjadi ' . $targetUser->name);
+    }
+
+    /**
+     * Kembali ke akun admin
+     */
+    public function switchBack()
+    {
+        if (session()->has('impersonated_by')) {
+            $adminId = session()->pull('impersonated_by');
+            $adminUser = User::find($adminId);
+            
+            if ($adminUser) {
+                Auth::login($adminUser);
+                return redirect()->route('dashboard')->with('success', 'Berhasil kembali ke akun Admin.');
+            }
+        }
+        
+        return back();
+    }
 }

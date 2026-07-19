@@ -147,11 +147,11 @@
         <div>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item text-muted" style="font-size: 0.85rem;">Dashboard / S1 Kesehatan Lingkungan</li>
+                    <li class="breadcrumb-item text-muted" style="font-size: 0.85rem;">Dashboard / {{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }}</li>
                 </ol>
             </nav>
             <h1 class="h3 fw-bold text-dark mb-1">Dashboard Kesiapan Akreditasi</h1>
-            <p class="text-muted mb-0" style="font-size: 0.85rem;">S1 Kesehatan Lingkungan (Sarjana) - FIKes Universitas XYZ - Instrumen Baru LAM-PTKes 2025</p>
+            <p class="text-muted mb-0" style="font-size: 0.85rem;">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }} ({{ $settings_data['prodi_jenjang'] ?? 'Sarjana' }}) - FIKes Universitas XYZ - Instrumen Baru LAM-PTKes 2025</p>
         </div>
         <div class="text-end" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#editJadwalModal" title="Klik untuk edit jadwal">
             <div class="text-muted" style="font-size: 0.8rem;">Sisa waktu pengajuan <i class="bi bi-pencil-square ms-1"></i></div>

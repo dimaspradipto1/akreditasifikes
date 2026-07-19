@@ -63,12 +63,12 @@
         <nav>
             <ol class="breadcrumb mb-1" style="font-size: 0.85rem;">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item">S1 Kesehatan Lingkungan</li>
+                <li class="breadcrumb-item">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }}</li>
                 <li class="breadcrumb-item active">K6 — Sarana, Prasarana & Keuangan</li>
             </ol>
         </nav>
         <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Kriteria 6 — Sarana, Prasarana & Keuangan</h1>
-        <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - {{ $subKriterias->count() }} sub-kriteria pada kriteria ini</small>
+        <small class="text-muted">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }} ({{ $settings_data['prodi_jenjang'] ?? 'Sarjana' }}) - {{ $subKriterias->count() }} sub-kriteria pada kriteria ini</small>
     </div>
     <div class="text-end">
         <div class="text-muted mb-1" style="font-size: 0.85rem;">Status simulasi kriteria</div>
@@ -161,7 +161,7 @@
     </div>
     <!-- Horizontal Navigation -->
     <ul class="nav nav-pills nav-pills-kriteria mb-4 border-bottom pb-3">
-        <li class="nav-item"><a class="nav-link {{ request()->routeIs('vmts.*') ? 'active' : '' }}" href="{{ route('vmts.index') }}"><i class="bi bi-circle-fill text-success"></i> K1 — VMTS</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('kriteria1.*') ? 'active' : '' }}" href="{{ route('kriteria1.index') }}"><i class="bi bi-circle-fill text-success"></i> K1 — VMTS</a></li>
         <li class="nav-item"><a class="nav-link {{ request()->routeIs('kurikulum.*') ? 'active' : '' }}" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a></li>
         <li class="nav-item"><a class="nav-link {{ request()->routeIs('penilaian.*') ? 'active' : '' }}" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a></li>
         <li class="nav-item"><a class="nav-link {{ request()->routeIs('mahasiswa.*') ? 'active' : '' }}" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mahasiswa</a></li>

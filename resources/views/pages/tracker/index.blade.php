@@ -5,12 +5,12 @@
     <nav>
         <ol class="breadcrumb" style="font-size: 0.85rem; margin-bottom: 0.5rem; background: transparent; padding: 0;">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item">S1 Kesehatan Lingkungan</li>
+            <li class="breadcrumb-item">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }}</li>
             <li class="breadcrumb-item active">Tracker Bukti</li>
         </ol>
     </nav>
     <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Tracker Bukti Terpusat</h1>
-    <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - Rekap seluruh dokumen bukti dari 8 Kriteria — halaman ini hanya MEMBACA, bukan tempat input</small>
+    <small class="text-muted">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }} ({{ $settings_data['prodi_jenjang'] ?? 'Sarjana' }}) - Rekap seluruh dokumen bukti dari 8 Kriteria — halaman ini hanya MEMBACA, bukan tempat input</small>
 </div>
 
 <section class="section dashboard">
@@ -151,7 +151,7 @@
             <!-- Legend Bottom -->
             <div class="mt-4 pt-3 border-top d-flex flex-wrap align-items-center gap-3" style="font-size: 0.8rem;">
                 <span class="badge rounded-pill bg-warning bg-opacity-10 text-darken px-3 py-2 border border-warning">PRODI</span>
-                <span class="text-muted">diisi tim S1 Kesehatan Lingkungan</span>
+                <span class="text-muted">diisi tim {{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }}</span>
                 
                 <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2 border border-success ms-md-3">FIKES</span>
                 <span class="text-muted">otomatis dari Dokumen Bersama FIKes</span>

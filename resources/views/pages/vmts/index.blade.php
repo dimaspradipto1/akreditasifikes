@@ -63,12 +63,12 @@
         <nav>
             <ol class="breadcrumb mb-1" style="font-size: 0.85rem;">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                <li class="breadcrumb-item">S1 Kesehatan Lingkungan</li>
+                <li class="breadcrumb-item">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }}</li>
                 <li class="breadcrumb-item active">K1 — Visi, Misi, Tujuan & Strategi</li>
             </ol>
         </nav>
         <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Kriteria 1 — Visi, Misi, Tujuan & Strategi</h1>
-        <small class="text-muted">S1 Kesehatan Lingkungan (Sarjana) - {{ $narasis->count() }} sub-kriteria pada kriteria ini</small>
+        <small class="text-muted">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }} ({{ $settings_data['prodi_jenjang'] ?? 'Sarjana' }}) - {{ $narasis->count() }} sub-kriteria pada kriteria ini</small>
     </div>
     <div class="text-end">
         <div class="text-muted mb-1" style="font-size: 0.85rem;">Status simulasi kriteria</div>
@@ -161,7 +161,7 @@
     </div>
     <!-- Horizontal Navigation -->
     <ul class="nav nav-pills nav-pills-kriteria mb-4 border-bottom pb-3">
-        <li class="nav-item"><a class="nav-link {{ request()->routeIs('vmts.*') ? 'active' : '' }}" href="{{ route('vmts.index') }}"><i class="bi bi-circle-fill text-success"></i> K1 — VMTS</a></li>
+        <li class="nav-item"><a class="nav-link {{ request()->routeIs('kriteria1.*') ? 'active' : '' }}" href="{{ route('kriteria1.index') }}"><i class="bi bi-circle-fill text-success"></i> K1 — VMTS</a></li>
         <li class="nav-item"><a class="nav-link {{ request()->routeIs('kurikulum.*') ? 'active' : '' }}" href="{{ route('kurikulum.index') }}"><i class="bi bi-circle-fill text-success"></i> K2 — Kurikulum</a></li>
         <li class="nav-item"><a class="nav-link {{ request()->routeIs('penilaian.*') ? 'active' : '' }}" href="{{ route('penilaian.index') }}"><i class="bi bi-circle-fill text-success"></i> K3 — Penilaian</a></li>
         <li class="nav-item"><a class="nav-link {{ request()->routeIs('mahasiswa.*') ? 'active' : '' }}" href="{{ route('mahasiswa.index') }}"><i class="bi bi-circle-fill text-warning"></i> K4 — Mahasiswa</a></li>
@@ -221,7 +221,7 @@
                         </h2>
                         <div id="collapse{{ $narasi->id }}" class="accordion-collapse collapse" aria-labelledby="heading{{ $narasi->id }}" data-bs-parent="#accordionEU">
                             <div class="accordion-body bg-white p-4">
-                                <form id="form-narasi-{{ $narasi->id }}" action="{{ route('vmts.update', $narasi->id) }}" method="POST">
+                                <form id="form-narasi-{{ $narasi->id }}" action="{{ route('kriteria1.update', $narasi->id) }}" method="POST">
                                     @csrf
                                     @method('PUT')
                                     <input type="hidden" name="type" value="narasi">
@@ -346,7 +346,7 @@
                                         <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
                                     </button>
                                     @if($bukti->level == 'PRODI')
-                                    <form action="{{ route('vmts.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
+                                    <form action="{{ route('kriteria1.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
                                         @csrf
                                         @method('DELETE')
                                         <input type="hidden" name="type" value="bukti">
@@ -361,7 +361,7 @@
                         <div class="modal fade" id="modalCatatanBukti{{ $bukti->id }}" tabindex="-1" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
-                                    <form action="{{ route('vmts.update', $bukti->id) }}" method="POST">
+                                    <form action="{{ route('kriteria1.update', $bukti->id) }}" method="POST">
                                         @csrf
                                         @method('PUT')
                                         <input type="hidden" name="type" value="bukti">
@@ -395,7 +395,7 @@
     <div class="modal fade" id="modalTambahBuktiVMTS" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="{{ route('vmts.store') }}" method="POST">
+                <form action="{{ route('kriteria1.store') }}" method="POST">
                     @csrf
                     <input type="hidden" name="type" value="bukti">
                     <input type="hidden" name="vmts_id" value="{{ $vmts->id }}">

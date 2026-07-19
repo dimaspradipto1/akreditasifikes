@@ -177,11 +177,38 @@
                             <hr class="dropdown-divider">
                         </li>
 
+                        @if(auth()->check() && (auth()->user()->role === 'admin' || session()->has('impersonated_by')))
+                            @if(session()->has('impersonated_by'))
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center text-warning fw-bold" href="{{ route('switch.back') }}">
+                                        <i class="bi bi-arrow-return-left"></i>
+                                        <span>Kembali ke Admin</span>
+                                    </a>
+                                </li>
+                            @else
+                                <li class="dropdown-header text-start">
+                                    <h6 class="mb-0 text-muted">Login As:</h6>
+                                </li>
+                                <li><a class="dropdown-item d-flex align-items-center" style="font-size: 14px; padding-left: 30px;" href="{{ route('switch.role', 'koordinatorakreditasifikes') }}"><i class="bi bi-circle"></i> Koordinator FIKes</a></li>
+                                <li><a class="dropdown-item d-flex align-items-center" style="font-size: 14px; padding-left: 30px;" href="{{ route('switch.role', 'koordinatorprodi') }}"><i class="bi bi-circle"></i> Koordinator Prodi</a></li>
+                                <li><a class="dropdown-item d-flex align-items-center" style="font-size: 14px; padding-left: 30px;" href="{{ route('switch.role', 'timpenyusun') }}"><i class="bi bi-circle"></i> Tim Penyusun</a></li>
+                                <li><a class="dropdown-item d-flex align-items-center" style="font-size: 14px; padding-left: 30px;" href="{{ route('switch.role', 'gpmfikes') }}"><i class="bi bi-circle"></i> GPM FIKes</a></li>
+                                <li><a class="dropdown-item d-flex align-items-center" style="font-size: 14px; padding-left: 30px;" href="{{ route('switch.role', 'timlpmrektorat') }}"><i class="bi bi-circle"></i> Tim LPM</a></li>
+                                <li><a class="dropdown-item d-flex align-items-center" style="font-size: 14px; padding-left: 30px;" href="{{ route('switch.role', 'dekan') }}"><i class="bi bi-circle"></i> Pimpinan (Dekan)</a></li>
+                            @endif
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                        @endif
+
                         <li>
-                            <a class="dropdown-item d-flex align-items-center" href="#">
-                                <i class="bi bi-box-arrow-right"></i>
-                                <span>Sign Out</span>
-                            </a>
+                            <form action="{{ route('logout') }}" method="POST" id="logout-form">
+                                @csrf
+                                <a class="dropdown-item d-flex align-items-center" href="#" onclick="document.getElementById('logout-form').submit(); return false;">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Sign Out</span>
+                                </a>
+                            </form>
                         </li>
 
                     </ul><!-- End Profile Dropdown Items -->

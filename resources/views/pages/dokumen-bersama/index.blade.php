@@ -6,13 +6,13 @@
             <nav>
                 <ol class="breadcrumb" style="font-size: 0.85rem; margin-bottom: 0.5rem; background: transparent; padding: 0;">
                     <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item">S1 Kesehatan Lingkungan</li>
+                    <li class="breadcrumb-item">{{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }}</li>
                     <li class="breadcrumb-item active">Dokumen Bersama</li>
                 </ol>
             </nav>
             <h1 class="mb-1" style="font-size: 1.5rem; font-weight: 700;">Dokumen Bersama</h1>
             <small class="text-muted">Diisi satu kali oleh Tim LPM/Rektorat & Dekanat/GPM FIKes<br> otomatis terbaca oleh halaman
-                Kriteria S1 Kesehatan Lingkungan (dan 2 prodi lain di FIKes)</small>
+                Kriteria {{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }} (dan 2 prodi lain di FIKes)</small>
         </div>
         <div>
             <button type="button" data-bs-toggle="modal" data-bs-target="#createModal" class="btn btn-sm btn-primary rounded-pill shadow-sm px-3 fw-bold text-nowrap">
@@ -67,7 +67,7 @@
             style="border-radius: 10px; font-size: 0.85rem;">
             <div class="text-dark">
                 <strong>Penting:</strong> <br> isi kolom Status, Link, PIC, dan Deadline di halaman ini SATU KALI saja. Data ini
-                otomatis terbaca oleh halaman Kriteria S1 Kesehatan Lingkungan <br> (badge
+                otomatis terbaca oleh halaman Kriteria {{ $settings_data['prodi_nama'] ?? 'S1 Kesehatan Lingkungan' }} <br> (badge
                 <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success"
                     style="font-size: 0.65rem; padding: 0.2rem 0.5rem;">FIKES</span> /
                 <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary border border-primary"
@@ -483,8 +483,8 @@
             // Initial call to set initial colors if necessary
             updateCounters();
 
-            // Event listener for input blur (Link, PIC, Deadline)
-            $('.doc-link, .doc-pic, .doc-deadline').on('blur', function() {
+            // Event listener for input change (Link, PIC, Deadline)
+            $('.doc-link, .doc-pic, .doc-deadline').on('change', function() {
                 saveRowData($(this).closest('.doc-row'));
             });
 
@@ -540,12 +540,39 @@
                         inline: true
                     },
                     success: function(response) {
-                        console.log('Saved', name);
-                        // Optional: show small toast notification
+                        console.log('Saved ID:', id);
+                        showToast('Tersimpan Otomatis', 'Perubahan pada dokumen berhasil disimpan.');
+                        
+                        // Visual feedback on the row
+                        $row.css('transition', 'background-color 0.5s');
+                        $row.css('background-color', '#d1e7dd');
+                        setTimeout(() => {
+                            $row.css('background-color', '');
+                        }, 1000);
                     },
                     error: function(xhr) {
-                        console.error('Error saving', name, xhr);
+                        console.error('Error saving ID:', id, xhr);
+                        showToast('Gagal Menyimpan', 'Terjadi kesalahan saat menyimpan data.', 'danger');
                     }
+                });
+            }
+
+            function showToast(title, message, type = 'success') {
+                const toastHtml = `
+                    <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px; z-index: 1055;">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <strong>${title}</strong><br>${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `;
+                const $toast = $(toastHtml).appendTo('body');
+                const toastInstance = new bootstrap.Toast($toast[0], { delay: 3000 });
+                toastInstance.show();
+                $toast.on('hidden.bs.toast', function() {
+                    $(this).remove();
                 });
             }
 

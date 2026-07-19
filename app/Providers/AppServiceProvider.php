@@ -25,5 +25,12 @@ class AppServiceProvider extends ServiceProvider
         if (app()->environment('production')) {
             URL::forceScheme('https');
         }
+
+        try {
+            $settings_data = \App\Models\Setting::all()->pluck('value', 'key');
+            \Illuminate\Support\Facades\View::share('settings_data', $settings_data);
+        } catch (\Exception $e) {
+            // Ignore if tables not migrated yet
+        }
     }
 }
