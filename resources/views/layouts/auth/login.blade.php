@@ -4,11 +4,11 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login — Sistem Akreditasi FIKES UIS</title>
+    <title>Login — Sistem Akreditasi FIKES XYZ</title>
     <meta name="description" content="Portal login Sistem Informasi Akreditasi Fakultas Ilmu Kesehatan Universitas Islam Syekh-Yusuf">
 
     <!-- Favicon -->
-    <link href="{{ asset('assets/img/logouis.png') }}" rel="icon" type="image/png">
+    <link href="{{ asset('assets/img/logoxyz.png') }}" rel="icon" type="image/png">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -509,12 +509,12 @@
         <div class="left-content">
             <div class="univ-badge">
                 <i class="bi bi-geo-alt-fill"></i>
-                Universitas Ibnu Sina — UIS
+                Universitas XYZ — XYZ
             </div>
 
             <h1>
                 Sistem Akreditasi<br>
-                <span class="hl">FIKES UIS</span>
+                <span class="hl">FIKES XYZ</span>
             </h1>
 
             <p>
@@ -565,12 +565,12 @@
         {{-- Logo --}}
         <div class="logo-area">
             <div class="logo-img-wrap">
-                <img src="{{ asset('assets/img/logouis.png') }}"
-                     alt="Logo Universitas Ibnu Sina"
+                <img src="{{ asset('assets/img/logoxyz.png') }}"
+                     alt="Logo Universitas XYZ"
                      onerror="this.parentElement.innerHTML='<i class=\'bi bi-hospital-fill\' style=\'font-size:2rem;color:var(--purple)\'></i>'">
             </div>
             <h4>Fakultas Ilmu Kesehatan</h4>
-            <p>Universitas Ibnu Sina — Batam</p>
+            <p>Universitas XYZ</p>
         </div>
 
         <div class="divider">
@@ -659,7 +659,7 @@
 
         {{-- Footer --}}
         <div class="right-footer">
-            <p><strong>FIKES UIS</strong> &copy; {{ date('Y') }} &mdash; Sistem Informasi Akreditasi v1.0</p>
+            <p><strong>FIKES XYZ</strong> &copy; {{ date('Y') }} &mdash; Sistem Informasi Akreditasi v1.0</p>
         </div>
 
     </div>

@@ -11,8 +11,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Favicons -->
-    <link href="{{ asset('assets/img/logouis.png') }}" rel="icon">
-    <link href="{{ asset('assets/img/logouis.png') }}" rel="apple-touch-icon">
+    <link href="{{ asset('assets/img/logoxyz.png') }}" rel="icon">
+    <link href="{{ asset('assets/img/logoxyz.png') }}" rel="apple-touch-icon">
 
     <!-- Google Fonts -->
     <link href="https://fonts.gstatic.com" rel="preconnect">
