@@ -22,7 +22,7 @@ class VmtsRequest extends FormRequest
      */
     public function rules(): array
     {
-        if ($this->routeIs('vmts.narasi.update')) {
+        if ($this->input('type') === 'narasi') {
             return [
                 'kondisi_saat_ini'  => 'nullable|string',
                 'data_fakta'        => 'nullable|string',
@@ -35,7 +35,19 @@ class VmtsRequest extends FormRequest
             ];
         }
 
-        if ($this->routeIs('vmts.bukti.store')) {
+        if ($this->input('type') === 'bukti') {
+            if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+                return [
+                    'nama_bukti'   => 'sometimes|required|string|max:255',
+                    'level'        => 'sometimes|required|in:PRODI,FIKES,UNIV',
+                    'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                    'link'       => 'nullable|string|max:255',
+                    'pic'        => 'nullable|string|max:255',
+                    'deadline'   => 'nullable|date',
+                    'catatan'    => 'nullable|string',
+                ];
+            }
+
             return [
                 'vmts_id'      => 'required|exists:vmts,id',
                 'elemen_kode'  => 'required|string',
@@ -43,18 +55,6 @@ class VmtsRequest extends FormRequest
                 'level'        => 'required|in:PRODI,FIKES,UNIV',
                 'status_bukti' => 'required|in:Tersedia,Tidak Ada,Belum Memenuhi',
                 'link'       => 'nullable|url',
-                'pic'        => 'nullable|string|max:255',
-                'deadline'   => 'nullable|date',
-                'catatan'    => 'nullable|string',
-            ];
-        }
-
-        if ($this->routeIs('vmts.bukti.update')) {
-            return [
-                'nama_bukti'   => 'sometimes|required|string|max:255',
-                'level'        => 'sometimes|required|in:PRODI,FIKES,UNIV',
-                'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
-                'link'       => 'nullable|string|max:255',
                 'pic'        => 'nullable|string|max:255',
                 'deadline'   => 'nullable|date',
                 'catatan'    => 'nullable|string',

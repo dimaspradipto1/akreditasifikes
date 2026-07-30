@@ -51,6 +51,10 @@ Route::middleware(['auth', 'checkrole'])->group(function () {
     Route::post('/dashboard/jadwal', [DashboardController::class, 'updateJadwal'])->name('dashboard.jadwal.update');
 
     Route::resource('kriteria1', VmtsController::class);
+    // Additional named routes for Kurikulum narasi/bukti actions (used by tests and AJAX)
+    Route::post('kurikulum/bukti', [KurikulumController::class, 'store'])->name('kurikulum.bukti.store');
+    Route::put('kurikulum/narasi/{id}', [KurikulumController::class, 'update'])->name('kurikulum.narasi.update');
+    Route::delete('kurikulum/bukti/{id}', [KurikulumController::class, 'destroy'])->name('kurikulum.bukti.destroy');
     Route::resource('kurikulum', KurikulumController::class);
     Route::resource('penilaian', App\Http\Controllers\PenilaianController::class);
 

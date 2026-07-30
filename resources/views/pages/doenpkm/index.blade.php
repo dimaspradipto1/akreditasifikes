@@ -212,13 +212,21 @@
                                 @endif
                             @endif
                             
-                            <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
-                                <span class="me-2">Narasi {{ $subPctNarasi }}%</span>
-                                <span class="bukti-pct-display">Bukti {{ $subPctBukti }}%</span>
-                            </div>
-                            
-                            <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
-                                <div class="progress-bar {{ $isMemenuhi ? 'bg-success' : ($subData['type'] == 'WAJIB' ? 'bg-danger' : 'bg-warning') }} progress-bar-combined" data-narasi-pct="{{ $subPctNarasi }}" role="progressbar" style="width: {{ ($subPctNarasi + $subPctBukti) / 2 }}%"></div>
+                            <div class="d-flex flex-column align-items-center text-muted" style="font-size: 0.8rem; gap:6px;">
+                                <div class="d-flex align-items-center" style="gap:8px;">
+                                    <small class="text-muted narasi-pct-label" style="font-weight:600;">Narasi {{ $subPctNarasi }}%</small>
+                                    <small class="text-muted bukti-pct-label" style="font-weight:600;">Bukti {{ $subPctBukti }}%</small>
+                                </div>
+
+                                <div class="d-flex" style="gap:6px;">
+                                    <div class="progress" style="width: 36px; height: 6px; border-radius: 4px;">
+                                        <div class="progress-bar bg-primary narasi-bar" role="progressbar" aria-valuenow="{{ $subPctNarasi }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $subPctNarasi }}%"></div>
+                                    </div>
+
+                                    <div class="progress" style="width: 36px; height: 6px; border-radius: 4px;">
+                                        <div class="progress-bar {{ $isMemenuhi ? 'bg-success' : ($subData['type'] == 'WAJIB' ? 'bg-danger' : 'bg-warning') }} bukti-bar" role="progressbar" aria-valuenow="{{ $subPctBukti }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $subPctBukti }}%"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </button>
@@ -381,11 +389,11 @@
                                                         <button type="button" class="btn btn-sm {{ $bukti->catatan ? 'text-primary' : 'text-secondary' }} p-1 border-0 shadow-none" title="Catatan" style="background:transparent;" data-bs-toggle="modal" data-bs-target="#modalCatatanBukti{{ $bukti->id }}">
                                                             <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
                                                         </button>
-                                                        <form action="{{ route('doenpkm.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
+                                                        <form action="{{ route('doenpkm.destroy', $bukti->id) }}" method="POST" class="d-inline form-delete-bukti">
                                                             @csrf
                                                             @method('DELETE')
                                                             <input type="hidden" name="type" value="bukti">
-                                                            <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
+                                                            <button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-delete-bukti" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
                                                         </form>
                                                     </div>
                                                 </td>
@@ -553,11 +561,36 @@
                             $row.css('background-color', 'transparent');
                         }, 800);
 
-                        // If response contains new percentage, we could update UI dynamically.
-                        // However, since DoenPKM aggregates per sub-kriteria (e.g. 5.1), 
-                        // a full page refresh is more reliable to update the top KPI cards and progress bars.
-                        // For now, we will reload the page to ensure all aggregated stats are accurate.
-                        window.location.reload();
+                        // If response contains new percentage, update UI dynamically (no full reload)
+                        if (response.pctBukti !== undefined && response.kriteria_kode !== undefined) {
+                            var heading = $row.closest('.accordion-item').find('.accordion-header');
+                            heading.find('.bukti-pct-label').text('Bukti ' + response.pctBukti + '%');
+                            heading.find('.bukti-bar').css('width', response.pctBukti + '%').attr('aria-valuenow', response.pctBukti);
+
+                            var narasiPct = parseFloat(heading.find('.narasi-bar').attr('aria-valuenow')) || 0;
+                            var combined = (narasiPct + response.pctBukti) / 2;
+                            // If there's a top-card or combined indicator, update it here if present
+                            var topBukti = $('#top-bukti-pct');
+                            if (topBukti.length) topBukti.text(response.pctBukti + '%');
+                            var topStatus = $('#top-status-simulasi');
+                            if (topStatus.length) {
+                                var totalPct = combined;
+                                var statusSimulasi = "Tidak Memenuhi";
+                                var statusBg = "bg-danger text-white";
+                                if (totalPct >= 85) {
+                                    statusSimulasi = "Unggul";
+                                    statusBg = "bg-success text-white";
+                                } else if (totalPct >= 70) {
+                                    statusSimulasi = "Baik Sekali";
+                                    statusBg = "bg-primary text-white";
+                                } else if (totalPct >= 50) {
+                                    statusSimulasi = "Baik";
+                                    statusBg = "bg-warning text-dark";
+                                }
+                                topStatus.text(statusSimulasi + ' (' + Math.round(totalPct) + '%)');
+                                topStatus.attr('class', 'badge ' + statusBg + ' px-3 py-2 rounded-3');
+                            }
+                        }
                     },
                     error: function(xhr) {
                         var msg = 'Gagal menyimpan perubahan. Silakan coba lagi.';
@@ -570,7 +603,32 @@
                         } else if (xhr.status === 500) {
                             msg = 'Terjadi kesalahan server (500).';
                         }
-                        alert(msg);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: msg,
+                            confirmButtonColor: '#3085d6',
+                        });
+                    }
+                });
+            });
+
+            // SweetAlert Delete Confirmation
+            $(document).on('click', '.btn-delete-bukti', function(e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data bukti ini akan dihapus permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
                     }
                 });
             });

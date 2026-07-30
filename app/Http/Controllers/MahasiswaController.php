@@ -27,11 +27,19 @@ class MahasiswaController extends Controller
     {
         $user = Auth::user();
 
-        // Cari atau buat data Mahasiswa untuk user ini (tahun akreditasi default ke tahun saat ini)
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : $user->id;
+
+        // Cari atau buat data Mahasiswa (shared globally by year)
         $mahasiswa = \App\Models\Mahasiswa::firstOrCreate(
-            ['user_id' => $user->id],
-            ['tahun_akreditasi' => date('Y')]
+            ['tahun_akreditasi' => date('Y')],
+            ['user_id' => $userId]
         );
+
+        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
+        foreach (['4.1', '4.2', '4.3'] as $subKode) {
+            $this->updateBuktiPersen($mahasiswa->id, $subKode);
+        }
 
         // Kriteria yang ada untuk Mahasiswa (K4)
         $kriterias = [
@@ -263,7 +271,11 @@ class MahasiswaController extends Controller
     {
         if ($request->has('type') && $request->type === 'narasi') {
             $narasi = \App\Models\MahasiswaNarasi::findOrFail($id);
-            $narasi->update($request->validated());
+            $data = $request->validated();
+            if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
+                $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+            }
+            $narasi->update($data);
 
             if (str_contains($narasi->kriteria_kode, '_EU')) {
                 $parentKode = explode('_', $narasi->kriteria_kode)[0];

@@ -389,11 +389,11 @@
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="akreditasi_start_date" class="form-label">Tanggal Mulai Pengajuan</label>
+                        <label for="akreditasi_start_date" class="form-label">Tanggal Mulai Pengajuan <span class="text-danger">*</span></label>
                         <input type="date" class="form-control" id="akreditasi_start_date" name="akreditasi_start_date" value="{{ $akreditasi_start_date ?? '' }}" required>
                     </div>
                     <div class="mb-3">
-                        <label for="akreditasi_end_date" class="form-label">Tanggal Target / Akhir</label>
+                        <label for="akreditasi_end_date" class="form-label">Tanggal Target / Akhir <span class="text-danger">*</span></label>
                         <input type="date" class="form-control" id="akreditasi_end_date" name="akreditasi_end_date" value="{{ $akreditasi_end_date ?? '' }}" required>
                     </div>
                 </div>

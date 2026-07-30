@@ -20,10 +20,18 @@ class SarpraskeuanganController extends Controller
     {
         $user = Auth::user();
 
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : $user->id;
+
         $sarpraskeuangan = \App\Models\Sarpraskeuangan::firstOrCreate(
-            ['user_id' => $user->id],
-            ['tahun' => date('Y')]
+            ['tahun' => date('Y')],
+            ['user_id' => $userId]
         );
+
+        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
+        foreach (['6.1', '6.2', '6.3'] as $subKode) {
+            $this->updateBuktiPersen($sarpraskeuangan->id, $subKode);
+        }
 
         $kriterias = [
             '6.1' => [

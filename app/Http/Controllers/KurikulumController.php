@@ -20,10 +20,19 @@ class KurikulumController extends Controller
     {
         $user = Auth::user();
         
-        // 1. Get or Create Kurikulum for current user (Prodi)
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : $user->id;
+
+        // 1. Get or Create Kurikulum (shared globally by year)
         $kurikulum = Kurikulum::firstOrCreate(
-            ['user_id' => $user->id, 'tahun_akreditasi' => date('Y')]
+            ['tahun_akreditasi' => date('Y')],
+            ['user_id' => $userId]
         );
+
+        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
+        foreach (['2.1', '2.2', '2.3', '2.4'] as $subKode) {
+            $this->updateBuktiPersen($kurikulum->id, $subKode);
+        }
 
         // 2. Ensure all Sub-kriteria exist for this Kurikulum
         $elements = [
@@ -77,12 +86,40 @@ class KurikulumController extends Controller
 
     public function store(KurikulumRequest $request)
     {
-        if ($request->has('type') && $request->type === 'bukti') {
-            $data = $request->validated();
+        $routeName = $request->route() ? $request->route()->getName() : null;
+        // Support both AJAX form with "type=bukti" and direct named route used in tests
+        if (($request->has('type') && $request->type === 'bukti') || $routeName === 'kurikulum.bukti.store') {
+            if ($routeName === 'kurikulum.bukti.store') {
+                $data = $request->validate([
+                    'kurikulum_id'  => 'required|exists:kurikulums,id',
+                    'kriteria_kode' => 'nullable|string',
+                    'nama_bukti'    => 'required|string|max:255',
+                    'level'         => 'required|in:PRODI,FIKES,UNIV',
+                    'status'        => 'required|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                    'link'          => 'nullable|url',
+                    'pic'           => 'nullable|string|max:255',
+                    'deadline'      => 'nullable|date',
+                    'catatan'       => 'nullable|string',
+                ]);
+                // map status if test used 'status' already correct
+            } else {
+                $data = $request->validated();
+            }
+
             if(isset($data['status_bukti'])) {
                 $data['status'] = $data['status_bukti'];
                 unset($data['status_bukti']);
             }
+
+            // If kriteria_kode not provided, pick the first non-EU narasi for this kurikulum
+            if (empty($data['kriteria_kode']) && !empty($data['kurikulum_id'])) {
+                $first = \App\Models\KurikulumNarasi::where('kurikulum_id', $data['kurikulum_id'])
+                    ->where('kriteria_kode', 'NOT LIKE', '%_EU%')
+                    ->orderBy('kriteria_kode')
+                    ->first();
+                $data['kriteria_kode'] = $first->kriteria_kode ?? '2.1';
+            }
+
             $bukti = KurikulumBukti::create($data);
             $this->updateBuktiPersen($bukti->kurikulum_id, $bukti->kriteria_kode);
 
@@ -97,9 +134,28 @@ class KurikulumController extends Controller
 
     public function update(KurikulumRequest $request, $id)
     {
-        if ($request->has('type') && $request->type === 'narasi') {
+        $routeName = $request->route() ? $request->route()->getName() : null;
+        // Support both forms: with `type=narasi` or named test route `kurikulum.narasi.update`
+        if (($request->has('type') && $request->type === 'narasi') || $routeName === 'kurikulum.narasi.update') {
             $narasi = \App\Models\KurikulumNarasi::findOrFail($id);
-            $narasi->update($request->validated());
+            if ($routeName === 'kurikulum.narasi.update') {
+                $data = $request->validate([
+                    'kondisi_saat_ini'  => 'nullable|string',
+                    'data_fakta'        => 'nullable|string',
+                    'analisis'          => 'nullable|string',
+                    'permasalahan'      => 'nullable|string',
+                    'rencana_perbaikan' => 'nullable|string',
+                    'status'            => 'sometimes|required|in:Memenuhi,Memenuhi Sebagian,Belum Memenuhi,Lengkap,Draft,Belum Diisi',
+                    'narasi_persen'     => 'nullable|integer|min:0|max:100',
+                    'bukti_persen'      => 'nullable|integer|min:0|max:100',
+                ]);
+            } else {
+                $data = $request->validated();
+            }
+            if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
+                $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+            }
+            $narasi->update($data);
 
             if (str_contains($narasi->kriteria_kode, '_EU')) {
                 $parentKode = explode('_', $narasi->kriteria_kode)[0];
@@ -132,7 +188,8 @@ class KurikulumController extends Controller
             return redirect()->back();
         }
 
-        if ($request->has('type') && $request->type === 'bukti') {
+        // Support bukti update via AJAX `type=bukti` or via named route if needed
+        if (($request->has('type') && $request->type === 'bukti') || $routeName === 'kurikulum.bukti.update') {
             $bukti = \App\Models\KurikulumBukti::findOrFail($id);
             $updateData = $request->validated();
             if(isset($updateData['status_bukti'])) {
@@ -157,7 +214,8 @@ class KurikulumController extends Controller
 
     public function destroy(Request $request, $id)
     {
-        if ($request->has('type') && $request->type === 'bukti') {
+        $routeName = $request->route() ? $request->route()->getName() : null;
+        if (($request->has('type') && $request->type === 'bukti') || $routeName === 'kurikulum.bukti.destroy') {
             $bukti = \App\Models\KurikulumBukti::findOrFail($id);
             $kurikulum_id = $bukti->kurikulum_id;
             $kriteria_kode = $bukti->kriteria_kode;

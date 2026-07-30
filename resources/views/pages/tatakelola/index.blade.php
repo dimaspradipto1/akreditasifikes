@@ -191,13 +191,21 @@
                         @endif
                         <span class="badge rounded-pill {{ $sub->status == 'Memenuhi' ? 'bg-success bg-opacity-10 text-success' : 'bg-warning bg-opacity-10 text-warning' }}" style="font-size: 0.7rem; padding: 0.35rem 0.6rem;"><i class="bi {{ $sub->status == 'Memenuhi' ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill' }} me-1"></i> {{ $sub->status }}</span>
                         
-                        <div class="d-flex align-items-center text-muted" style="font-size: 0.85rem;">
-                            <span class="me-2">Narasi {{ $sub->narasi_persen ?? 0 }}%</span>
-                            <span class="bukti-pct-display">Bukti {{ $sub->bukti_persen ?? 0 }}%</span>
-                        </div>
-                        
-                        <div class="progress" style="width: 80px; height: 6px; border-radius: 4px;">
-                            <div class="progress-bar bg-success progress-bar-combined" data-narasi-pct="{{ $sub->narasi_persen ?? 0 }}" role="progressbar" style="width: {{ (($sub->narasi_persen ?? 0) + ($sub->bukti_persen ?? 0)) / 2 }}%"></div>
+                        <div class="d-flex flex-column align-items-center text-muted" style="font-size: 0.8rem; gap:6px;">
+                            <div class="d-flex align-items-center" style="gap:8px;">
+                                <small class="text-muted narasi-pct-label" style="font-weight:600;">Narasi {{ $sub->narasi_persen ?? 0 }}%</small>
+                                <small class="text-muted bukti-pct-label" style="font-weight:600;">Bukti {{ $sub->bukti_persen ?? 0 }}%</small>
+                            </div>
+
+                            <div class="d-flex" style="gap:6px;">
+                                <div class="progress" style="width: 36px; height: 6px; border-radius: 4px;">
+                                    <div class="progress-bar bg-primary narasi-bar" role="progressbar" aria-valuenow="{{ $sub->narasi_persen ?? 0 }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $sub->narasi_persen ?? 0 }}%"></div>
+                                </div>
+
+                                <div class="progress" style="width: 36px; height: 6px; border-radius: 4px;">
+                                    <div class="progress-bar bg-success bukti-bar" role="progressbar" aria-valuenow="{{ $sub->bukti_persen ?? 0 }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ $sub->bukti_persen ?? 0 }}%"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </button>
@@ -417,11 +425,11 @@
                                                     <button type="button" class="btn btn-sm {{ $bukti->catatan ? 'text-primary' : 'text-secondary' }} p-1 border-0 shadow-none" title="Catatan" style="background:transparent;" data-bs-toggle="modal" data-bs-target="#modalCatatanBukti{{ $bukti->id }}">
                                                         <i class="bi bi-chat-left-text{{ $bukti->catatan ? '-fill' : '' }}" style="font-size:14px;"></i>
                                                     </button>
-                                                    <form action="{{ route('tatakelola.destroy', $bukti->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Yakin ingin menghapus bukti ini?');">
+                                                    <form action="{{ route('tatakelola.destroy', $bukti->id) }}" method="POST" class="d-inline form-delete-bukti">
                                                         @csrf
                                                         @method('DELETE')
                                                         <input type="hidden" name="type" value="bukti">
-                                                        <button type="submit" class="btn btn-sm btn-danger py-0 px-1" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
+                                                        <button type="button" class="btn btn-sm btn-danger py-0 px-1 btn-delete-bukti" title="Hapus"><i class="bi bi-trash-fill" style="font-size:11px;"></i></button>
                                                     </form>
                                                 </div>
                                             </td>
@@ -493,11 +501,11 @@
                         </div>
                         <div class="modal-body">
                             <div class="mb-3">
-                                <label class="form-label">Nama Dokumen Bukti</label>
+                                <label class="form-label">Nama Dokumen Bukti <span class="text-danger">*</span></label>
                                 <input type="text" name="nama_bukti" class="form-control" required>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Level Tanggung Jawab</label>
+                                <label class="form-label">Level Tanggung Jawab <span class="text-danger">*</span></label>
                                 <select name="level" class="form-select" required>
                                     <option value="PRODI">PRODI</option>
                                     <option value="FIKES">FIKES</option>
@@ -505,7 +513,7 @@
                                 </select>
                             </div>
                             <div class="mb-3">
-                                <label class="form-label">Status</label>
+                                <label class="form-label">Status <span class="text-danger">*</span></label>
                                 <select name="status_bukti" class="form-select" required>
                                     <option value="Tersedia">Tersedia</option>
                                     <option value="Tidak Ada">Tidak Ada</option>
@@ -593,16 +601,40 @@
                         // Update percentages dynamically if returned
                         if(response.pctBukti !== undefined && response.kriteria_kode !== undefined) {
                             var heading = $row.closest('.accordion-item').find('.accordion-header');
-                            heading.find('.bukti-pct-display').text('Bukti ' + response.pctBukti + '%');
-                            
-                            var progressBar = heading.find('.progress-bar-combined');
-                            var narasiPct = parseFloat(progressBar.data('narasi-pct')) || 0;
+                            heading.find('.bukti-pct-label').text('Bukti ' + response.pctBukti + '%');
+                            heading.find('.bukti-bar').css('width', response.pctBukti + '%').attr('aria-valuenow', response.pctBukti);
+
+                            var narasiPct = parseFloat(heading.find('.narasi-bar').attr('aria-valuenow')) || 0;
                             var combined = (narasiPct + response.pctBukti) / 2;
-                            progressBar.css('width', combined + '%');
                         }
                     },
                     error: function(xhr) {
-                        alert('Gagal menyimpan perubahan. Silakan coba lagi.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal',
+                            text: 'Gagal menyimpan perubahan. Silakan coba lagi.',
+                            confirmButtonColor: '#3085d6',
+                        });
+                    }
+                });
+            });
+
+            // SweetAlert Delete Confirmation
+            $(document).on('click', '.btn-delete-bukti', function(e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data bukti ini akan dihapus permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
                     }
                 });
             });

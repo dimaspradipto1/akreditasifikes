@@ -26,29 +26,3 @@ class Mutu extends Model
         return $this->hasMany(MutuBukti::class);
     }
 }
-
-class MutuNarasi extends Model
-{
-    use HasFactory;
-    
-    protected $table = 'mutu_narasis';
-    protected $guarded = [];
-
-    public function mutu()
-    {
-        return $this->belongsTo(Mutu::class);
-    }
-}
-
-class MutuBukti extends Model
-{
-    use HasFactory;
-
-    protected $table = 'mutu_buktis';
-    protected $guarded = [];
-
-    public function mutu()
-    {
-        return $this->belongsTo(Mutu::class);
-    }
-}

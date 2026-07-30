@@ -26,29 +26,3 @@ class Sarpraskeuangan extends Model
         return $this->hasMany(SarpraskeuanganBukti::class);
     }
 }
-
-class SarpraskeuanganNarasi extends Model
-{
-    use HasFactory;
-    
-    protected $table = 'sarpraskeuangan_narasis';
-    protected $guarded = [];
-
-    public function sarpraskeuangan()
-    {
-        return $this->belongsTo(Sarpraskeuangan::class);
-    }
-}
-
-class SarpraskeuanganBukti extends Model
-{
-    use HasFactory;
-
-    protected $table = 'sarpraskeuangan_buktis';
-    protected $guarded = [];
-
-    public function sarpraskeuangan()
-    {
-        return $this->belongsTo(Sarpraskeuangan::class);
-    }
-}

@@ -19,16 +19,23 @@ class PenilaianController extends Controller
      */
     public function index(Builder $builder, Request $request)
     {
-        // Ambil data kurikulum untuk tahun akreditasi terbaru atau milik user
-        $penilaian = Penilaian::where('user_id', Auth::id())
-            ->orderBy('tahun_akreditasi', 'desc')
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : Auth::id();
+
+        // Ambil data kurikulum untuk tahun akreditasi terbaru (shared globally by year)
+        $penilaian = Penilaian::where('tahun_akreditasi', date('Y'))
             ->first();
 
         if (!$penilaian) {
             $penilaian = Penilaian::create([
-                'user_id' => Auth::id(),
+                'user_id' => $userId,
                 'tahun_akreditasi' => date('Y')
             ]);
+        }
+
+        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
+        foreach (['3.1', '3.2', '3.3', '3.4'] as $subKode) {
+            $this->updateBuktiPersen($penilaian->id, $subKode);
         }
 
         // Jika request dari DataTables (untuk Bagian B - Daftar Bukti)
@@ -122,7 +129,11 @@ class PenilaianController extends Controller
         
         if ($request->has('type') && $request->type === 'narasi') {
             $narasi = \App\Models\PenilaianNarasi::findOrFail($id);
-            $narasi->update($request->validated());
+            $data = $request->validated();
+            if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
+                $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+            }
+            $narasi->update($data);
 
             if (str_contains($narasi->kriteria_kode, '_EU')) {
                 $parentKode = explode('_', $narasi->kriteria_kode)[0];

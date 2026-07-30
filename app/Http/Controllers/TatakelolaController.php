@@ -20,10 +20,16 @@ class TatakelolaController extends Controller
     {
         $user = Auth::user();
 
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : $user->id;
+
         $tatakelola = \App\Models\Tatakelola::firstOrCreate(
-            ['user_id' => $user->id],
-            ['tahun' => date('Y')]
+            ['tahun' => date('Y')],
+            ['user_id' => $userId]
         );
+
+        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
+        $this->updateBuktiPersen($tatakelola->id, '8.1');
 
         $kriterias = [
             '8.1' => [

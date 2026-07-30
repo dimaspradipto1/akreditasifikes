@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Hash;
 class UserSeeder extends Seeder
 {
     /**
-     * Seed data pengguna default sesuai struktur role FIKES UIS.
+     * Seed data pengguna default sesuai struktur role FIKES .
      *
      * Role yang tersedia (dari App\Http\Middleware\Checkrole::ROLES):
      * - admin                     → Admin Sistem
@@ -25,49 +25,49 @@ class UserSeeder extends Seeder
         $users = [
             [
                 'name'      => 'Administrator Sistem',
-                'email'     => 'admin@fikes.uis.ac.id',
+                'email'     => 'admin@fikes.ac.id',
                 'password'  => Hash::make('Admin@123'),
                 'role'      => 'admin',
                 'is_active' => true,
             ],
             [
                 'name'      => 'Koordinator Akreditasi FIKes',
-                'email'     => 'koordinator.akreditasi@fikes.uis.ac.id',
+                'email'     => 'koordinator.akreditasi@fikes.ac.id',
                 'password'  => Hash::make('Koor@123'),
                 'role'      => 'koordinatorakreditasifikes',
                 'is_active' => true,
             ],
             [
                 'name'      => 'Koordinator Program Studi',
-                'email'     => 'koordinator.prodi@fikes.uis.ac.id',
+                'email'     => 'koordinator.prodi@fikes.ac.id',
                 'password'  => Hash::make('Koor@123'),
                 'role'      => 'koordinatorprodi',
                 'is_active' => true,
             ],
             [
                 'name'      => 'Tim Penyusun Dosen',
-                'email'     => 'timpenyusun@fikes.uis.ac.id',
+                'email'     => 'timpenyusun@fikes.ac.id',
                 'password'  => Hash::make('Tim@123'),
                 'role'      => 'timpenyusun',
                 'is_active' => true,
             ],
             [
                 'name'      => 'GPM FIKes',
-                'email'     => 'gpmfikes@fikes.uis.ac.id',
+                'email'     => 'gpmfikes@fikes.ac.id',
                 'password'  => Hash::make('Gpm@123'),
                 'role'      => 'gpmfikes',
                 'is_active' => true,
             ],
             [
                 'name'      => 'Tim LPM Rektorat',
-                'email'     => 'timlpm@fikes.uis.ac.id',
+                'email'     => 'timlpm@fikes.ac.id',
                 'password'  => Hash::make('Lpm@123'),
                 'role'      => 'timlpmrektorat',
                 'is_active' => true,
             ],
             [
                 'name'      => 'Dekan FIKES',
-                'email'     => 'dekan@fikes.uis.ac.id',
+                'email'     => 'dekan@fikes.ac.id',
                 'password'  => Hash::make('Dekan@123'),
                 'role'      => 'dekan',
                 'is_active' => true,

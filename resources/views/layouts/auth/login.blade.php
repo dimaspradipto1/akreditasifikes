@@ -751,7 +751,7 @@
 
                 {{-- Email --}}
                 <div class="field">
-                    <label for="email">Alamat Email</label>
+                    <label for="email">Alamat Email <span class="text-danger">*</span></label>
                     <div class="input-wrap">
                         <input type="email" id="email" name="email"
                             class="{{ $errors->has('email') ? 'is-invalid' : '' }}" value="{{ old('email') }}"
@@ -765,7 +765,7 @@
 
                 {{-- Password --}}
                 <div class="field">
-                    <label for="password">Password</label>
+                    <label for="password">Password <span class="text-danger">*</span></label>
                     <div class="input-wrap">
                         <input type="password" id="password" name="password"
                             class="{{ $errors->has('password') ? 'is-invalid' : '' }}" placeholder="Masukkan password"

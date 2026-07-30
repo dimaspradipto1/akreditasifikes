@@ -20,10 +20,16 @@ class MutuController extends Controller
     {
         $user = Auth::user();
 
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : $user->id;
+
         $mutu = \App\Models\Mutu::firstOrCreate(
-            ['user_id' => $user->id],
-            ['tahun' => date('Y')]
+            ['tahun' => date('Y')],
+            ['user_id' => $userId]
         );
+
+        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
+        $this->updateBuktiPersen($mutu->id, '7.1');
 
         $kriterias = [
             '7.1' => [

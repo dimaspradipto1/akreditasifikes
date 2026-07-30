@@ -13,7 +13,7 @@ class PenilaianRequest extends FormRequest
 
     public function rules(): array
     {
-        if ($this->routeIs('penilaian.narasi.update')) {
+        if ($this->input('type') === 'narasi') {
             return [
                 'kondisi_saat_ini'  => 'nullable|string',
                 'data_fakta'        => 'nullable|string',
@@ -26,7 +26,19 @@ class PenilaianRequest extends FormRequest
             ];
         }
 
-        if ($this->routeIs('penilaian.bukti.store')) {
+        if ($this->input('type') === 'bukti') {
+            if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+                return [
+                    'nama_bukti'   => 'sometimes|required|string|max:255',
+                    'level'        => 'sometimes|required|in:PRODI,FIKES,UNIV',
+                    'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                    'link'       => 'nullable|string|max:255',
+                    'pic'        => 'nullable|string|max:255',
+                    'deadline'   => 'nullable|date',
+                    'catatan'    => 'nullable|string',
+                ];
+            }
+
             return [
                 'penilaian_id'  => 'required|exists:penilaians,id',
                 'kriteria_kode' => 'required|string',
@@ -37,18 +49,6 @@ class PenilaianRequest extends FormRequest
                 'pic'          => 'nullable|string|max:255',
                 'deadline'     => 'nullable|date',
                 'catatan'      => 'nullable|string',
-            ];
-        }
-
-        if ($this->routeIs('penilaian.bukti.update')) {
-            return [
-                'nama_bukti'   => 'sometimes|required|string|max:255',
-                'level'        => 'sometimes|required|in:PRODI,FIKES,UNIV',
-                'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
-                'link'       => 'nullable|string|max:255',
-                'pic'        => 'nullable|string|max:255',
-                'deadline'   => 'nullable|date',
-                'catatan'    => 'nullable|string',
             ];
         }
 

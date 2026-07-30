@@ -26,29 +26,3 @@ class Tatakelola extends Model
         return $this->hasMany(TatakelolaBukti::class);
     }
 }
-
-class TatakelolaNarasi extends Model
-{
-    use HasFactory;
-    
-    protected $table = 'tatakelola_narasis';
-    protected $guarded = [];
-
-    public function tatakelola()
-    {
-        return $this->belongsTo(Tatakelola::class);
-    }
-}
-
-class TatakelolaBukti extends Model
-{
-    use HasFactory;
-
-    protected $table = 'tatakelola_buktis';
-    protected $guarded = [];
-
-    public function tatakelola()
-    {
-        return $this->belongsTo(Tatakelola::class);
-    }
-}

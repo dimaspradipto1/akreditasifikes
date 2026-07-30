@@ -90,7 +90,7 @@
                         @foreach($matrix as $item)
                         @php
                             $routeMap = [
-                                1 => 'vmts.index',
+                                1 => 'kriteria1.index',
                                 2 => 'kurikulum.index',
                                 3 => 'penilaian.index',
                                 4 => 'mahasiswa.index',

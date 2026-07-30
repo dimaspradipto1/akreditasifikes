@@ -2,7 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\TataKelola;
+use App\Models\Tatakelola;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -17,7 +17,7 @@ class TataKelolaDataTable extends DataTable
     /**
      * Build the DataTable class.
      *
-     * @param QueryBuilder<TataKelola> $query Results from query() method.
+     * @param QueryBuilder<Tatakelola> $query Results from query() method.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
@@ -29,9 +29,9 @@ class TataKelolaDataTable extends DataTable
     /**
      * Get the query source of dataTable.
      *
-     * @return QueryBuilder<TataKelola>
+     * @return QueryBuilder<Tatakelola>
      */
-    public function query(TataKelola $model): QueryBuilder
+    public function query(Tatakelola $model): QueryBuilder
     {
         return $model->newQuery();
     }

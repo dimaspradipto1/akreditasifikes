@@ -33,7 +33,7 @@ class VmtsTest extends TestCase
 
     public function test_index_page_can_be_accessed()
     {
-        $response = $this->actingAs($this->user)->get(route('vmts.index'));
+        $response = $this->actingAs($this->user)->get(route('kriteria1.index'));
         $response->assertStatus(200);
         $response->assertViewIs('pages.vmts.index');
     }
@@ -42,10 +42,9 @@ class VmtsTest extends TestCase
     {
         $narasi = VmtsNarasi::where('elemen_kode', 'EU-1')->first();
         
-        $response = $this->actingAs($this->user)->put(route('vmts.narasi.update', $narasi->id), [
-            'status' => 'Memenuhi',
-            'narasi_persen' => 80,
-            'bukti_persen' => 90,
+        $response = $this->actingAs($this->user)->put(route('kriteria1.update', $narasi->id), [
+            'type' => 'narasi',
+            'status' => 'Lengkap',
             'kondisi_saat_ini' => 'Kondisi saat ini sangat baik',
         ]);
 
@@ -58,11 +57,13 @@ class VmtsTest extends TestCase
 
     public function test_can_store_bukti()
     {
-        $response = $this->actingAs($this->user)->post(route('vmts.bukti.store'), [
+        $response = $this->actingAs($this->user)->post(route('kriteria1.store'), [
+            'type' => 'bukti',
             'vmts_id' => $this->vmts->id,
+            'elemen_kode' => '1.1',
             'nama_bukti' => 'Dokumen VMTS Baru',
             'level' => 'PRODI',
-            'status' => 'Tersedia',
+            'status_bukti' => 'Tersedia',
             'link' => 'https://example.com/doc',
         ]);
 
@@ -77,12 +78,13 @@ class VmtsTest extends TestCase
     {
         $bukti = VmtsBukti::create([
             'vmts_id' => $this->vmts->id,
+            'elemen_kode' => '1.1',
             'nama_bukti' => 'To Be Deleted',
             'level' => 'PRODI',
             'status' => 'Tersedia',
         ]);
 
-        $response = $this->actingAs($this->user)->delete(route('vmts.bukti.destroy', $bukti->id));
+        $response = $this->actingAs($this->user)->delete(route('kriteria1.destroy', $bukti->id), ['type' => 'bukti']);
         $response->assertRedirect();
         
         $this->assertDatabaseMissing('vmts_buktis', [

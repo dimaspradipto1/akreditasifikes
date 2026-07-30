@@ -20,10 +20,17 @@ class VmtsController extends Controller
     {
         $user = Auth::user();
         
-        // 1. Get or Create VMTS for current user (Prodi)
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : $user->id;
+
+        // 1. Get or Create VMTS for current year (shared across users)
         $vmts = Vmts::firstOrCreate(
-            ['user_id' => $user->id, 'tahun_akreditasi' => date('Y')]
+            ['tahun_akreditasi' => date('Y')],
+            ['user_id' => $userId]
         );
+
+        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
+        $this->updateBuktiPersen($vmts->id);
 
         // 2. Ensure all 6 Elemen Utama (EU) exist for this VMTS
         $elements = [
@@ -63,7 +70,7 @@ class VmtsController extends Controller
                 unset($data['status_bukti']);
             }
             $bukti = \App\Models\VmtsBukti::create($data);
-            $this->updateBuktiPersen($bukti->vmts_id, $bukti->kriteria_kode);
+            $this->updateBuktiPersen($bukti->vmts_id, $bukti->elemen_kode);
 
             Alert::success('Berhasil!', 'Bukti pendukung berhasil ditambahkan.')
                 ->toToast()->autoclose(3000)->timerProgressBar();
@@ -78,33 +85,13 @@ class VmtsController extends Controller
     {
         if ($request->has('type') && $request->type === 'narasi') {
             $narasi = \App\Models\VmtsNarasi::findOrFail($id);
-            $narasi->update($request->validated());
-
-            if (str_contains($narasi->kriteria_kode, '_EU')) {
-                $parentKode = explode('_', $narasi->kriteria_kode)[0];
-                $parent = \App\Models\VmtsNarasi::where('vmts_id', $narasi->vmts_id)
-                    ->where('kriteria_kode', $parentKode)
-                    ->first();
-
-                if ($parent) {
-                    $allEUs = \App\Models\VmtsNarasi::where('vmts_id', $narasi->vmts_id)
-                        ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
-                        ->get();
-                    
-                    $totalEU = $allEUs->count();
-                    $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
-                    
-                    $narasiPersen = $totalEU > 0 ? round(($lengkapEU / $totalEU) * 100) : 0;
-                    $status = ($narasiPersen == 100) ? 'Memenuhi' : 'Belum Memenuhi';
-                    
-                    $parent->update([
-                        'narasi_persen' => $narasiPersen,
-                        'status' => $status
-                    ]);
-                }
+            $data = $request->validated();
+            if (isset($data['status'])) {
+                $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
             }
+            $narasi->update($data);
 
-            Alert::success('Berhasil!', 'Narasi ' . $narasi->kriteria_kode . ' berhasil disimpan.')
+            Alert::success('Berhasil!', 'Narasi ' . $narasi->elemen_kode . ' berhasil disimpan.')
                 ->toToast()->autoclose(3000)->timerProgressBar();
 
             return redirect()->back();
@@ -120,10 +107,10 @@ class VmtsController extends Controller
             }
 
             $bukti->update($updateData);
-            $newPctBukti = $this->updateBuktiPersen($bukti->vmts_id, $bukti->kriteria_kode);
+            $newPctBukti = $this->updateBuktiPersen($bukti->vmts_id, $bukti->elemen_kode);
 
             if ($request->ajax()) {
-                return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.', 'pctBukti' => $newPctBukti, 'kriteria_kode' => $bukti->kriteria_kode]);
+                return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.', 'pctBukti' => $newPctBukti, 'kriteria_kode' => $bukti->elemen_kode]);
             }
 
             Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
@@ -140,7 +127,7 @@ class VmtsController extends Controller
         if ($request->has('type') && $request->type === 'bukti') {
             $bukti = \App\Models\VmtsBukti::findOrFail($id);
             $vmtsId = $bukti->vmts_id;
-            $kriteriaKode = $bukti->kriteria_kode;
+            $kriteriaKode = $bukti->elemen_kode;
             $bukti->delete();
             $this->updateBuktiPersen($vmtsId, $kriteriaKode);
 

@@ -157,10 +157,10 @@
                                         <button type="button" class="btn btn-sm btn-outline-primary btn-edit" data-id="{{ $doc->id }}" data-kode="{{ $doc->kode }}" data-nama="{{ $doc->nama_dokumen }}" data-deskripsi="{{ $doc->deskripsi }}" data-jenis="{{ $doc->jenis }}" data-level="{{ $doc->level }}" title="Edit">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <form action="{{ route('dokumen-bersama.destroy', $doc->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?')">
+                                        <form action="{{ route('dokumen-bersama.destroy', $doc->id) }}" method="POST" class="d-inline form-delete-bukti">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-bukti" title="Hapus">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -254,10 +254,10 @@
                                         <button type="button" class="btn btn-sm btn-outline-primary btn-edit" data-id="{{ $doc->id }}" data-kode="{{ $doc->kode }}" data-nama="{{ $doc->nama_dokumen }}" data-deskripsi="{{ $doc->deskripsi }}" data-jenis="{{ $doc->jenis }}" data-level="{{ $doc->level }}" title="Edit">
                                             <i class="bi bi-pencil-square"></i>
                                         </button>
-                                        <form action="{{ route('dokumen-bersama.destroy', $doc->id) }}" method="POST" class="d-inline" onsubmit="return confirm('Apakah Anda yakin ingin menghapus dokumen ini?')">
+                                        <form action="{{ route('dokumen-bersama.destroy', $doc->id) }}" method="POST" class="d-inline form-delete-bukti">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                                            <button type="button" class="btn btn-sm btn-outline-danger btn-delete-bukti" title="Hapus">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -294,11 +294,11 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Kode Dokumen</label>
+                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Kode Dokumen <span class="text-danger">*</span></label>
                             <input type="text" name="kode" class="form-control" required placeholder="Contoh: SK_IZIN">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Nama Dokumen</label>
+                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Nama Dokumen <span class="text-danger">*</span></label>
                             <input type="text" name="nama_dokumen" class="form-control" required placeholder="Nama lengkap dokumen">
                         </div>
                         <div class="mb-3">
@@ -310,7 +310,7 @@
                             <input type="text" name="jenis" class="form-control" placeholder="Contoh: SK, Pedoman, dll">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Level / Lingkup</label>
+                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Level / Lingkup <span class="text-danger">*</span></label>
                             <select name="level" class="form-select" required>
                                 <option value="UNIV">Universitas (UNIV)</option>
                                 <option value="FIKES">Fakultas (FIKES)</option>
@@ -339,11 +339,11 @@
                     @method('PUT')
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Kode Dokumen</label>
+                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Kode Dokumen <span class="text-danger">*</span></label>
                             <input type="text" name="kode" id="editKode" class="form-control" required placeholder="Contoh: SK_IZIN">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Nama Dokumen</label>
+                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Nama Dokumen <span class="text-danger">*</span></label>
                             <input type="text" name="nama_dokumen" id="editNama" class="form-control" required placeholder="Nama lengkap dokumen">
                         </div>
                         <div class="mb-3">
@@ -355,7 +355,7 @@
                             <input type="text" name="jenis" id="editJenis" class="form-control" placeholder="Contoh: SK, Pedoman, dll">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Level / Lingkup</label>
+                            <label class="form-label text-muted" style="font-size: 0.85rem; font-weight: 600;">Level / Lingkup <span class="text-danger">*</span></label>
                             <select name="level" id="editLevel" class="form-select" required>
                                 <option value="UNIV">Universitas (UNIV)</option>
                                 <option value="FIKES">Fakultas (FIKES)</option>
@@ -582,6 +582,26 @@
                     $(this).siblings('.doc-catatan-btn').removeClass('btn-light').addClass(
                         'btn-primary text-white');
                 }
+            });
+
+            // SweetAlert Delete Confirmation
+            $(document).on('click', '.btn-delete-bukti', function(e) {
+                e.preventDefault();
+                var form = $(this).closest('form');
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Dokumen ini akan dihapus secara permanen!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
             });
         });
     </script>

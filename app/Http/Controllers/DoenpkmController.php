@@ -19,9 +19,18 @@ class DoenpkmController extends Controller
     {
         $user = Auth::user();
         
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : $user->id;
+
         $doenpkm = Doenpkm::firstOrCreate(
-            ['user_id' => $user->id, 'tahun_akreditasi' => date('Y')]
+            ['tahun_akreditasi' => date('Y')],
+            ['user_id' => $userId]
         );
+
+        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
+        foreach (['5.1', '5.2', '5.3'] as $subKode) {
+            $this->updateBuktiPersen($doenpkm->id, $subKode);
+        }
 
         $elements = [
             '5.1' => [

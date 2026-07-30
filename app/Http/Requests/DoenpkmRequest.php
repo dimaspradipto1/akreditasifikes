@@ -21,10 +21,8 @@ class DoenpkmRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [];
-
-        if ($this->routeIs('doenpkm.narasi.update')) {
-            $rules = [
+        if ($this->input('type') === 'narasi') {
+            return [
                 'status' => 'required|in:Draft,Lengkap,Belum Diisi',
                 'kondisi_saat_ini' => 'nullable|string',
                 'data_fakta' => 'nullable|string',
@@ -35,8 +33,22 @@ class DoenpkmRequest extends FormRequest
             ];
         }
 
-        if ($this->routeIs('doenpkm.bukti.store')) {
-            $rules = [
+        if ($this->input('type') === 'bukti') {
+            if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+                return [
+                    'doenpkm_id' => 'sometimes|exists:doenpkms,id',
+                    'elemen_kode' => 'sometimes|string',
+                    'nama_bukti' => 'sometimes|string|max:255',
+                    'level' => 'sometimes|string|in:PRODI,FIKES,UNIV',
+                    'status_bukti' => 'sometimes|string|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                    'link' => 'nullable|url|max:255',
+                    'pic' => 'nullable|string|max:255',
+                    'deadline' => 'nullable|date',
+                    'catatan' => 'nullable|string',
+                ];
+            }
+
+            return [
                 'doenpkm_id' => 'required|exists:doenpkms,id',
                 'elemen_kode' => 'required|string',
                 'nama_bukti' => 'required|string|max:255',
@@ -49,20 +61,6 @@ class DoenpkmRequest extends FormRequest
             ];
         }
 
-        if ($this->routeIs('doenpkm.bukti.update')) {
-            $rules = [
-                'doenpkm_id' => 'sometimes|exists:doenpkms,id',
-                'elemen_kode' => 'sometimes|string',
-                'nama_bukti' => 'sometimes|string|max:255',
-                'level' => 'sometimes|string|in:PRODI,FIKES,UNIV',
-                'status_bukti' => 'sometimes|string|in:Tersedia,Tidak Ada,Belum Memenuhi',
-                'link' => 'nullable|url|max:255',
-                'pic' => 'nullable|string|max:255',
-                'deadline' => 'nullable|date',
-                'catatan' => 'nullable|string',
-            ];
-        }
-
-        return $rules;
+        return [];
     }
 }
