@@ -219,13 +219,7 @@
                         <p class="text-muted mb-4" style="font-size: 0.85rem;">{{ $euKriterias->count() }} Elemen Utama pada sub-kriteria ini. Setiap EU memuat form narasi 5 blok (A-E) beserta status & simulasi pemenuhan otomatis.</p>
 
                         <div class="accordion mb-5" id="accordionEU{{ $sub->id }}">
-                            @php
-                                $euCount = $euKriterias->count();
-                                $visibleLimit = (in_array($sub->kriteria_kode, ['4.3', '4.4'])) ? 3 : 4;
-                                $visibleEus = $euKriterias->take($visibleLimit);
-                                $hiddenEuCount = $euCount > $visibleLimit ? $euCount - $visibleLimit : 0;
-                            @endphp
-                            @foreach($visibleEus as $euKode => $euNarasi)
+                            @foreach($euKriterias as $euKode => $euNarasi)
                             @php
                                 $displayEuKode = explode('_', $euNarasi->kriteria_kode)[1] ?? $euNarasi->kriteria_kode;
                             @endphp
