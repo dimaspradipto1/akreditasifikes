@@ -274,7 +274,7 @@
 
             <!-- Bagian B untuk Daftar Bukti Pendukung (Ditampilkan untuk semua sub-kriteria) -->
             <h5 class="fw-bold mb-1 mt-5" style="font-size: 1rem; color: #1e3a8a;">Bagian B — Daftar Bukti Pendukung</h5>
-            <p class="text-muted mb-4" style="font-size: 0.85rem;">Dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</p>
+            <p class="text-muted mb-4" style="font-size: 0.85rem;">16 dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</p>
             
             <div class="bg-white p-3 rounded shadow-sm" style="border: 1px solid #e2e8f0;">
                 <div class="d-flex justify-content-end mb-3">

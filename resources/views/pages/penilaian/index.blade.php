@@ -342,8 +342,14 @@
                     <!-- Bagian B untuk Daftar Bukti Pendukung (Ditampilkan untuk semua sub-kriteria) -->
                     <h5 class="fw-bold mb-1 mt-4" style="font-size: 1rem; color: #1e3a8a;">Bagian B — Daftar Bukti Pendukung</h5>
                     @php
-                        $docCount = 8;
-                        $plusCount = 4;
+                        $targetBuktiMap = [
+                            '3.1' => 7,
+                            '3.2' => 6,
+                            '3.3' => 9,
+                            '3.4' => 8,
+                        ];
+                        $docCount = $targetBuktiMap[$sub->kriteria_kode] ?? 8;
+                        $plusCount = max(0, $docCount - 4);
                     @endphp
                     <p class="text-muted mb-4" style="font-size: 0.85rem;">{{ $docCount }} dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</p>
                     

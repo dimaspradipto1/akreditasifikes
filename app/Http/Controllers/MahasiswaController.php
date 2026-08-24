@@ -107,51 +107,9 @@ class MahasiswaController extends Controller
 
             if ($kriteria['is_eu']) {
                 foreach ($kriteria['eus'] as $euKode => $euNama) {
-                    $narasiData = ['kriteria_nama' => $euNama, 'status' => 'Draft'];
-                    
-                    // Pre-fill 4.1 EU-1 to match screenshot
-                    if ($euKode == '4.1_EU1') {
-                        $narasiData['status'] = 'Lengkap';
-                        $narasiData['kondisi_saat_ini'] = 'Kondisi saat ini pada aspek ini sudah berjalan sesuai standar minimum, dengan dokumentasi yang tersedia di tingkat program studi.';
-                        $narasiData['data_fakta'] = 'Data pendukung terkumpul dari dokumen internal prodi dan Dokumen Bersama FIKes/Universitas yang relevan.';
-                        $narasiData['analisis'] = 'Dibandingkan dengan standar LAM-PTKes, capaian saat ini berada pada kategori memenuhi dengan beberapa catatan minor.';
-                        $narasiData['permasalahan'] = 'Masih ditemukan keterlambatan pembaruan dokumen pada beberapa siklus terakhir.';
-                        $narasiData['rencana_perbaikan'] = 'Disusun rencana pembaruan berkala setiap semester beserta penanggung jawab pelaksana.';
-                    }
-                    
-                    // Pre-fill 4.2 EU-1 to match screenshot
-                    if ($euKode == '4.2_EU-1') {
-                        $narasiData['status'] = 'Lengkap';
-                        $narasiData['kondisi_saat_ini'] = 'Kondisi saat ini pada aspek ini sudah berjalan sesuai standar minimum, dengan dokumentasi yang tersedia di tingkat program studi.';
-                        $narasiData['data_fakta'] = 'Data pendukung terkumpul dari dokumen internal prodi dan Dokumen Bersama FIKes/Universitas yang relevan.';
-                        $narasiData['analisis'] = 'Dibandingkan dengan standar LAM-PTKes, capaian saat ini berada pada kategori memenuhi dengan beberapa catatan minor.';
-                        $narasiData['permasalahan'] = 'Masih ditemukan keterlambatan pembaruan dokumen pada beberapa siklus terakhir.';
-                        $narasiData['rencana_perbaikan'] = 'Disusun rencana pembaruan berkala setiap semester beserta penanggung jawab pelaksana.';
-                    }
-
-                    // Pre-fill 4.3 EU-1 to match screenshot
-                    if ($euKode == '4.3_EU-1') {
-                        $narasiData['status'] = 'Lengkap';
-                        $narasiData['kondisi_saat_ini'] = 'Kondisi saat ini pada aspek ini sudah berjalan sesuai standar minimum, dengan dokumentasi yang tersedia di tingkat program studi.';
-                        $narasiData['data_fakta'] = 'Data pendukung terkumpul dari dokumen internal prodi dan Dokumen Bersama FIKes/Universitas yang relevan.';
-                        $narasiData['analisis'] = 'Dibandingkan dengan standar LAM-PTKes, capaian saat ini berada pada kategori memenuhi dengan beberapa catatan minor.';
-                        $narasiData['permasalahan'] = 'Masih ditemukan keterlambatan pembaruan dokumen pada beberapa siklus terakhir.';
-                        $narasiData['rencana_perbaikan'] = 'Disusun rencana pembaruan berkala setiap semester beserta penanggung jawab pelaksana.';
-                    }
-
-                    // Pre-fill 4.4 EU-1 to match screenshot
-                    if ($euKode == '4.4_EU-1') {
-                        $narasiData['status'] = 'Lengkap';
-                        $narasiData['kondisi_saat_ini'] = 'Kondisi saat ini pada aspek ini sudah berjalan sesuai standar minimum, dengan dokumentasi yang tersedia di tingkat program studi.';
-                        $narasiData['data_fakta'] = 'Data pendukung terkumpul dari dokumen internal prodi dan Dokumen Bersama FIKes/Universitas yang relevan.';
-                        $narasiData['analisis'] = 'Dibandingkan dengan standar LAM-PTKes, capaian saat ini berada pada kategori memenuhi dengan beberapa catatan minor.';
-                        $narasiData['permasalahan'] = 'Masih ditemukan keterlambatan pembaruan dokumen pada beberapa siklus terakhir.';
-                        $narasiData['rencana_perbaikan'] = 'Disusun rencana pembaruan berkala setiap semester beserta penanggung jawab pelaksana.';
-                    }
-
                     \App\Models\MahasiswaNarasi::firstOrCreate(
                         ['mahasiswa_id' => $mahasiswa->id, 'kriteria_kode' => $euKode],
-                        $narasiData
+                        ['kriteria_nama' => $euNama, 'status' => 'Draft']
                     );
                 }
             }

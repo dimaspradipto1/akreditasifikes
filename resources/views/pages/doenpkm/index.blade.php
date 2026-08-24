@@ -311,7 +311,18 @@
                         <!-- Bagian B -->
                         <div class="mb-5">
                             <div class="section-title mb-1">Bagian B — Daftar Bukti Pendukung</div>
-                            <div class="section-subtitle mb-3">Dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</div>
+                            @php
+                                $targetBuktiMap = [
+                                    '5.1' => 7,
+                                    '5.2' => 8,
+                                    '5.3' => 7,
+                                    '5.4' => 5,
+                                    '5.5' => 5,
+                                    '5.6' => 5,
+                                ];
+                                $docCount = $targetBuktiMap[$subKode] ?? 5;
+                            @endphp
+                            <div class="section-subtitle mb-3">{{ $docCount }} dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</div>
                             
                             <div class="mb-3 text-end">
                                 <button class="btn btn-sm text-white" style="background: #5520B8;" data-bs-toggle="modal" data-bs-target="#modalTambahBukti{{ str_replace('.', '_', $subKode) }}">

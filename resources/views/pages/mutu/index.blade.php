@@ -338,11 +338,11 @@
                     <!-- Bagian B untuk Daftar Bukti Pendukung (Ditampilkan untuk semua sub-kriteria) -->
                     <h5 class="fw-bold mb-1 mt-4" style="font-size: 1rem; color: #1e3a8a;">Bagian B — Daftar Bukti Pendukung</h5>
                     @php
-                        $docCount = 17;
-                        if ($sub->kriteria_kode == '7.1') $docCount = 17;
-                        
-                        $plusCount = 13;
-                        if ($sub->kriteria_kode == '7.1') $plusCount = 13;
+                        $targetBuktiMap = [
+                            '7.1' => 10,
+                        ];
+                        $docCount = $targetBuktiMap[$sub->kriteria_kode] ?? 10;
+                        $plusCount = max(0, $docCount - 4);
                     @endphp
                     <p class="text-muted mb-4" style="font-size: 0.85rem;">{{ $docCount }} dokumen bukti diperlukan · badge level menandai siapa yang mengisi (PRODI = tim prodi, FIKES/UNIV = otomatis dari Dokumen Bersama).</p>
                     
