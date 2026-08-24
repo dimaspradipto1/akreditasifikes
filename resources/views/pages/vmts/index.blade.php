@@ -138,7 +138,7 @@
                     </div>
                     <div>
                         <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Sub Memenuhi</div>
-                        <div class="fs-4 fw-bold text-success" style="line-height: 1;">{{ $narasis->where('status', 'Memenuhi')->count() }} <span class="text-muted fw-normal fs-6">dari {{ $narasis->count() }}</span></div>
+                        <div class="fs-4 fw-bold text-success" style="line-height: 1;">{{ $pctNarasi == 100 ? 1 : 0 }} <span class="text-muted fw-normal fs-6">dari 1</span></div>
                     </div>
                 </div>
             </div>
@@ -153,7 +153,7 @@
                     </div>
                     <div>
                         <div class="text-muted mb-1" style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Wajib Belum</div>
-                        <div class="fs-4 fw-bold text-danger" style="line-height: 1;">{{ $narasis->where('status', '!=', 'Memenuhi')->count() }}</div>
+                        <div class="fs-4 fw-bold text-danger" style="line-height: 1;">{{ $narasis->where('status', '!=', 'Lengkap')->count() > 0 ? 1 : 0 }}</div>
                     </div>
                 </div>
             </div>

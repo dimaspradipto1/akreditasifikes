@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use App\Models\Vmts;
 use App\Models\Kurikulum;
 use App\Models\Penilaian;
@@ -17,18 +18,18 @@ class MatriksController extends Controller
 {
     public function index()
     {
-        $userId = Auth::id();
-        $tahun = date('Y');
+        $targetUser = User::where('role', 'koordinatorprodi')->first() ?: User::first();
+        $userId = $targetUser ? $targetUser->id : Auth::id();
 
-        // 1. Fetch parent models
-        $vmts = Vmts::where('user_id', '=', $userId)->first();
-        $kurikulum = Kurikulum::where('user_id', '=', $userId)->first();
-        $penilaian = Penilaian::where('user_id', '=', $userId)->first();
-        $mahasiswa = Mahasiswa::where('user_id', '=', $userId)->first();
-        $doenpkm = Doenpkm::where('user_id', '=', $userId)->first();
-        $sarpras = Sarpraskeuangan::where('user_id', '=', $userId)->first();
-        $mutu = Mutu::where('user_id', '=', $userId)->first();
-        $tatakelola = Tatakelola::where('user_id', '=', $userId)->first();
+        // 1. Fetch parent models (shared globally by year)
+        $vmts = Vmts::where('tahun_akreditasi', date('Y'))->first() ?: Vmts::where('user_id', $userId)->first();
+        $kurikulum = Kurikulum::where('tahun_akreditasi', date('Y'))->first() ?: Kurikulum::where('user_id', $userId)->first();
+        $penilaian = Penilaian::where('tahun_akreditasi', date('Y'))->first() ?: Penilaian::where('user_id', $userId)->first();
+        $mahasiswa = Mahasiswa::where('tahun_akreditasi', date('Y'))->first() ?: Mahasiswa::where('user_id', $userId)->first();
+        $doenpkm = Doenpkm::where('tahun_akreditasi', date('Y'))->first() ?: Doenpkm::where('user_id', $userId)->first();
+        $sarpras = Sarpraskeuangan::where('tahun', date('Y'))->first() ?: Sarpraskeuangan::where('user_id', $userId)->first();
+        $mutu = Mutu::where('tahun', date('Y'))->first() ?: Mutu::where('user_id', $userId)->first();
+        $tatakelola = Tatakelola::where('tahun', date('Y'))->first() ?: Tatakelola::where('user_id', $userId)->first();
 
         // 2. Fetch Narasis (Collections)
         $vmtsN = $vmts ? $vmts->narasis()->get() : collect();
@@ -40,7 +41,7 @@ class MatriksController extends Controller
         $mutuN = $mutu ? $mutu->narasis()->get()->keyBy('kriteria_kode') : collect();
         $tatakelolaN = $tatakelola ? $tatakelola->narasis()->get()->keyBy('kriteria_kode') : collect();
 
-        // Helper function for K5 (Doenpkm) which only has EUs in DB
+        // Helper function for K5 (Doenpkm)
         $getDoenpkmStats = function($prefix) use ($doenpkmN) {
             $eus = $doenpkmN->filter(function($n) use ($prefix) {
                 return str_starts_with($n->elemen_kode, $prefix . '-');
@@ -49,22 +50,22 @@ class MatriksController extends Controller
             if ($count == 0) return ['narasi' => 0, 'bukti' => 0, 'status' => 'Tidak Memenuhi'];
             $narasi = (int) round($eus->avg('narasi_persen'));
             $bukti = (int) round($eus->avg('bukti_persen'));
-            $memenuhi = $eus->where('status', 'Memenuhi')->count();
+            $memenuhi = $eus->where('status', 'Lengkap')->count();
             $status = ($memenuhi == $count && $count > 0) ? 'Memenuhi' : 'Tidak Memenuhi';
             return ['narasi' => $narasi, 'bukti' => $bukti, 'status' => $status];
         };
 
-        // Static definition of 26 sub-criteria based on user screenshot and controllers
+        // Static definition of 26 sub-criteria (Total EU: 114, Total Bukti: 214)
         $subKriteria = [
-            // K1 (1)
+            // K1 (1 Sub, 6 EU, 16 Bukti)
             [
                 'no' => 1, 'kode' => '1.1', 'nama' => 'Pernyataan Visi, Misi, Tujuan, dan Strategi', 
                 'kriteria' => 'Visi, Misi, Tujuan, dan Strategi', 'eu' => 6, 'bukti' => 16, 'kategori' => 'WAJIB',
-                'simulasi' => $vmtsN->count() > 0 && $vmtsN->where('status', '!=', 'Memenuhi')->count() == 0 ? 'Memenuhi' : 'Tidak Memenuhi',
+                'simulasi' => $vmtsN->count() > 0 && $vmtsN->where('status', '!=', 'Lengkap')->count() == 0 ? 'Memenuhi' : 'Tidak Memenuhi',
                 'pct_narasi' => $vmtsN->count() > 0 ? (int)round($vmtsN->avg('narasi_persen')) : 0,
                 'pct_bukti' => $vmtsN->count() > 0 ? (int)round($vmtsN->avg('bukti_persen')) : 0,
             ],
-            // K2 (4)
+            // K2 (4 Sub, 17 EU, 35 Bukti)
             [
                 'no' => 2, 'kode' => '2.1', 'nama' => 'Capaian Pembelajaran dalam Kurikulum', 'kriteria' => 'Kurikulum', 'eu' => 7, 'bukti' => 16, 'kategori' => 'WAJIB',
                 'simulasi' => $kurikulumN->has('2.1') ? $kurikulumN->get('2.1')->status : 'Tidak Memenuhi',
@@ -89,7 +90,7 @@ class MatriksController extends Controller
                 'pct_narasi' => $kurikulumN->has('2.4') ? $kurikulumN->get('2.4')->narasi_persen : 0,
                 'pct_bukti' => $kurikulumN->has('2.4') ? $kurikulumN->get('2.4')->bukti_persen : 0,
             ],
-            // K3 (4)
+            // K3 (4 Sub, 17 EU, 30 Bukti)
             [
                 'no' => 3, 'kode' => '3.1', 'nama' => 'Kebijakan dan Sistem Penilaian', 'kriteria' => 'Penilaian', 'eu' => 3, 'bukti' => 7, 'kategori' => 'WAJIB',
                 'simulasi' => $penilaianN->has('3.1') ? $penilaianN->get('3.1')->status : 'Tidak Memenuhi',
@@ -114,9 +115,9 @@ class MatriksController extends Controller
                 'pct_narasi' => $penilaianN->has('3.4') ? $penilaianN->get('3.4')->narasi_persen : 0,
                 'pct_bukti' => $penilaianN->has('3.4') ? $penilaianN->get('3.4')->bukti_persen : 0,
             ],
-            // K4 (4)
+            // K4 (4 Sub, 25 EU, 44 Bukti)
             [
-                'no' => 4, 'kode' => '4.1', 'nama' => 'Kebijakan Seleksi dan Penerimaan Mahasiswa Baru (Maba)', 'kriteria' => 'Mahasiswa', 'eu' => 3, 'bukti' => 12, 'kategori' => 'WAJIB',
+                'no' => 4, 'kode' => '4.1', 'nama' => 'Kebijakan Seleksi dan Penerimaan Mahasiswa Baru (Maba)', 'kriteria' => 'Mahasiswa', 'eu' => 7, 'bukti' => 12, 'kategori' => 'WAJIB',
                 'simulasi' => $mahasiswaN->has('4.1') ? $mahasiswaN->get('4.1')->status : 'Tidak Memenuhi',
                 'pct_narasi' => $mahasiswaN->has('4.1') ? $mahasiswaN->get('4.1')->narasi_persen : 0,
                 'pct_bukti' => $mahasiswaN->has('4.1') ? $mahasiswaN->get('4.1')->bukti_persen : 0,
@@ -139,40 +140,40 @@ class MatriksController extends Controller
                 'pct_narasi' => $mahasiswaN->has('4.4') ? $mahasiswaN->get('4.4')->narasi_persen : 0,
                 'pct_bukti' => $mahasiswaN->has('4.4') ? $mahasiswaN->get('4.4')->bukti_persen : 0,
             ],
-            // K5 (6)
+            // K5 (6 Sub, 23 EU, 37 Bukti)
             [
-                'no' => 5, 'kode' => '5.1', 'nama' => 'Kebijakan Penetapan Dosen', 'kriteria' => 'Dosen & PkM', 'eu' => 3, 'bukti' => 5, 'kategori' => 'WAJIB',
+                'no' => 5, 'kode' => '5.1', 'nama' => 'Kebijakan Penetapan Dosen', 'kriteria' => 'Dosen & PkM', 'eu' => 4, 'bukti' => 7, 'kategori' => 'WAJIB',
                 'simulasi' => $getDoenpkmStats('5.1')['status'], 'pct_narasi' => $getDoenpkmStats('5.1')['narasi'], 'pct_bukti' => $getDoenpkmStats('5.1')['bukti'],
             ],
             [
-                'no' => 5, 'kode' => '5.2', 'nama' => 'Kinerja dan Perilaku Dosen', 'kriteria' => 'Dosen & PkM', 'eu' => 4, 'bukti' => 6, 'kategori' => 'WAJIB',
+                'no' => 5, 'kode' => '5.2', 'nama' => 'Kinerja dan Perilaku Dosen', 'kriteria' => 'Dosen & PkM', 'eu' => 5, 'bukti' => 8, 'kategori' => 'WAJIB',
                 'simulasi' => $getDoenpkmStats('5.2')['status'], 'pct_narasi' => $getDoenpkmStats('5.2')['narasi'], 'pct_bukti' => $getDoenpkmStats('5.2')['bukti'],
             ],
             [
-                'no' => 5, 'kode' => '5.3', 'nama' => 'Pengembangan Profesional Berkelanjutan untuk Dosen', 'kriteria' => 'Dosen & PkM', 'eu' => 3, 'bukti' => 5, 'kategori' => 'BOLEH SEBAGIAN',
+                'no' => 5, 'kode' => '5.3', 'nama' => 'Pengembangan Profesional Berkelanjutan untuk Dosen', 'kriteria' => 'Dosen & PkM', 'eu' => 4, 'bukti' => 7, 'kategori' => 'BOLEH SEBAGIAN',
                 'simulasi' => $getDoenpkmStats('5.3')['status'], 'pct_narasi' => $getDoenpkmStats('5.3')['narasi'], 'pct_bukti' => $getDoenpkmStats('5.3')['bukti'],
             ],
             [
-                'no' => 5, 'kode' => '5.4', 'nama' => 'Pengembangan Tenaga Kependidikan', 'kriteria' => 'Dosen & PkM', 'eu' => 2, 'bukti' => 3, 'kategori' => 'BOLEH SEBAGIAN',
+                'no' => 5, 'kode' => '5.4', 'nama' => 'Pengembangan Tenaga Kependidikan', 'kriteria' => 'Dosen & PkM', 'eu' => 3, 'bukti' => 5, 'kategori' => 'BOLEH SEBAGIAN',
                 'simulasi' => $getDoenpkmStats('5.4')['status'], 'pct_narasi' => $getDoenpkmStats('5.4')['narasi'], 'pct_bukti' => $getDoenpkmStats('5.4')['bukti'],
             ],
             [
-                'no' => 5, 'kode' => '5.5', 'nama' => 'Relevansi Penelitian sesuai Visi dan Unggulan PS', 'kriteria' => 'Dosen & PkM', 'eu' => 2, 'bukti' => 3, 'kategori' => 'WAJIB',
+                'no' => 5, 'kode' => '5.5', 'nama' => 'Relevansi Penelitian sesuai Visi dan Unggulan PS', 'kriteria' => 'Dosen & PkM', 'eu' => 4, 'bukti' => 5, 'kategori' => 'WAJIB',
                 'simulasi' => $getDoenpkmStats('5.5')['status'], 'pct_narasi' => $getDoenpkmStats('5.5')['narasi'], 'pct_bukti' => $getDoenpkmStats('5.5')['bukti'],
             ],
             [
-                'no' => 5, 'kode' => '5.6', 'nama' => 'Relevansi PkM sesuai Visi dan Unggulan PS', 'kriteria' => 'Dosen & PkM', 'eu' => 2, 'bukti' => 3, 'kategori' => 'WAJIB',
+                'no' => 5, 'kode' => '5.6', 'nama' => 'Relevansi PkM sesuai Visi dan Unggulan PS', 'kriteria' => 'Dosen & PkM', 'eu' => 3, 'bukti' => 5, 'kategori' => 'WAJIB',
                 'simulasi' => $getDoenpkmStats('5.6')['status'], 'pct_narasi' => $getDoenpkmStats('5.6')['narasi'], 'pct_bukti' => $getDoenpkmStats('5.6')['bukti'],
             ],
-            // K6 (3)
+            // K6 (3 Sub, 10 EU, 19 Bukti)
             [
-                'no' => 6, 'kode' => '6.1', 'nama' => 'Fasilitas Fisik untuk Pendidikan dan Pelatihan', 'kriteria' => 'Sarana, Prasarana & Keuangan', 'eu' => 5, 'bukti' => 8, 'kategori' => 'WAJIB',
+                'no' => 6, 'kode' => '6.1', 'nama' => 'Fasilitas Fisik untuk Pendidikan dan Pelatihan', 'kriteria' => 'Sarana, Prasarana & Keuangan', 'eu' => 2, 'bukti' => 8, 'kategori' => 'WAJIB',
                 'simulasi' => $sarprasN->has('6.1') ? $sarprasN->get('6.1')->status : 'Tidak Memenuhi',
                 'pct_narasi' => $sarprasN->has('6.1') ? $sarprasN->get('6.1')->narasi_persen : 0,
                 'pct_bukti' => $sarprasN->has('6.1') ? $sarprasN->get('6.1')->bukti_persen : 0,
             ],
             [
-                'no' => 6, 'kode' => '6.2', 'nama' => 'Sumber Informasi', 'kriteria' => 'Sarana, Prasarana & Keuangan', 'eu' => 3, 'bukti' => 5, 'kategori' => 'BOLEH SEBAGIAN',
+                'no' => 6, 'kode' => '6.2', 'nama' => 'Sumber Informasi', 'kriteria' => 'Sarana, Prasarana & Keuangan', 'eu' => 4, 'bukti' => 5, 'kategori' => 'BOLEH SEBAGIAN',
                 'simulasi' => $sarprasN->has('6.2') ? $sarprasN->get('6.2')->status : 'Tidak Memenuhi',
                 'pct_narasi' => $sarprasN->has('6.2') ? $sarprasN->get('6.2')->narasi_persen : 0,
                 'pct_bukti' => $sarprasN->has('6.2') ? $sarprasN->get('6.2')->bukti_persen : 0,
@@ -183,14 +184,14 @@ class MatriksController extends Controller
                 'pct_narasi' => $sarprasN->has('6.3') ? $sarprasN->get('6.3')->narasi_persen : 0,
                 'pct_bukti' => $sarprasN->has('6.3') ? $sarprasN->get('6.3')->bukti_persen : 0,
             ],
-            // K7 (1)
+            // K7 (1 Sub, 5 EU, 10 Bukti)
             [
                 'no' => 7, 'kode' => '7.1', 'nama' => 'Sistem Penjaminan Mutu', 'kriteria' => 'Penjaminan Mutu', 'eu' => 5, 'bukti' => 10, 'kategori' => 'WAJIB',
                 'simulasi' => $mutuN->has('7.1') ? $mutuN->get('7.1')->status : 'Tidak Memenuhi',
                 'pct_narasi' => $mutuN->has('7.1') ? $mutuN->get('7.1')->narasi_persen : 0,
                 'pct_bukti' => $mutuN->has('7.1') ? $mutuN->get('7.1')->bukti_persen : 0,
             ],
-            // K8 (3)
+            // K8 (3 Sub, 11 EU, 23 Bukti)
             [
                 'no' => 8, 'kode' => '8.1', 'nama' => 'Tata Kelola', 'kriteria' => 'Tata Kelola', 'eu' => 5, 'bukti' => 12, 'kategori' => 'WAJIB',
                 'simulasi' => $tatakelolaN->has('8.1') ? $tatakelolaN->get('8.1')->status : 'Tidak Memenuhi',

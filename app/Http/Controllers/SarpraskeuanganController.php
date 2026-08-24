@@ -28,7 +28,6 @@ class SarpraskeuanganController extends Controller
             ['user_id' => $userId]
         );
 
-        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
         foreach (['6.1', '6.2', '6.3'] as $subKode) {
             $this->updateBuktiPersen($sarpraskeuangan->id, $subKode);
         }
@@ -37,28 +36,76 @@ class SarpraskeuanganController extends Controller
             '6.1' => [
                 'nama' => 'Fasilitas Fisik untuk Pendidikan dan Pelatihan',
                 'is_wajib' => true,
+                'is_eu' => true,
+                'eus' => [
+                    '6.1_EU-1' => 'Ketersediaan, kecukupan, dan aksesibilitas sarana dan prasarana pembelajaran/laboratorium',
+                    '6.1_EU-2' => 'Pemeliharaan, keselamatan, dan keberlanjutan sarana prasarana',
+                ]
             ],
             '6.2' => [
                 'nama' => 'Sumber Informasi',
                 'is_wajib' => false,
+                'is_eu' => true,
+                'eus' => [
+                    '6.2_EU-1' => 'Ketersediaan dan aksesibilitas sumber pustaka (buku teks, jurnal nasional/internasional, e-library)',
+                    '6.2_EU-2' => 'Fasilitas dan infrastruktur teknologi informasi dan komunikasi (TIK) untuk pembelajaran',
+                    '6.2_EU-3' => 'Sistem informasi manajemen terintegrasi untuk layanan akademik & administrasi (SIAKAD/SIM)',
+                    '6.2_EU-4' => 'Pengelolaan, pemeliharaan, dan sistem keamanan infrastruktur TIK / data',
+                ]
             ],
             '6.3' => [
                 'nama' => 'Sumber Daya Keuangan',
                 'is_wajib' => false,
+                'is_eu' => true,
+                'eus' => [
+                    '6.3_EU-1' => 'Kebijakan, sistem, dan keberlanjutan alokasi anggaran operasional dan investasi',
+                    '6.3_EU-2' => 'Kecukupan dana untuk operasional pendidikan, penelitian, dan pengabdian masyarakat (Tridharma)',
+                    '6.3_EU-3' => 'Realisasi penggunaan dana dan efisiensi pengelolaan anggaran keuangan',
+                    '6.3_EU-4' => 'Akuntabilitas, pelaporan, audit keuangan internal dan eksternal',
+                ]
             ],
         ];
 
         foreach ($kriterias as $kode => $kriteria) {
             \App\Models\SarpraskeuanganNarasi::firstOrCreate(
                 ['sarpraskeuangan_id' => $sarpraskeuangan->id, 'kriteria_kode' => $kode],
-                ['status' => 'Belum Diisi']
+                ['kriteria_nama' => $kriteria['nama'], 'status' => 'Belum Diisi']
             );
+
+            if (!empty($kriteria['is_eu']) && !empty($kriteria['eus'])) {
+                foreach ($kriteria['eus'] as $euKode => $euNama) {
+                    \App\Models\SarpraskeuanganNarasi::firstOrCreate(
+                        ['sarpraskeuangan_id' => $sarpraskeuangan->id, 'kriteria_kode' => $euKode],
+                        ['kriteria_nama' => $euNama, 'status' => 'Draft']
+                    );
+                }
+            }
+        }
+
+        // Recalculate parent narasi persen and status for all sub-kriterias
+        foreach (array_keys($kriterias) as $parentKode) {
+            $allEUs = \App\Models\SarpraskeuanganNarasi::where('sarpraskeuangan_id', $sarpraskeuangan->id)
+                ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
+                ->get();
+            
+            $totalEU = $allEUs->count();
+            if ($totalEU > 0) {
+                $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
+                $narasiPersen = round(($lengkapEU / $totalEU) * 100);
+                $status = ($narasiPersen == 100) ? 'Memenuhi' : ($narasiPersen > 0 ? 'Memenuhi Sebagian' : 'Belum Memenuhi');
+
+                \App\Models\SarpraskeuanganNarasi::where('sarpraskeuangan_id', $sarpraskeuangan->id)
+                    ->where('kriteria_kode', $parentKode)
+                    ->update([
+                        'narasi_persen' => $narasiPersen,
+                        'status' => $status
+                    ]);
+            }
         }
 
         $narasis = $sarpraskeuangan->narasis()->get()->keyBy('kriteria_kode');
-        $subKriterias = $narasis;
+        $subKriterias = $narasis->filter(fn($n, $kode) => !str_contains($kode, '_EU'));
 
-        // Hitung persentase global
         $totalSub = $subKriterias->count();
         $pctNarasi = $totalSub > 0 ? (int) round($subKriterias->avg('narasi_persen')) : 0;
         $pctBukti = $totalSub > 0 ? (int) round($subKriterias->avg('bukti_persen')) : 0;
@@ -102,15 +149,36 @@ class SarpraskeuanganController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, $id)
+    public function update(SarpraskeuanganRequest $request, $id)
     {
         if ($request->has('type') && $request->type === 'narasi') {
             $narasi = \App\Models\SarpraskeuanganNarasi::findOrFail($id);
-            $narasi->update($request->validate([
-                'narasi' => 'nullable|string',
-                'status' => 'required|string',
-                'narasi_persen' => 'nullable|integer'
-            ]));
+            $data = $request->validated();
+
+            if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
+                $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
+            }
+
+            $narasi->update($data);
+
+            if (str_contains($narasi->kriteria_kode, '_EU')) {
+                $parentKode = explode('_', $narasi->kriteria_kode)[0];
+                $allEUs = \App\Models\SarpraskeuanganNarasi::where('sarpraskeuangan_id', $narasi->sarpraskeuangan_id)
+                    ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
+                    ->get();
+                
+                $totalEU = $allEUs->count();
+                $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
+                $narasiPersen = $totalEU > 0 ? round(($lengkapEU / $totalEU) * 100) : 0;
+                $status = ($narasiPersen == 100) ? 'Memenuhi' : ($narasiPersen > 0 ? 'Memenuhi Sebagian' : 'Belum Memenuhi');
+
+                \App\Models\SarpraskeuanganNarasi::where('sarpraskeuangan_id', $narasi->sarpraskeuangan_id)
+                    ->where('kriteria_kode', $parentKode)
+                    ->update([
+                        'narasi_persen' => $narasiPersen,
+                        'status' => $status
+                    ]);
+            }
 
             if ($request->ajax()) {
                 return response()->json(['success' => true, 'message' => 'Tersimpan']);
@@ -134,10 +202,15 @@ class SarpraskeuanganController extends Controller
                 'catatan' => $request->input('catatan', $bukti->catatan),
             ]);
 
-            $this->updateBuktiPersen($bukti->sarpraskeuangan_id, $bukti->kriteria_kode);
+            $newPct = $this->updateBuktiPersen($bukti->sarpraskeuangan_id, $bukti->kriteria_kode);
 
             if ($request->ajax()) {
-                return response()->json(['success' => true, 'message' => 'Berhasil diperbarui.']);
+                return response()->json([
+                    'success' => true, 
+                    'message' => 'Berhasil diperbarui.',
+                    'pctBukti' => $newPct,
+                    'kriteria_kode' => $bukti->kriteria_kode
+                ]);
             }
 
             Alert::success('Berhasil!', 'Bukti pendukung berhasil diperbarui.')
@@ -180,5 +253,7 @@ class SarpraskeuanganController extends Controller
         \App\Models\SarpraskeuanganNarasi::where('sarpraskeuangan_id', $sarpraskeuangan_id)
             ->where('kriteria_kode', $kriteria_kode)
             ->update(['bukti_persen' => $newPctBukti]);
+
+        return $newPctBukti;
     }
 }

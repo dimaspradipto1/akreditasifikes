@@ -28,7 +28,6 @@ class MutuController extends Controller
             ['user_id' => $userId]
         );
 
-        // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
         $this->updateBuktiPersen($mutu->id, '7.1');
 
         $kriterias = [
@@ -62,12 +61,9 @@ class MutuController extends Controller
             }
         }
 
-        // Default Buktis removed per user request
-
         $narasis = $mutu->narasis()->get()->keyBy('kriteria_kode');
         $subKriterias = $narasis->filter(fn($n) => !str_contains($n->kriteria_kode, '_EU'));
 
-        // Hitung persentase global
         $totalSub = $subKriterias->count();
         $pctNarasi = $totalSub > 0 ? (int) round($subKriterias->avg('narasi_persen')) : 0;
         $pctBukti = $totalSub > 0 ? (int) round($subKriterias->avg('bukti_persen')) : 0;
@@ -111,14 +107,11 @@ class MutuController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, $id)
+    public function update(MutuRequest $request, $id)
     {
         if ($request->has('type') && $request->type === 'narasi') {
             $narasi = \App\Models\MutuNarasi::findOrFail($id);
-            $data = $request->validate([
-                'status' => 'required|string',
-                'narasi' => 'nullable|string'
-            ]);
+            $data = $request->validated();
 
             if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
                 $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
@@ -126,9 +119,8 @@ class MutuController extends Controller
 
             $narasi->update($data);
 
-            // Jika ini adalah EU, update rata-rata narasi_persen ke parent
             if (str_contains($narasi->kriteria_kode, '_EU')) {
-                $parentKode = explode('_EU', $narasi->kriteria_kode)[0];
+                $parentKode = explode('_', $narasi->kriteria_kode)[0];
                 $parent = \App\Models\MutuNarasi::where('mutu_id', $narasi->mutu_id)
                     ->where('kriteria_kode', $parentKode)
                     ->first();

@@ -37,7 +37,7 @@ class MahasiswaController extends Controller
         );
 
         // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
-        foreach (['4.1', '4.2', '4.3'] as $subKode) {
+        foreach (['4.1', '4.2', '4.3', '4.4'] as $subKode) {
             $this->updateBuktiPersen($mahasiswa->id, $subKode);
         }
 
@@ -48,9 +48,13 @@ class MahasiswaController extends Controller
                 'is_wajib' => true,
                 'is_eu' => true,
                 'eus' => [
-                    '4.1_EU1' => 'Kebijakan seleksi mahasiswa baru',
-                    '4.1_EU2' => 'Rasio pendaftar terhadap daya tampung',
-                    '4.1_EU3' => 'Transparansi prosedur penerimaan'
+                    '4.1_EU-1' => 'Kebijakan & pedoman sistem seleksi penerimaan mahasiswa baru',
+                    '4.1_EU-2' => 'Kriteria dan instrumen seleksi (akademik, non-akademik, kesehatan)',
+                    '4.1_EU-3' => 'Rasio pendaftar terhadap daya tampung (selektivitas)',
+                    '4.1_EU-4' => 'Transparansi, akuntabilitas, dan sosialisasi sistem seleksi',
+                    '4.1_EU-5' => 'Kebijakan penerimaan mahasiswa afirmasi/berkebutuhan khusus/3T',
+                    '4.1_EU-6' => 'Evaluasi & tindak lanjut efektivitas mekanisme seleksi',
+                    '4.1_EU-7' => 'Layanan informasi, registrasi & orientasi mahasiswa baru (PKKMB)'
                 ]
             ],
             '4.2' => [
@@ -85,11 +89,11 @@ class MahasiswaController extends Controller
                 'is_wajib' => true,
                 'is_eu' => true,
                 'eus' => [
-                    '4.4_EU-1' => 'Kebijakan keselamatan & K3 kampus',
-                    '4.4_EU-2' => 'Prosedur tanggap darurat',
-                    '4.4_EU-3' => 'Penanganan kekerasan/PPKS',
-                    '4.4_EU-4' => 'Layanan medis darurat',
-                    '4.4_EU-5' => 'Keamanan lingkungan kampus'
+                    '4.4_EU-1' => 'Kebijakan keselamatan mahasiswa',
+                    '4.4_EU-2' => 'Identifikasi & pengelolaan risiko',
+                    '4.4_EU-3' => 'Edukasi keselamatan mahasiswa',
+                    '4.4_EU-4' => 'Pelaporan insiden',
+                    '4.4_EU-5' => 'Keselamatan luar kampus'
                 ]
             ],
         ];

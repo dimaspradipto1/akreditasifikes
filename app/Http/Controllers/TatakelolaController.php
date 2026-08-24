@@ -29,7 +29,7 @@ class TatakelolaController extends Controller
         );
 
         // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
-        $this->updateBuktiPersen($tatakelola->id, '8.1');
+        foreach (['8.1', '8.2', '8.3'] as $subKode) { $this->updateBuktiPersen($tatakelola->id, $subKode); }
 
         $kriterias = [
             '8.1' => [

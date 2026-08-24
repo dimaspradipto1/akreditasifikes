@@ -91,7 +91,7 @@ class PenilaianController extends Controller
         $totalSub = $subKriterias->count();
         $pctNarasi = $totalSub > 0 ? (int) round($subKriterias->avg('narasi_persen')) : 0;
 
-        $pctBukti = $totalSub > 0 ? (int) round($narasis->avg('bukti_persen')) : 0;
+        $pctBukti = $totalSub > 0 ? (int) round($subKriterias->avg('bukti_persen')) : 0;
 
         return view('pages.penilaian.index', compact(
             'penilaian',

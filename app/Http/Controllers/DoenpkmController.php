@@ -28,7 +28,7 @@ class DoenpkmController extends Controller
         );
 
         // Always recalculate bukti percentage on page load to keep it dynamic and synchronized
-        foreach (['5.1', '5.2', '5.3'] as $subKode) {
+        foreach (['5.1', '5.2', '5.3', '5.4', '5.5', '5.6'] as $subKode) {
             $this->updateBuktiPersen($doenpkm->id, $subKode);
         }
 
