@@ -99,7 +99,9 @@ class MahasiswaController extends Controller
         ];
 
         // Ensure narasis exist for each sub-criteria and EU
+        $allValidCodes = [];
         foreach ($kriterias as $kode => $kriteria) {
+            $allValidCodes[] = $kode;
             \App\Models\MahasiswaNarasi::firstOrCreate(
                 ['mahasiswa_id' => $mahasiswa->id, 'kriteria_kode' => $kode],
                 ['kriteria_nama' => $kriteria['nama'], 'status' => 'Belum Diisi']
@@ -107,6 +109,7 @@ class MahasiswaController extends Controller
 
             if ($kriteria['is_eu']) {
                 foreach ($kriteria['eus'] as $euKode => $euNama) {
+                    $allValidCodes[] = $euKode;
                     \App\Models\MahasiswaNarasi::firstOrCreate(
                         ['mahasiswa_id' => $mahasiswa->id, 'kriteria_kode' => $euKode],
                         ['kriteria_nama' => $euNama, 'status' => 'Draft']
@@ -114,6 +117,9 @@ class MahasiswaController extends Controller
                 }
             }
         }
+
+        // Cleanup obsolete/duplicate EU codes not in $kriterias (e.g. legacy 4.1_EU1, 4.1_EU2, 4.1_EU3)
+        $mahasiswa->narasis()->whereNotIn('kriteria_kode', $allValidCodes)->delete();
 
 
         // Recalculate parent narasi persen and status for all sub-kriterias from EUs
