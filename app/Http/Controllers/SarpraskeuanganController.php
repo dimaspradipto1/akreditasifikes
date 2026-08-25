@@ -69,14 +69,14 @@ class SarpraskeuanganController extends Controller
         foreach ($kriterias as $kode => $kriteria) {
             \App\Models\SarpraskeuanganNarasi::firstOrCreate(
                 ['sarpraskeuangan_id' => $sarpraskeuangan->id, 'kriteria_kode' => $kode],
-                ['kriteria_nama' => $kriteria['nama'], 'status' => 'Belum Diisi']
+                ['status' => 'Belum Diisi']
             );
 
             if (!empty($kriteria['is_eu']) && !empty($kriteria['eus'])) {
                 foreach ($kriteria['eus'] as $euKode => $euNama) {
                     \App\Models\SarpraskeuanganNarasi::firstOrCreate(
                         ['sarpraskeuangan_id' => $sarpraskeuangan->id, 'kriteria_kode' => $euKode],
-                        ['kriteria_nama' => $euNama, 'status' => 'Draft']
+                        ['status' => 'Draft']
                     );
                 }
             }
@@ -104,6 +104,27 @@ class SarpraskeuanganController extends Controller
         }
 
         $narasis = $sarpraskeuangan->narasis()->get()->keyBy('kriteria_kode');
+
+        foreach ($narasis as $kode => $narasi) {
+            if (str_contains($kode, '_EU')) {
+                $parentKode = explode('_', $kode)[0];
+                $narasi->kriteria_nama = $kriterias[$parentKode]['eus'][$kode] ?? '';
+            } else {
+                $narasi->kriteria_nama = $kriterias[$kode]['nama'] ?? '';
+            }
+
+            $decoded = json_decode($narasi->narasi_text, true);
+            if (is_array($decoded)) {
+                $narasi->kondisi_saat_ini = $decoded['kondisi_saat_ini'] ?? '';
+                $narasi->data_fakta = $decoded['data_fakta'] ?? '';
+                $narasi->analisis = $decoded['analisis'] ?? '';
+            } else {
+                $narasi->kondisi_saat_ini = $narasi->narasi_text;
+                $narasi->data_fakta = '';
+                $narasi->analisis = '';
+            }
+        }
+
         $subKriterias = $narasis->filter(fn($n, $kode) => !str_contains($kode, '_EU'));
 
         $totalSub = $subKriterias->count();
@@ -154,6 +175,14 @@ class SarpraskeuanganController extends Controller
         if ($request->has('type') && $request->type === 'narasi') {
             $narasi = \App\Models\SarpraskeuanganNarasi::findOrFail($id);
             $data = $request->validated();
+
+            $narasi_text = [
+                'kondisi_saat_ini' => $data['kondisi_saat_ini'] ?? '',
+                'data_fakta' => $data['data_fakta'] ?? '',
+                'analisis' => $data['analisis'] ?? '',
+            ];
+            $data['narasi_text'] = json_encode($narasi_text);
+            unset($data['kondisi_saat_ini'], $data['data_fakta'], $data['analisis']);
 
             if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
                 $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;

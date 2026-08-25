@@ -22,11 +22,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('sarpraskeuangan_id')->constrained('sarpraskeuangans')->cascadeOnDelete();
             $table->string('kriteria_kode', 10);
-            $table->string('kriteria_nama')->nullable();
             $table->text('narasi_text')->nullable();
-            $table->text('kondisi_saat_ini')->nullable();
-            $table->text('data_fakta')->nullable();
-            $table->text('analisis')->nullable();
             $table->integer('narasi_persen')->default(0);
             $table->integer('bukti_persen')->default(0);
             $table->string('status', 20)->default('Belum Diisi'); // Memenuhi, Memenuhi Sebagian, Belum Memenuhi, Lengkap, dll
