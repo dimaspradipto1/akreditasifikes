@@ -31,20 +31,20 @@ class ReportController extends Controller
     {
         $k1_narasi = \Illuminate\Support\Facades\DB::table('vmts_narasis')->avg('narasi_persen') ?? 0;
         $k1_bukti = \Illuminate\Support\Facades\DB::table('vmts_narasis')->avg('bukti_persen') ?? 0;
-        $k2_narasi = \Illuminate\Support\Facades\DB::table('kurikulum_narasis')->avg('narasi_persen') ?? 0;
-        $k2_bukti = \Illuminate\Support\Facades\DB::table('kurikulum_narasis')->avg('bukti_persen') ?? 0;
-        $k3_narasi = \Illuminate\Support\Facades\DB::table('penilaian_narasis')->avg('narasi_persen') ?? 0;
-        $k3_bukti = \Illuminate\Support\Facades\DB::table('penilaian_narasis')->avg('bukti_persen') ?? 0;
-        $k4_narasi = \Illuminate\Support\Facades\DB::table('mahasiswa_narasis')->avg('narasi_persen') ?? 0;
-        $k4_bukti = \Illuminate\Support\Facades\DB::table('mahasiswa_narasis')->avg('bukti_persen') ?? 0;
+        $k2_narasi = \Illuminate\Support\Facades\DB::table('kurikulum_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k2_bukti = \Illuminate\Support\Facades\DB::table('kurikulum_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        $k3_narasi = \Illuminate\Support\Facades\DB::table('penilaian_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k3_bukti = \Illuminate\Support\Facades\DB::table('penilaian_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        $k4_narasi = \Illuminate\Support\Facades\DB::table('mahasiswa_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k4_bukti = \Illuminate\Support\Facades\DB::table('mahasiswa_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
         $k5_narasi = \Illuminate\Support\Facades\DB::table('doenpkm_narasis')->avg('narasi_persen') ?? 0;
         $k5_bukti = \Illuminate\Support\Facades\DB::table('doenpkm_narasis')->avg('bukti_persen') ?? 0;
-        $k6_narasi = \Illuminate\Support\Facades\DB::table('sarpraskeuangan_narasis')->avg('narasi_persen') ?? 0;
-        $k6_bukti = \Illuminate\Support\Facades\DB::table('sarpraskeuangan_narasis')->avg('bukti_persen') ?? 0;
-        $k7_narasi = \Illuminate\Support\Facades\DB::table('mutu_narasis')->avg('narasi_persen') ?? 0;
-        $k7_bukti = \Illuminate\Support\Facades\DB::table('mutu_narasis')->avg('bukti_persen') ?? 0;
-        $k8_narasi = \Illuminate\Support\Facades\DB::table('tatakelola_narasis')->avg('narasi_persen') ?? 0;
-        $k8_bukti = \Illuminate\Support\Facades\DB::table('tatakelola_narasis')->avg('bukti_persen') ?? 0;
+        $k6_narasi = \Illuminate\Support\Facades\DB::table('sarpraskeuangan_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k6_bukti = \Illuminate\Support\Facades\DB::table('sarpraskeuangan_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        $k7_narasi = \Illuminate\Support\Facades\DB::table('mutu_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k7_bukti = \Illuminate\Support\Facades\DB::table('mutu_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        $k8_narasi = \Illuminate\Support\Facades\DB::table('tatakelola_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k8_bukti = \Illuminate\Support\Facades\DB::table('tatakelola_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
 
         $kriterias_data = [
             ['id' => 'K1', 'name' => 'Visi, Misi, Tujuan & Strategi', 'skor' => ($k1_narasi + $k1_bukti) / 2],

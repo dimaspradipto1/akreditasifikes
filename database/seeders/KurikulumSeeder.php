@@ -66,25 +66,6 @@ class KurikulumSeeder extends Seeder
                 'status' => 'Memenuhi',
             ]);
         }
-        
-        $subKriteria = [
-            '2.5', '2.6', '2.7', '2.8'
-        ];
-        
-        foreach ($subKriteria as $kode) {
-            KurikulumNarasi::updateOrCreate([
-                'kurikulum_id' => $kurikulum->id,
-                'kriteria_kode' => $kode,
-            ], [
-                'kriteria_nama' => 'Sub-kriteria ' . $kode,
-                'kondisi_saat_ini' => 'Kondisi saat ini berjalan dengan baik.',
-                'data_fakta' => 'Data tersedia.',
-                'analisis' => 'Capaian sudah memenuhi.',
-                'permasalahan' => 'Tidak ada.',
-                'rencana_perbaikan' => 'Evaluasi rutin.',
-                'status' => 'Memenuhi',
-            ]);
-        }
 
         // Buat data Bukti Pendukung (Bagian B)
         $buktis = [

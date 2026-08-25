@@ -170,8 +170,32 @@ class DokumenBersamaController extends Controller
     public function destroy($id)
     {
         $dokumenBersama = \App\Models\DokumenBersama::findOrFail($id);
+        $oldNama = $dokumenBersama->nama_dokumen;
         $dokumenBersama->delete();
+
+        // Force autoloader to load files containing multiple classes
+        class_exists(\App\Models\Vmts::class);
+        class_exists(\App\Models\Kurikulum::class);
+        class_exists(\App\Models\Penilaian::class);
+        class_exists(\App\Models\Mahasiswa::class);
+        class_exists(\App\Models\Doenpkm::class);
+        class_exists(\App\Models\Sarpraskeuangan::class);
+        class_exists(\App\Models\Mutu::class);
+        class_exists(\App\Models\Tatakelola::class);
+
+        $deleteBuktis = function($buktiClass) use ($oldNama) {
+            $buktiClass::where('nama_bukti', '=', $oldNama)->delete();
+        };
+
+        $deleteBuktis(VmtsBukti::class);
+        $deleteBuktis(KurikulumBukti::class);
+        $deleteBuktis(PenilaianBukti::class);
+        $deleteBuktis(MahasiswaBukti::class);
+        $deleteBuktis(DoenpkmBukti::class);
+        $deleteBuktis(SarpraskeuanganBukti::class);
+        $deleteBuktis(MutuBukti::class);
+        $deleteBuktis(TatakelolaBukti::class);
         
-        return redirect()->back()->with('success', 'Dokumen berhasil dihapus!');
+        return redirect()->back()->with('success', 'Dokumen bersama dan bukti terkait berhasil dihapus!');
     }
 }

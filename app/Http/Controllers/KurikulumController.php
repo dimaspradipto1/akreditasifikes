@@ -63,6 +63,11 @@ class KurikulumController extends Controller
             '2.4_EU-3' => 'Suasana akademik (seminar/kuliah tamu ≥ 2x/semester)',
         ];
 
+        // Clean up any non-standard sub-kriteria (e.g. 2.5-2.8)
+        KurikulumNarasi::where('kurikulum_id', $kurikulum->id)
+            ->whereNotIn('kriteria_kode', array_keys($elements))
+            ->delete();
+
         foreach ($elements as $kode => $nama) {
             $status = str_contains($kode, 'EU') ? 'Draft' : 'Belum Memenuhi';
             KurikulumNarasi::firstOrCreate(
@@ -71,14 +76,34 @@ class KurikulumController extends Controller
             );
         }
 
+        // Recalculate parent sub-kriterias (2.1-2.4) narasi_persen and status from EUs
+        foreach (['2.1', '2.2', '2.3', '2.4'] as $parentKode) {
+            $allEUs = $kurikulum->narasis()
+                ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
+                ->get();
+            
+            $totalEU = $allEUs->count();
+            if ($totalEU > 0) {
+                $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
+                $narasiPersen = (int) round(($lengkapEU / $totalEU) * 100);
+                $status = ($narasiPersen == 100) ? 'Memenuhi' : ($narasiPersen > 0 ? 'Memenuhi Sebagian' : 'Belum Memenuhi');
+
+                $kurikulum->narasis()
+                    ->where('kriteria_kode', $parentKode)
+                    ->update([
+                        'narasi_persen' => $narasiPersen,
+                        'status' => $status
+                    ]);
+            }
+        }
+
         $narasis = $kurikulum->narasis()->get()->keyBy('kriteria_kode');
         $subKriterias = $narasis->filter(fn($n) => !str_contains($n->kriteria_kode, '_EU'));
 
-        // Kalkulasi persentase kelengkapan
-        $totalNarasi = $narasis->count();
-        $pctNarasi = $totalNarasi > 0 ? (int) round($narasis->avg('narasi_persen')) : 0;
-
-        $pctBukti = $totalNarasi > 0 ? (int) round($narasis->avg('bukti_persen')) : 0;
+        // Kalkulasi persentase kelengkapan berdasarkan 4 sub-kriteria
+        $totalSub = $subKriterias->count();
+        $pctNarasi = $totalSub > 0 ? (int) round($subKriterias->avg('narasi_persen')) : 0;
+        $pctBukti = $totalSub > 0 ? (int) round($subKriterias->avg('bukti_persen')) : 0;
 
         // Render index page without DataTable
         return view('pages.kurikulum.index', compact('kurikulum', 'narasis', 'subKriterias', 'pctNarasi', 'pctBukti'));

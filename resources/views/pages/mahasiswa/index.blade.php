@@ -286,11 +286,6 @@
                             </div>
                             @endforeach
                         </div>
-                        @if($hiddenEuCount > 0)
-                        <div class="mb-5 text-muted" style="font-size: 0.8rem; font-style: italic; margin-top: -2rem;">
-                            + {{ $hiddenEuCount }} Elemen Utama lain pada sub-kriteria ini — lihat Tracker Terpusat untuk rincian lengkap.
-                        </div>
-                        @endif
 
 
                     @else

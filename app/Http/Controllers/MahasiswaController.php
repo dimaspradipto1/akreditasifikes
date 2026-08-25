@@ -116,6 +116,27 @@ class MahasiswaController extends Controller
         }
 
 
+        // Recalculate parent narasi persen and status for all sub-kriterias from EUs
+        foreach (array_keys($kriterias) as $parentKode) {
+            $allEUs = $mahasiswa->narasis()
+                ->where('kriteria_kode', 'LIKE', $parentKode . '_EU%')
+                ->get();
+            
+            $totalEU = $allEUs->count();
+            if ($totalEU > 0) {
+                $lengkapEU = $allEUs->where('status', 'Lengkap')->count();
+                $narasiPersen = round(($lengkapEU / $totalEU) * 100);
+                $status = ($narasiPersen == 100) ? 'Memenuhi' : ($narasiPersen > 0 ? 'Memenuhi Sebagian' : 'Belum Memenuhi');
+
+                $mahasiswa->narasis()
+                    ->where('kriteria_kode', $parentKode)
+                    ->update([
+                        'narasi_persen' => $narasiPersen,
+                        'status' => $status
+                    ]);
+            }
+        }
+
         $narasis = $mahasiswa->narasis()->get()->keyBy('kriteria_kode');
         
         // Data sub-kriterias (4.1, 4.2, 4.3, 4.4)

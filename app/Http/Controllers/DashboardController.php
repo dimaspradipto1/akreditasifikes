@@ -27,26 +27,26 @@ class DashboardController extends Controller
         $k1_narasi = DB::table('vmts_narasis')->avg('narasi_persen') ?? 0;
         $k1_bukti = DB::table('vmts_narasis')->avg('bukti_persen') ?? 0;
         
-        $k2_narasi = DB::table('kurikulum_narasis')->avg('narasi_persen') ?? 0;
-        $k2_bukti = DB::table('kurikulum_narasis')->avg('bukti_persen') ?? 0;
+        $k2_narasi = DB::table('kurikulum_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k2_bukti = DB::table('kurikulum_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
         
-        $k3_narasi = DB::table('penilaian_narasis')->avg('narasi_persen') ?? 0;
-        $k3_bukti = DB::table('penilaian_narasis')->avg('bukti_persen') ?? 0;
+        $k3_narasi = DB::table('penilaian_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k3_bukti = DB::table('penilaian_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
         
-        $k4_narasi = DB::table('mahasiswa_narasis')->avg('narasi_persen') ?? 0;
-        $k4_bukti = DB::table('mahasiswa_narasis')->avg('bukti_persen') ?? 0;
+        $k4_narasi = DB::table('mahasiswa_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k4_bukti = DB::table('mahasiswa_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
         
         $k5_narasi = DB::table('doenpkm_narasis')->avg('narasi_persen') ?? 0;
         $k5_bukti = DB::table('doenpkm_narasis')->avg('bukti_persen') ?? 0;
         
-        $k6_narasi = DB::table('sarpraskeuangan_narasis')->avg('narasi_persen') ?? 0;
-        $k6_bukti = DB::table('sarpraskeuangan_narasis')->avg('bukti_persen') ?? 0;
+        $k6_narasi = DB::table('sarpraskeuangan_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k6_bukti = DB::table('sarpraskeuangan_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
         
-        $k7_narasi = DB::table('mutu_narasis')->avg('narasi_persen') ?? 0;
-        $k7_bukti = DB::table('mutu_narasis')->avg('bukti_persen') ?? 0;
+        $k7_narasi = DB::table('mutu_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k7_bukti = DB::table('mutu_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
         
-        $k8_narasi = DB::table('tatakelola_narasis')->avg('narasi_persen') ?? 0;
-        $k8_bukti = DB::table('tatakelola_narasis')->avg('bukti_persen') ?? 0;
+        $k8_narasi = DB::table('tatakelola_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
+        $k8_bukti = DB::table('tatakelola_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
 
         $kriteria_stats = [
             'K1' => ['nama' => 'Visi, Misi, Tujuan & Strategi', 'narasi' => round($k1_narasi), 'bukti' => round($k1_bukti)],
