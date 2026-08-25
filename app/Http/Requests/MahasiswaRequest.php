@@ -22,27 +22,47 @@ class MahasiswaRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            // Narasi rules
-            'kondisi_saat_ini' => 'nullable|string',
-            'data_fakta' => 'nullable|string',
-            'analisis' => 'nullable|string',
-            'permasalahan' => 'nullable|string',
-            'rencana_perbaikan' => 'nullable|string',
-            'status' => 'nullable|in:Memenuhi,Memenuhi Sebagian,Belum Memenuhi,Lengkap,Draft,Belum Diisi',
-            'narasi_persen' => 'nullable|integer|min:0|max:100',
-            'bukti_persen' => 'nullable|integer|min:0|max:100',
+        if ($this->input('type') === 'narasi') {
+            return [
+                'kondisi_saat_ini' => 'nullable|string',
+                'data_fakta' => 'nullable|string',
+                'analisis' => 'nullable|string',
+                'permasalahan' => 'nullable|string',
+                'rencana_perbaikan' => 'nullable|string',
+                'status' => 'nullable|in:Memenuhi,Memenuhi Sebagian,Belum Memenuhi,Lengkap,Draft,Belum Diisi',
+                'narasi_persen' => 'nullable|integer|min:0|max:100',
+                'bukti_persen' => 'nullable|integer|min:0|max:100',
+            ];
+        }
 
-            // Bukti rules (when storing/updating)
-            'mahasiswa_id' => 'sometimes|required|exists:mahasiswas,id',
-            'kriteria_kode' => 'sometimes|required|string',
-            'nama_bukti' => 'sometimes|required|string|max:255',
-            'level' => 'sometimes|required|in:PRODI,FIKES,UNIV',
-            'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
-            'link' => 'nullable|string|max:255',
-            'pic' => 'nullable|string|max:255',
-            'deadline' => 'nullable|date',
-            'catatan' => 'nullable|string',
-        ];
+        if ($this->input('type') === 'bukti') {
+            if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+                return [
+                    'nama_bukti' => 'sometimes|required|string|max:255',
+                    'level' => 'sometimes|required|in:PRODI,FIKES,UNIV',
+                    'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                    'status' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                    'link' => 'nullable|string|max:255',
+                    'pic' => 'nullable|string|max:255',
+                    'deadline' => 'nullable|date',
+                    'catatan' => 'nullable|string',
+                ];
+            }
+
+            return [
+                'mahasiswa_id' => 'required|exists:mahasiswas,id',
+                'kriteria_kode' => 'required|string',
+                'nama_bukti' => 'required|string|max:255',
+                'level' => 'required|in:PRODI,FIKES,UNIV',
+                'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                'status' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                'link' => 'nullable|string|max:255',
+                'pic' => 'nullable|string|max:255',
+                'deadline' => 'nullable|date',
+                'catatan' => 'nullable|string',
+            ];
+        }
+
+        return [];
     }
 }

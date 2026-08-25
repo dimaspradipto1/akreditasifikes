@@ -14,25 +14,47 @@ class MutuRequest extends FormRequest
 
     public function rules(): array
     {
-        return [
-            'type' => 'nullable|string',
-            'kondisi_saat_ini' => 'nullable|string',
-            'data_fakta' => 'nullable|string',
-            'analisis' => 'nullable|string',
-            'permasalahan' => 'nullable|string',
-            'rencana_perbaikan' => 'nullable|string',
-            'status' => 'sometimes|required|in:Memenuhi,Memenuhi Sebagian,Belum Memenuhi,Lengkap,Draft,Belum Diisi',
-            'narasi_persen' => 'nullable|integer|min:0|max:100',
-            'bukti_persen' => 'nullable|integer|min:0|max:100',
-            'mutu_id' => 'sometimes|required|exists:mutus,id',
-            'kriteria_kode' => 'sometimes|required|string',
-            'nama_bukti' => 'sometimes|required|string|max:255',
-            'level' => 'sometimes|required|in:PRODI,FIKES,UNIV',
-            'status_bukti' => 'sometimes|required|in:Tersedia,Tidak Ada,Belum Memenuhi',
-            'link' => 'nullable|string',
-            'pic' => 'nullable|string|max:255',
-            'deadline' => 'nullable|date',
-            'catatan' => 'nullable|string'
-        ];
+        if ($this->input('type') === 'narasi') {
+            return [
+                'kondisi_saat_ini' => 'nullable|string',
+                'data_fakta' => 'nullable|string',
+                'analisis' => 'nullable|string',
+                'permasalahan' => 'nullable|string',
+                'rencana_perbaikan' => 'nullable|string',
+                'status' => 'sometimes|required|in:Memenuhi,Memenuhi Sebagian,Belum Memenuhi,Lengkap,Draft,Belum Diisi',
+                'narasi_persen' => 'nullable|integer|min:0|max:100',
+                'bukti_persen' => 'nullable|integer|min:0|max:100',
+            ];
+        }
+
+        if ($this->input('type') === 'bukti') {
+            if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+                return [
+                    'nama_bukti' => 'sometimes|required|string|max:255',
+                    'level' => 'sometimes|required|in:PRODI,FIKES,UNIV',
+                    'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                    'status' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                    'link' => 'nullable|string',
+                    'pic' => 'nullable|string|max:255',
+                    'deadline' => 'nullable|date',
+                    'catatan' => 'nullable|string'
+                ];
+            }
+
+            return [
+                'mutu_id' => 'required|exists:mutus,id',
+                'kriteria_kode' => 'required|string',
+                'nama_bukti' => 'required|string|max:255',
+                'level' => 'required|in:PRODI,FIKES,UNIV',
+                'status_bukti' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                'status' => 'sometimes|in:Tersedia,Tidak Ada,Belum Memenuhi',
+                'link' => 'nullable|string',
+                'pic' => 'nullable|string|max:255',
+                'deadline' => 'nullable|date',
+                'catatan' => 'nullable|string'
+            ];
+        }
+
+        return [];
     }
 }

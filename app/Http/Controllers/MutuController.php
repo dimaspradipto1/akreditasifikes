@@ -90,7 +90,7 @@ class MutuController extends Controller
                 'kriteria_kode' => $kriteria_kode,
                 'nama_bukti' => $request->input('nama_bukti'),
                 'level' => $request->input('level'),
-                'status' => $request->input('status_bukti'),
+                'status' => $request->input('status_bukti') ?? $request->input('status', 'Tidak Ada'),
                 'link' => $request->input('link'),
                 'pic' => $request->input('pic'),
                 'deadline' => $request->input('deadline'),
@@ -112,6 +112,7 @@ class MutuController extends Controller
         if ($request->has('type') && $request->type === 'narasi') {
             $narasi = \App\Models\MutuNarasi::findOrFail($id);
             $data = $request->validated();
+            unset($data['type']);
 
             if (str_contains($narasi->kriteria_kode, '_EU') && isset($data['status'])) {
                 $data['narasi_persen'] = $data['status'] === 'Lengkap' ? 100 : 0;
@@ -156,10 +157,11 @@ class MutuController extends Controller
         if ($request->has('type') && $request->type === 'bukti') {
             $bukti = \App\Models\MutuBukti::findOrFail($id);
             
+            $status = $request->input('status_bukti') ?? $request->input('status', $bukti->status);
             $bukti->update([
                 'nama_bukti' => $request->input('nama_bukti', $bukti->nama_bukti),
                 'level' => $request->input('level', $bukti->level),
-                'status' => $request->input('status_bukti', $bukti->status),
+                'status' => $status,
                 'link' => $request->input('link', $bukti->link),
                 'pic' => $request->input('pic', $bukti->pic),
                 'deadline' => $request->input('deadline', $bukti->deadline),

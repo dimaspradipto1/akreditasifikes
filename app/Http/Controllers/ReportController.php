@@ -230,76 +230,52 @@ class ReportController extends Controller
         };
 
         // K1 - VMTS
-        $vmts = Vmts::where('user_id', '=', $userId)->first();
-        if ($vmts) {
-            $buktis = VmtsBukti::where('vmts_id', '=', $vmts->id)->get()->map(function($b) use ($extractSubK) {
-                return (object)['kriteria' => 'K1', 'sub_k' => $extractSubK($b->elemen_kode ?? $b->kriteria_kode ?? ''), 'kode_eu' => $b->elemen_kode ?? $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
-            });
-            $allBukti = $allBukti->merge($buktis);
-        }
+        $buktis = VmtsBukti::all()->map(function($b) use ($extractSubK) {
+            return (object)['kriteria' => 'K1', 'sub_k' => $extractSubK($b->elemen_kode ?? $b->kriteria_kode ?? ''), 'kode_eu' => $b->elemen_kode ?? $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
+        });
+        $allBukti = $allBukti->merge($buktis);
 
         // K2 - Kurikulum
-        $kurikulum = Kurikulum::where('user_id', '=', $userId)->first();
-        if ($kurikulum) {
-            $buktis = KurikulumBukti::where('kurikulum_id', '=', $kurikulum->id)->get()->map(function($b) use ($extractSubK) {
-                return (object)['kriteria' => 'K2', 'sub_k' => $extractSubK($b->kriteria_kode ?? $b->elemen_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? $b->elemen_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
-            });
-            $allBukti = $allBukti->merge($buktis);
-        }
+        $buktis = KurikulumBukti::all()->map(function($b) use ($extractSubK) {
+            return (object)['kriteria' => 'K2', 'sub_k' => $extractSubK($b->kriteria_kode ?? $b->elemen_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? $b->elemen_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
+        });
+        $allBukti = $allBukti->merge($buktis);
 
         // K3 - Penilaian
-        $penilaian = Penilaian::where('user_id', '=', $userId)->first();
-        if ($penilaian) {
-            $buktis = PenilaianBukti::where('penilaian_id', '=', $penilaian->id)->get()->map(function($b) use ($extractSubK) {
-                return (object)['kriteria' => 'K3', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
-            });
-            $allBukti = $allBukti->merge($buktis);
-        }
+        $buktis = PenilaianBukti::all()->map(function($b) use ($extractSubK) {
+            return (object)['kriteria' => 'K3', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
+        });
+        $allBukti = $allBukti->merge($buktis);
 
         // K4 - Mahasiswa
-        $mahasiswa = Mahasiswa::where('user_id', '=', $userId)->first();
-        if ($mahasiswa) {
-            $buktis = MahasiswaBukti::where('mahasiswa_id', '=', $mahasiswa->id)->get()->map(function($b) use ($extractSubK) {
-                return (object)['kriteria' => 'K4', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
-            });
-            $allBukti = $allBukti->merge($buktis);
-        }
+        $buktis = MahasiswaBukti::all()->map(function($b) use ($extractSubK) {
+            return (object)['kriteria' => 'K4', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
+        });
+        $allBukti = $allBukti->merge($buktis);
 
         // K5 - Doenpkm
-        $doenpkm = Doenpkm::where('user_id', '=', $userId)->first();
-        if ($doenpkm) {
-            $buktis = DoenpkmBukti::where('doenpkm_id', '=', $doenpkm->id)->get()->map(function($b) use ($extractSubK) {
-                return (object)['kriteria' => 'K5', 'sub_k' => $extractSubK($b->elemen_kode ?? $b->kriteria_kode ?? ''), 'kode_eu' => $b->elemen_kode ?? $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
-            });
-            $allBukti = $allBukti->merge($buktis);
-        }
+        $buktis = DoenpkmBukti::all()->map(function($b) use ($extractSubK) {
+            return (object)['kriteria' => 'K5', 'sub_k' => $extractSubK($b->elemen_kode ?? $b->kriteria_kode ?? ''), 'kode_eu' => $b->elemen_kode ?? $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
+        });
+        $allBukti = $allBukti->merge($buktis);
 
         // K6 - Sarpraskeuangan
-        $sarpras = Sarpraskeuangan::where('user_id', '=', $userId)->first();
-        if ($sarpras) {
-            $buktis = SarpraskeuanganBukti::where('sarpraskeuangan_id', '=', $sarpras->id)->get()->map(function($b) use ($extractSubK) {
-                return (object)['kriteria' => 'K6', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
-            });
-            $allBukti = $allBukti->merge($buktis);
-        }
+        $buktis = SarpraskeuanganBukti::all()->map(function($b) use ($extractSubK) {
+            return (object)['kriteria' => 'K6', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
+        });
+        $allBukti = $allBukti->merge($buktis);
 
         // K7 - Mutu
-        $mutu = Mutu::where('user_id', '=', $userId)->first();
-        if ($mutu) {
-            $buktis = MutuBukti::where('mutu_id', '=', $mutu->id)->get()->map(function($b) use ($extractSubK) {
-                return (object)['kriteria' => 'K7', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
-            });
-            $allBukti = $allBukti->merge($buktis);
-        }
+        $buktis = MutuBukti::all()->map(function($b) use ($extractSubK) {
+            return (object)['kriteria' => 'K7', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
+        });
+        $allBukti = $allBukti->merge($buktis);
 
         // K8 - Tatakelola
-        $tatakelola = Tatakelola::where('user_id', '=', $userId)->first();
-        if ($tatakelola) {
-            $buktis = TatakelolaBukti::where('tatakelola_id', '=', $tatakelola->id)->get()->map(function($b) use ($extractSubK) {
-                return (object)['kriteria' => 'K8', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
-            });
-            $allBukti = $allBukti->merge($buktis);
-        }
+        $buktis = TatakelolaBukti::all()->map(function($b) use ($extractSubK) {
+            return (object)['kriteria' => 'K8', 'sub_k' => $extractSubK($b->kriteria_kode ?? ''), 'kode_eu' => $b->kriteria_kode ?? '', 'nama_dokumen' => $b->nama_bukti, 'level' => $b->level ?? 'PRODI', 'status' => $b->status ?? 'Belum Ada', 'pic' => $b->pic ?? '—'];
+        });
+        $allBukti = $allBukti->merge($buktis);
 
         $allBukti = $allBukti->map(function($b) {
             if ($b->level === 'FIKES' || $b->level === 'UNIV') {
