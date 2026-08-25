@@ -23,30 +23,56 @@ class DashboardController extends Controller
         
         $sisaHari = Carbon::now()->startOfDay()->diffInDays(Carbon::parse($akreditasi_end_date)->startOfDay(), false);
 
-        // 2. Ambil Rata-rata Persentase dari 8 Kriteria menggunakan DB Facade
-        $k1_narasi = DB::table('vmts_narasis')->avg('narasi_persen') ?? 0;
-        $k1_bukti = DB::table('vmts_narasis')->avg('bukti_persen') ?? 0;
+        // 2. Ambil Parent Model untuk tiap Kriteria (shared globally per tahun)
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : \Illuminate\Support\Facades\Auth::id();
+
+        $vmts = \App\Models\Vmts::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Vmts::where('user_id', $userId)->first();
+        $kurikulum = \App\Models\Kurikulum::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Kurikulum::where('user_id', $userId)->first();
+        $penilaian = \App\Models\Penilaian::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Penilaian::where('user_id', $userId)->first();
+        $mahasiswa = \App\Models\Mahasiswa::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Mahasiswa::where('user_id', $userId)->first();
+        $doenpkm = \App\Models\Doenpkm::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Doenpkm::where('user_id', $userId)->first();
+        $sarpras = \App\Models\Sarpraskeuangan::where('tahun', date('Y'))->first() ?: \App\Models\Sarpraskeuangan::where('user_id', $userId)->first();
+        $mutu = \App\Models\Mutu::where('tahun', date('Y'))->first() ?: \App\Models\Mutu::where('user_id', $userId)->first();
+        $tatakelola = \App\Models\Tatakelola::where('tahun', date('Y'))->first() ?: \App\Models\Tatakelola::where('user_id', $userId)->first();
+
+        // K1: VMTS (EU-1 s/d EU-6)
+        $k1_narasi = $vmts ? ($vmts->narasis()->avg('narasi_persen') ?? 0) : 0;
+        $k1_bukti = $vmts ? ($vmts->narasis()->avg('bukti_persen') ?? 0) : 0;
         
-        $k2_narasi = DB::table('kurikulum_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k2_bukti = DB::table('kurikulum_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        // K2: Kurikulum (sub-kriteria 2.1 s/d 2.4)
+        $k2_sub = $kurikulum ? $kurikulum->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k2_narasi = $k2_sub->count() > 0 ? ($k2_sub->avg('narasi_persen') ?? 0) : 0;
+        $k2_bukti = $k2_sub->count() > 0 ? ($k2_sub->avg('bukti_persen') ?? 0) : 0;
         
-        $k3_narasi = DB::table('penilaian_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k3_bukti = DB::table('penilaian_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        // K3: Penilaian (sub-kriteria 3.1 s/d 3.4)
+        $k3_sub = $penilaian ? $penilaian->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k3_narasi = $k3_sub->count() > 0 ? ($k3_sub->avg('narasi_persen') ?? 0) : 0;
+        $k3_bukti = $k3_sub->count() > 0 ? ($k3_sub->avg('bukti_persen') ?? 0) : 0;
         
-        $k4_narasi = DB::table('mahasiswa_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k4_bukti = DB::table('mahasiswa_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        // K4: Mahasiswa (sub-kriteria 4.1 s/d 4.4)
+        $k4_sub = $mahasiswa ? $mahasiswa->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k4_narasi = $k4_sub->count() > 0 ? ($k4_sub->avg('narasi_persen') ?? 0) : 0;
+        $k4_bukti = $k4_sub->count() > 0 ? ($k4_sub->avg('bukti_persen') ?? 0) : 0;
         
-        $k5_narasi = DB::table('doenpkm_narasis')->avg('narasi_persen') ?? 0;
-        $k5_bukti = DB::table('doenpkm_narasis')->avg('bukti_persen') ?? 0;
+        // K5: Dosen, Tendik, Penelitian & PkM
+        $k5_narasi = $doenpkm ? ($doenpkm->narasis()->avg('narasi_persen') ?? 0) : 0;
+        $k5_bukti = $doenpkm ? ($doenpkm->narasis()->avg('bukti_persen') ?? 0) : 0;
         
-        $k6_narasi = DB::table('sarpraskeuangan_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k6_bukti = DB::table('sarpraskeuangan_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        // K6: Sarana, Prasarana & Keuangan (sub-kriteria 6.1 s/d 6.3)
+        $k6_sub = $sarpras ? $sarpras->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k6_narasi = $k6_sub->count() > 0 ? ($k6_sub->avg('narasi_persen') ?? 0) : 0;
+        $k6_bukti = $k6_sub->count() > 0 ? ($k6_sub->avg('bukti_persen') ?? 0) : 0;
         
-        $k7_narasi = DB::table('mutu_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k7_bukti = DB::table('mutu_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        // K7: Penjaminan Mutu (sub-kriteria 7.1 s/d 7.3)
+        $k7_sub = $mutu ? $mutu->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k7_narasi = $k7_sub->count() > 0 ? ($k7_sub->avg('narasi_persen') ?? 0) : 0;
+        $k7_bukti = $k7_sub->count() > 0 ? ($k7_sub->avg('bukti_persen') ?? 0) : 0;
         
-        $k8_narasi = DB::table('tatakelola_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k8_bukti = DB::table('tatakelola_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        // K8: Tata Kelola & Administrasi (sub-kriteria 8.1 s/d 8.3)
+        $k8_sub = $tatakelola ? $tatakelola->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k8_narasi = $k8_sub->count() > 0 ? ($k8_sub->avg('narasi_persen') ?? 0) : 0;
+        $k8_bukti = $k8_sub->count() > 0 ? ($k8_sub->avg('bukti_persen') ?? 0) : 0;
 
         $kriteria_stats = [
             'K1' => ['nama' => 'Visi, Misi, Tujuan & Strategi', 'narasi' => round($k1_narasi), 'bukti' => round($k1_bukti)],

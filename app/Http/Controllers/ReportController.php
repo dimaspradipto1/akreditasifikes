@@ -29,22 +29,55 @@ class ReportController extends Controller
 {
     public function index()
     {
-        $k1_narasi = \Illuminate\Support\Facades\DB::table('vmts_narasis')->avg('narasi_persen') ?? 0;
-        $k1_bukti = \Illuminate\Support\Facades\DB::table('vmts_narasis')->avg('bukti_persen') ?? 0;
-        $k2_narasi = \Illuminate\Support\Facades\DB::table('kurikulum_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k2_bukti = \Illuminate\Support\Facades\DB::table('kurikulum_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
-        $k3_narasi = \Illuminate\Support\Facades\DB::table('penilaian_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k3_bukti = \Illuminate\Support\Facades\DB::table('penilaian_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
-        $k4_narasi = \Illuminate\Support\Facades\DB::table('mahasiswa_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k4_bukti = \Illuminate\Support\Facades\DB::table('mahasiswa_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
-        $k5_narasi = \Illuminate\Support\Facades\DB::table('doenpkm_narasis')->avg('narasi_persen') ?? 0;
-        $k5_bukti = \Illuminate\Support\Facades\DB::table('doenpkm_narasis')->avg('bukti_persen') ?? 0;
-        $k6_narasi = \Illuminate\Support\Facades\DB::table('sarpraskeuangan_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k6_bukti = \Illuminate\Support\Facades\DB::table('sarpraskeuangan_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
-        $k7_narasi = \Illuminate\Support\Facades\DB::table('mutu_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k7_bukti = \Illuminate\Support\Facades\DB::table('mutu_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
-        $k8_narasi = \Illuminate\Support\Facades\DB::table('tatakelola_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('narasi_persen') ?? 0;
-        $k8_bukti = \Illuminate\Support\Facades\DB::table('tatakelola_narasis')->where('kriteria_kode', 'NOT LIKE', '%_EU%')->avg('bukti_persen') ?? 0;
+        $targetUser = \App\Models\User::where('role', 'koordinatorprodi')->first() ?: \App\Models\User::first();
+        $userId = $targetUser ? $targetUser->id : \Illuminate\Support\Facades\Auth::id();
+
+        $vmts = \App\Models\Vmts::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Vmts::where('user_id', $userId)->first();
+        $kurikulum = \App\Models\Kurikulum::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Kurikulum::where('user_id', $userId)->first();
+        $penilaian = \App\Models\Penilaian::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Penilaian::where('user_id', $userId)->first();
+        $mahasiswa = \App\Models\Mahasiswa::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Mahasiswa::where('user_id', $userId)->first();
+        $doenpkm = \App\Models\Doenpkm::where('tahun_akreditasi', date('Y'))->first() ?: \App\Models\Doenpkm::where('user_id', $userId)->first();
+        $sarpras = \App\Models\Sarpraskeuangan::where('tahun', date('Y'))->first() ?: \App\Models\Sarpraskeuangan::where('user_id', $userId)->first();
+        $mutu = \App\Models\Mutu::where('tahun', date('Y'))->first() ?: \App\Models\Mutu::where('user_id', $userId)->first();
+        $tatakelola = \App\Models\Tatakelola::where('tahun', date('Y'))->first() ?: \App\Models\Tatakelola::where('user_id', $userId)->first();
+
+        // K1: VMTS
+        $k1_narasi = $vmts ? ($vmts->narasis()->avg('narasi_persen') ?? 0) : 0;
+        $k1_bukti = $vmts ? ($vmts->narasis()->avg('bukti_persen') ?? 0) : 0;
+
+        // K2: Kurikulum
+        $k2_sub = $kurikulum ? $kurikulum->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k2_narasi = $k2_sub->count() > 0 ? ($k2_sub->avg('narasi_persen') ?? 0) : 0;
+        $k2_bukti = $k2_sub->count() > 0 ? ($k2_sub->avg('bukti_persen') ?? 0) : 0;
+
+        // K3: Penilaian
+        $k3_sub = $penilaian ? $penilaian->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k3_narasi = $k3_sub->count() > 0 ? ($k3_sub->avg('narasi_persen') ?? 0) : 0;
+        $k3_bukti = $k3_sub->count() > 0 ? ($k3_sub->avg('bukti_persen') ?? 0) : 0;
+
+        // K4: Mahasiswa
+        $k4_sub = $mahasiswa ? $mahasiswa->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k4_narasi = $k4_sub->count() > 0 ? ($k4_sub->avg('narasi_persen') ?? 0) : 0;
+        $k4_bukti = $k4_sub->count() > 0 ? ($k4_sub->avg('bukti_persen') ?? 0) : 0;
+
+        // K5: Dosen, Tendik, Penelitian & PkM
+        $k5_narasi = $doenpkm ? ($doenpkm->narasis()->avg('narasi_persen') ?? 0) : 0;
+        $k5_bukti = $doenpkm ? ($doenpkm->narasis()->avg('bukti_persen') ?? 0) : 0;
+
+        // K6: Sarpras & Keu
+        $k6_sub = $sarpras ? $sarpras->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k6_narasi = $k6_sub->count() > 0 ? ($k6_sub->avg('narasi_persen') ?? 0) : 0;
+        $k6_bukti = $k6_sub->count() > 0 ? ($k6_sub->avg('bukti_persen') ?? 0) : 0;
+
+        // K7: Mutu
+        $k7_sub = $mutu ? $mutu->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k7_narasi = $k7_sub->count() > 0 ? ($k7_sub->avg('narasi_persen') ?? 0) : 0;
+        $k7_bukti = $k7_sub->count() > 0 ? ($k7_sub->avg('bukti_persen') ?? 0) : 0;
+
+        // K8: Tatakelola
+        $k8_sub = $tatakelola ? $tatakelola->narasis()->where('kriteria_kode', 'NOT LIKE', '%_EU%')->get() : collect();
+        $k8_narasi = $k8_sub->count() > 0 ? ($k8_sub->avg('narasi_persen') ?? 0) : 0;
+        $k8_bukti = $k8_sub->count() > 0 ? ($k8_sub->avg('bukti_persen') ?? 0) : 0;
 
         $kriterias_data = [
             ['id' => 'K1', 'name' => 'Visi, Misi, Tujuan & Strategi', 'skor' => ($k1_narasi + $k1_bukti) / 2],
